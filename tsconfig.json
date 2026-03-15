@@ -1,0 +1,117 @@
+{
+  "compilerOptions": {
+    /* -------------------------------------------------------------------------
+     * ENVIRONMENT & OUTPUT
+     * ------------------------------------------------------------------------- */
+    // "lib" tells TypeScript which built-in JS APIs (like Array.map, Promise, etc.)
+    // are available in the runtime environment. "ESNext" includes the very latest features.
+    "lib": ["dom", "dom.iterable", "esnext"],
+    // "target" determines the version of JavaScript syntax to output (e.g. arrow functions).
+    // "ESNext" means we assume the runtime supports modern syntax, so we don't transpile much.
+    "target": "ESNext",
+    // "module" sets the format of the output modules.
+    // - "esnext": Best for bundlers (Webpack/Turbopack) as it preserves dynamic imports and ESM syntax.
+    // - "NodeNext": Best for running TS directly in Node.js or strictly adhering to Node's ESM rules.
+    // Since we use Next.js (which bundles code), "esnext" is the optimal choice.
+    "module": "esnext",
+    // "moduleDetection": "force" treats every file as a module (as if it had `export {}`),
+    // preventing variables from leaking into the global scope in scripts without imports/exports.
+    "moduleDetection": "force",
+    // "jsx": "react-jsx" supports React 17+ style JSX, where you don't need to
+    // `import React from 'react'` in every file that uses JSX.
+    "jsx": "react-jsx",
+    // "allowJs": false prevents standard .js files from being part of the program.
+    // Next.js default is `true`, but `false` ensures strict TypeScript usage for this project.
+    "allowJs": false,
+    // "esModuleInterop": true allows importing CommonJS modules (like `module.exports = ...`)
+    // using standard ESM syntax (`import foo from 'foo'`) by creating a synthetic default export.
+    "esModuleInterop": true,
+    // "forceConsistentCasingInFileNames": true prevents bugs where files are imported
+    // with wrong casing (e.g. 'MyFile' vs 'myfile'). This is crucial because Linux is
+    // case-sensitive while Windows/macOS are not.
+    "forceConsistentCasingInFileNames": true,
+    /* -------------------------------------------------------------------------
+     * MODULE RESOLUTION
+     * ------------------------------------------------------------------------- */
+    // "moduleResolution" determines how imports are mapped to files.
+    // - "bundler": The modern standard for TS 5.0+ with Webpack/Vite/Turbopack. Mimics how bundlers resolve files.
+    // - "NodeNext": Strictly follows Node.js resolution (requires file extensions in imports, etc.).
+    // We use "bundler" because Next.js handles the resolution logic and we want flexible imports.
+    "moduleResolution": "bundler",
+    // "baseUrl" and "paths" allow using absolute aliases (like `@/db/index`).
+    // baseUrl: "." means the root of the project.
+    // paths: maps "@/*" to look inside the root "./*" folder.
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    // "verbatimModuleSyntax": true prevents TypeScript from removing unused imports
+    // or transforming imports in ways that might break modern bundlers or runtimes.
+    // It forces you to use `import type` for type-only imports, keeping the output predictable.
+    "verbatimModuleSyntax": true,
+    // "isolatedModules": true ensures every file can be safely transpiled individually.
+    // This is required by tools like esbuild, Vite, and Bun which don't type-check the whole project
+    // when building a single file.
+    "isolatedModules": true,
+    // "resolveJsonModule": true allows importing .json files directly
+    // (e.g. `import config from './config.json'`).
+    "resolveJsonModule": true,
+    // "incremental": true enables incremental compilation, speeding up type checking
+    // by reusing info from previous builds. Recommended for Next.js.
+    "incremental": true,
+    // "outDir" specifies where build output goes.
+    "outDir": "./dist",
+    // "noEmit": true tells TypeScript NOT to output .js files.
+    // We are using Bun to run .ts files directly, so we use TS only for type checking/linting.
+    "noEmit": true,
+    // "allowImportingTsExtensions": true allows writing `import ... from './file.ts'`.
+    // Standard TS requires dropping the extension or using .js, but Bun/modern runtimes allow .ts.
+    "allowImportingTsExtensions": true,
+    /* -------------------------------------------------------------------------
+     * PLUGINS
+     * ------------------------------------------------------------------------- */
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    /* -------------------------------------------------------------------------
+     * STRICT TYPE-CHECKING (The Safety Net)
+     * ------------------------------------------------------------------------- */
+    // "strict": true enables a wide range of strict type checking options (strictNullChecks, etc.).
+    // It's the recommended baseline for any new project.
+    "strict": true,
+    // "skipLibCheck": true speeds up compilation by skipping type checking of .d.ts files
+    // in node_modules. We assume library authors have already checked their types.
+    "skipLibCheck": true,
+    // "noFallthroughCasesInSwitch": true ensures you don't accidentally forget a `break`
+    // in a switch statement (unless you explicitly document it).
+    "noFallthroughCasesInSwitch": true,
+    // "noUncheckedIndexedAccess": true adds `undefined` to any array/object index access.
+    // e.g. `const item = arr[0]` becomes `string | undefined`, forcing you to check if it exists.
+    "noUncheckedIndexedAccess": true,
+    // "noImplicitOverride": true requires the `override` keyword when a class method
+    // overrides a parent method. This prevents bugs when a parent method is renamed but the child isn't.
+    "noImplicitOverride": true,
+    /* -------------------------------------------------------------------------
+     * EXTRA STRICTNESS (Code Quality)
+     * ------------------------------------------------------------------------- */
+    // "noUnusedLocals": true reports errors for variables defined but never used.
+    // Helps keep code clean and prevents dead code accumulation.
+    "noUnusedLocals": true,
+    // "noUnusedParameters": true reports errors for function parameters that are never used.
+    "noUnusedParameters": true,
+    // "noPropertyAccessFromIndexSignature": false allows accessing properties via dot notation
+    // even if they are defined in an index signature. Kept false for convenience.
+    "noPropertyAccessFromIndexSignature": false,
+    // "noImplicitReturns": true ensures that if a function returns a value in one place,
+    // it must return a value in all possible code paths (no accidental `undefined` returns).
+    "noImplicitReturns": true,
+    // "exactOptionalPropertyTypes": true enforces that an optional property `?:` is not
+    // manually set to `undefined`. It must be either a value or missing entirely.
+    // This prevents "spread" bugs where `undefined` overrides a default value.
+    "exactOptionalPropertyTypes": true
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

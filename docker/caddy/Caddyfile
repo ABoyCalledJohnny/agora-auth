@@ -1,0 +1,64 @@
+# =============================================================================
+# Caddyfile — Reverse proxy for agora-auth
+#
+# Caddy automatically provisions and renews TLS certificates via Let's Encrypt.
+# HTTP → HTTPS redirect is automatic — no extra config needed.
+#
+# Docker DNS resolves each alias to all matching container IPs on that
+# network, so replicas are load-balanced automatically.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Global options
+# ---------------------------------------------------------------------------
+{
+	# Email for Let's Encrypt certificate notifications (expiry warnings, etc.)
+	email info@agora-auth.de
+}
+
+# ---------------------------------------------------------------------------
+# Production — agora-auth.de
+# ---------------------------------------------------------------------------
+agora-auth.de, www.agora-auth.de {
+	# Redirect www → apex (single canonical URL for SEO).
+	# @www (matcher) matches requests whose Host header is exactly www.agora-auth.de.
+	# redir then sends a 301 to the apex host and preserves path + query via {uri}.
+	@www host www.agora-auth.de
+	redir @www https://agora-auth.de{uri} permanent
+
+	# Forward requests to the production app containers.
+	reverse_proxy app:3000 {
+		# Active health checks — Caddy probes each upstream independently.
+		# If a replica fails (no 2xx response within the timeout), Caddy
+		# removes it from the pool and stops sending it traffic. It keeps
+		# probing on the same interval and re-adds the replica once it
+		# responds with 2xx again.
+		health_uri /api/up
+		health_interval 30s
+		health_timeout 5s
+	}
+
+	# Edge-level security headers.
+	# App-level headers (CSP, HSTS, Permissions-Policy, etc.) are set in
+	# next.config.ts so they travel with the app regardless of proxy.
+	# These apply at the Caddy layer to all responses, including static files.
+	header {
+		# Prevent search engines from indexing.
+		# Remove this line when the site is ready for public indexing.
+		X-Robots-Tag "noindex, nofollow"
+
+		# Remove server identity header added by Caddy.
+		-Server
+		-Via
+	}
+
+	# Compress responses with Zstd (modern, faster) and Gzip (fallback).
+	# The client's Accept-Encoding header determines which is used.
+	encode zstd gzip
+
+	# Access log.
+	# With plain `log`, Caddy writes access logs to stdout/stderr.
+	# Docker Compose captures and rotates these logs via the json-file driver
+	# configured in compose.caddy.yaml.
+	log
+}

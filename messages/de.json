@@ -1,0 +1,211 @@
+{
+  "Errors": {
+    "VALIDATION_ERROR": "Die angegebenen Daten sind ungültig.",
+    "NOT_FOUND": "Die angeforderte Ressource konnte nicht gefunden werden.",
+    "INTERNAL": "Ein unerwarteter Serverfehler ist aufgetreten.",
+    "UNAUTHORIZED": "Du musst angemeldet sein, um diese Aktion auszuführen.",
+    "FORBIDDEN": "Du hast keine Berechtigung für diese Aktion.",
+    "INVALID_CREDENTIALS": "Die angegebene E-Mail oder das Passwort ist falsch.",
+    "TOKEN_EXPIRED": "Deine Sitzung oder dein Bestätigungs-Token ist abgelaufen.",
+    "TOKEN_INVALID": "Das angegebene Token ist ungültig oder fehlerhaft.",
+    "TOKEN_REVOKED": "Dieses Token wurde widerrufen.",
+    "ACCOUNT_SUSPENDED": "Dein Konto wurde gesperrt.",
+    "ACCOUNT_PENDING": "Dein Konto wartet auf Bestätigung.",
+    "EMAIL_EXISTS": "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits.",
+    "USERNAME_EXISTS": "Dieser Benutzername ist nicht verfügbar."
+  },
+  "Validation": {
+    "required": "{field} ist erforderlich.",
+    "email": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "minLength": "{field} muss mindestens {min} Zeichen lang sein.",
+    "maxLength": "{field} darf höchstens {max} Zeichen lang sein.",
+    "passwordMinLength": "Das Passwort muss mindestens 12 Zeichen lang sein.",
+    "passwordUppercase": "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
+    "passwordLowercase": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
+    "passwordNumber": "Das Passwort muss mindestens eine Zahl enthalten.",
+    "passwordSpecial": "Das Passwort muss mindestens ein Sonderzeichen enthalten.",
+    "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+    "usernameMinLength": "Der Benutzername muss mindestens 3 Zeichen lang sein.",
+    "usernameMaxLength": "Der Benutzername darf höchstens 30 Zeichen lang sein.",
+    "usernameFormat": "Der Benutzername darf nur Kleinbuchstaben (a–z), Zahlen, Bindestriche und Unterstriche enthalten."
+  },
+  "Common": {
+    "email": "E-Mail",
+    "password": "Passwort",
+    "username": "Benutzername",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "edit": "Bearbeiten",
+    "change": "Ändern",
+    "save": "Speichern",
+    "saving": "Speichert…",
+    "loading": "Lädt…",
+    "or": "oder",
+    "back": "Zurück",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen",
+    "areYouSure": "Bist du sicher?",
+    "somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "success": "Erfolg"
+  },
+  "Auth": {
+    "Login": {
+      "heading": "Anmelden",
+      "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "name@beispiel.de",
+      "passwordLabel": "Passwort",
+      "passwordPlaceholder": "Passwort eingeben",
+      "rememberMe": "Angemeldet bleiben",
+      "submit": "Anmelden",
+      "submitting": "Anmeldung läuft…",
+      "forgotPassword": "Passwort vergessen?",
+      "noAccount": "Noch kein Konto?",
+      "noAccountLink": "Registrieren"
+    },
+    "Register": {
+      "heading": "Konto erstellen",
+      "usernameLabel": "Benutzername",
+      "usernamePlaceholder": "Benutzernamen wählen",
+      "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "name@beispiel.de",
+      "passwordLabel": "Passwort",
+      "passwordPlaceholder": "Passwort erstellen",
+      "confirmPasswordLabel": "Passwort bestätigen",
+      "confirmPasswordPlaceholder": "Passwort wiederholen",
+      "passwordRequirements": "Mindestens 12 Zeichen, darunter Groß- und Kleinbuchstaben, eine Zahl und ein Sonderzeichen.",
+      "submit": "Konto erstellen",
+      "submitting": "Konto wird erstellt…",
+      "hasAccount": "Bereits ein Konto?",
+      "hasAccountLink": "Anmelden"
+    },
+    "ForgotPassword": {
+      "heading": "Passwort vergessen?",
+      "description": "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen.",
+      "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "name@beispiel.de",
+      "submit": "Link senden",
+      "submitting": "Wird gesendet…",
+      "success": "Falls ein Konto mit dieser E-Mail existiert, wurde ein Link zum Zurücksetzen gesendet."
+    },
+    "ResetPassword": {
+      "heading": "Neues Passwort festlegen",
+      "passwordLabel": "Neues Passwort",
+      "passwordPlaceholder": "Neues Passwort eingeben",
+      "confirmPasswordLabel": "Neues Passwort bestätigen",
+      "confirmPasswordPlaceholder": "Neues Passwort wiederholen",
+      "submit": "Passwort zurücksetzen",
+      "submitting": "Wird zurückgesetzt…",
+      "success": "Dein Passwort wurde zurückgesetzt.",
+      "goToLogin": "Zur Anmeldung"
+    },
+    "VerifyEmail": {
+      "heading": "E-Mail überprüfen",
+      "description": "Wir haben einen Bestätigungslink an {email} gesendet.",
+      "resend": "Bestätigungs-E-Mail erneut senden",
+      "resending": "Wird erneut gesendet…",
+      "resendSuccess": "Bestätigungs-E-Mail wurde erneut gesendet.",
+      "verified": "Deine E-Mail-Adresse wurde bestätigt."
+    },
+    "logout": "Abmelden",
+    "logoutSuccess": "Du wurdest abgemeldet."
+  },
+  "User": {
+    "Profile": {
+      "heading": "Profil",
+      "myProfile": "Mein Profil",
+      "displayName": "Anzeigename",
+      "bio": "Über mich",
+      "memberSince": "Mitglied seit"
+    },
+    "Settings": {
+      "heading": "Einstellungen",
+      "tabs": {
+        "profile": "Profil",
+        "account": "Konto"
+      },
+      "Profile": {
+        "displayNameLabel": "Anzeigename",
+        "displayNamePlaceholder": "Dein Anzeigename",
+        "bioLabel": "Über mich",
+        "bioPlaceholder": "Erzähl etwas über dich",
+        "submit": "Änderungen speichern",
+        "submitting": "Speichert…",
+        "success": "Profil aktualisiert."
+      },
+      "Account": {
+        "emailLabel": "E-Mail",
+        "usernameLabel": "Benutzername",
+        "passwordLabel": "Passwort",
+        "passwordMask": "••••••••",
+        "EditEmail": {
+          "newEmailLabel": "Neue E-Mail-Adresse",
+          "newEmailPlaceholder": "neue@beispiel.de",
+          "currentPasswordLabel": "Aktuelles Passwort",
+          "currentPasswordPlaceholder": "Aktuelles Passwort eingeben",
+          "submit": "Speichern",
+          "submitting": "Speichert…",
+          "success": "Ein Bestätigungslink wurde an deine neue E-Mail-Adresse gesendet."
+        },
+        "EditUsername": {
+          "newUsernameLabel": "Neuer Benutzername",
+          "newUsernamePlaceholder": "Neuen Benutzernamen wählen",
+          "submit": "Speichern",
+          "submitting": "Speichert…",
+          "success": "Benutzername aktualisiert."
+        },
+        "EditPassword": {
+          "currentPasswordLabel": "Aktuelles Passwort",
+          "currentPasswordPlaceholder": "Aktuelles Passwort eingeben",
+          "newPasswordLabel": "Neues Passwort",
+          "newPasswordPlaceholder": "Neues Passwort eingeben",
+          "confirmPasswordLabel": "Neues Passwort bestätigen",
+          "confirmPasswordPlaceholder": "Neues Passwort wiederholen",
+          "submit": "Speichern",
+          "submitting": "Speichert…",
+          "success": "Passwort aktualisiert."
+        },
+        "DeleteAccount": {
+          "trigger": "Konto löschen",
+          "warning": "Diese Aktion ist endgültig und kann nicht rückgängig gemacht werden.",
+          "description": "Gib dein Passwort zur Bestätigung ein.",
+          "currentPasswordLabel": "Aktuelles Passwort",
+          "currentPasswordPlaceholder": "Aktuelles Passwort eingeben",
+          "submit": "Konto löschen",
+          "submitting": "Wird gelöscht…"
+        }
+      }
+    }
+  },
+  "Nav": {
+    "home": "Startseite",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "admin": "Verwaltung",
+    "logout": "Abmelden",
+    "loggedInAs": "Angemeldet als {name}"
+  },
+  "Admin": {
+    "Users": {
+      "heading": "Benutzerverwaltung",
+      "tableHeading": "Benutzer",
+      "columnUsername": "Benutzername",
+      "columnEmail": "E-Mail",
+      "columnStatus": "Status",
+      "columnRole": "Rolle",
+      "columnCreated": "Erstellt",
+      "columnLastLogin": "Letzte Anmeldung",
+      "actionSuspend": "Sperren",
+      "actionActivate": "Aktivieren",
+      "actionDelete": "Löschen",
+      "createUser": "Benutzer anlegen",
+      "emptyState": "Keine Benutzer gefunden.",
+      "Pagination": {
+        "previous": "Zurück",
+        "next": "Weiter",
+        "pageOf": "Seite {page} von {total}"
+      }
+    }
+  }
+}

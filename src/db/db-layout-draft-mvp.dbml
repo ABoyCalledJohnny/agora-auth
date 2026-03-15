@@ -1,0 +1,207 @@
+// ==========================================
+// 1. CORE IDENTITY (The User)
+// ==========================================
+// The central entity of the system.
+// Contains essential identity and routing information.
+Table users {
+  // Internal System ID: Never expose to frontend to prevent enumeration.
+  id uuid [primary key, default: `gen_random_uuid()`]
+  
+  // Public ID: Safe for URLs (e.g., /user/u_12345).
+  // Using text allows for Nanoid or CUID.
+  public_id text [not null, unique, note: "Nanoid. Safe for public URLs/APIs."]
+  
+  // Account Credentials & State
+  username text [not null, unique]
+  email text [not null, unique]
+  email_verified_at timestamptz [default: null, note: "Security gate. Null = unverified."]
+  
+  // Access Control
+  status text [not null, default: 'pending', note: "active | suspended | pending"]
+
+  // Auditing (Denormalized)
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`, note: "Requires trigger to auto-update."]
+  last_sign_in_at timestamptz [default: null, note: "Denormalized for performance."]
+}
+
+// Extended profile data.
+// Separated to keep the 'users' table lightweight and performant.
+// One-to-One relationship with users.
+Table user_profiles {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  
+  user_id uuid [not null, unique, note: "Strict 1:1 relationship."]
+
+  // Identity
+  first_name text
+  last_name text
+  display_name text [note: "Public facing name if different from username."]
+  
+  // Visuals & Details
+  avatar_url text
+  tagline text
+  bio text
+  hobbies text[] [note: "PostgreSQL array. Enables filtering/search on individual hobbies."]
+  website_url text
+  location text
+  pronouns text [note: "e.g. they/them, she/her"]
+  
+  // Flexible Data
+  social_links jsonb [default: null, note: "JSON object for Twitter, GitHub, etc."]
+
+  // Metadata
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`, note: "Tracks profile updates. Requires trigger to auto-update."]
+}
+
+// specific configuration for the user account.
+Table user_settings {
+  id uuid [primary key, default: `gen_random_uuid()`]
+
+  user_id uuid [not null, unique]
+
+  privacy_settings jsonb [not null, note: "Controls visibility of profile fields."]
+  preferences jsonb [default: null, note: "UI themes, notification settings, etc."]
+
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`, note: "Requires trigger to auto-update."]
+}
+
+// ==========================================
+// 2. AUTHENTICATION & SECURITY
+// ==========================================
+// Handles login methods, sessions, and verification.
+
+// Stores login credentials.
+Table user_credentials {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  
+  user_id uuid [not null, unique]
+
+  // Password: The hashed password.
+  password_hash text [not null]
+
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`, note: "Requires trigger to auto-update."]
+}
+
+// Short-lived tokens for email verification, password resets, etc.
+Table verification_tokens {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  user_id uuid [not null]
+  
+  // Security: Store hash, not raw token.
+  token_hash text [not null, unique]
+  
+  type text [not null, note: "'email_verification' | 'password_reset'"]
+  metadata jsonb [default: null, note: "Optional payload tied to token lifecycle (e.g. { newEmail } for email change)."]
+  
+  expires_at timestamptz [not null]
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    (user_id, type) // Lookup active tokens for a user/type combo
+    expires_at // Cleanup jobs: DELETE WHERE expires_at < now()
+  }
+}
+
+// Active user sessions.
+// High churn table.
+Table user_sessions {
+  id uuid [primary key, default: `gen_random_uuid()`]
+
+  user_id uuid [not null]
+
+  // Secure lookup key
+  session_token_hash text [not null, unique]
+
+  // Refresh Token Rotation
+  // Used to detect token reuse attacks.
+  previous_session_token_hash text [default: null, unique]
+
+  // Context
+  ip_address text [not null]
+  user_agent text [not null]
+
+  // Lifecycle
+  created_at timestamptz [not null, default: `now()`]
+  last_active_at timestamptz [not null, default: `now()`]
+  expires_at timestamptz [not null]
+  revoked_at timestamptz [default: null]
+
+  indexes {
+    user_id // Fetch all sessions for a user
+    expires_at // Cleanup jobs: DELETE WHERE expires_at < now()
+  }
+}
+
+// ==========================================
+// 3. ACCESS CONTROL (RBAC)
+// ==========================================
+// Role definitions and assignments.
+
+Table roles {
+  id uuid [primary key, default: `gen_random_uuid()`]
+
+  name text [not null, unique, note: "e.g. 'admin', 'editor', 'subscriber'"]
+
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`, note: "Requires trigger to auto-update."]
+}
+
+// Many-to-Many link between Users and Roles.
+Table users_roles {
+  user_id uuid [not null]
+  role_id uuid [not null]
+
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    (user_id, role_id) [pk, note: "Composite PK prevents duplicate assignments."]
+    role_id // Index for reverse lookups (Who has this role?)
+  }
+}
+
+// ==========================================
+// 4. API CLIENTS (Third-Party Services)
+// ==========================================
+// Manages external services that consume the API.
+
+Table api_clients {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  
+  // Identity
+  name text [not null, unique]
+
+  // Credentials
+  client_id text [not null, unique, note: "Public identifier. Nanoid or CUID recommended."]
+  api_key_hash text [not null, unique, note: "SHA-256 hash of a securely generated random string (e.g. 32 bytes hex/base64)."]
+
+  // Routing / Domain
+  domain_name text [not null, unique, note: "Allowed origin/domain for CORS/redirects"]
+  verify_email_path text [not null, default: '/verify-email/{token}', note: "Client route template. {token} is replaced server-side when generating links."]
+  reset_password_path text [not null, default: '/reset-password/{token}', note: "Client route template. {token} is replaced server-side when generating links."]
+
+  // Status
+  is_active boolean [not null, default: true]
+
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`, note: "Requires trigger to auto-update."]
+}
+
+// ==========================================
+// REFERENCES
+// ==========================================
+// Define foreign key constraints and delete behaviors.
+
+// Identity & Auth
+Ref: user_profiles.user_id - users.id [delete: cascade]
+Ref: user_settings.user_id - users.id [delete: cascade]
+Ref: user_credentials.user_id - users.id [delete: cascade]
+Ref: verification_tokens.user_id > users.id [delete: cascade]
+Ref: user_sessions.user_id > users.id [delete: cascade]
+
+// RBAC
+Ref: users_roles.user_id > users.id [delete: cascade]
+Ref: users_roles.role_id > roles.id [delete: cascade]

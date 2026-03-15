@@ -1,0 +1,211 @@
+{
+  "Errors": {
+    "VALIDATION_ERROR": "The provided data is invalid.",
+    "NOT_FOUND": "The requested resource could not be found.",
+    "INTERNAL": "An unexpected internal server error occurred.",
+    "UNAUTHORIZED": "You must be logged in to perform this action.",
+    "FORBIDDEN": "You do not have permission to perform this action.",
+    "INVALID_CREDENTIALS": "The email or password provided is incorrect.",
+    "TOKEN_EXPIRED": "Your session or verification token has expired.",
+    "TOKEN_INVALID": "The provided token is invalid or malformed.",
+    "TOKEN_REVOKED": "This token has been revoked.",
+    "ACCOUNT_SUSPENDED": "Your account has been suspended.",
+    "ACCOUNT_PENDING": "Your account is pending verification.",
+    "EMAIL_EXISTS": "A user with this email address already exists.",
+    "USERNAME_EXISTS": "This username is not available."
+  },
+  "Validation": {
+    "required": "{field} is required.",
+    "email": "Please enter a valid email address.",
+    "minLength": "{field} must be at least {min} characters.",
+    "maxLength": "{field} must be at most {max} characters.",
+    "passwordMinLength": "Password must be at least 12 characters.",
+    "passwordUppercase": "Password must contain at least one uppercase letter.",
+    "passwordLowercase": "Password must contain at least one lowercase letter.",
+    "passwordNumber": "Password must contain at least one number.",
+    "passwordSpecial": "Password must contain at least one special character.",
+    "passwordMismatch": "Passwords do not match.",
+    "usernameMinLength": "Username must be at least 3 characters.",
+    "usernameMaxLength": "Username must be at most 30 characters.",
+    "usernameFormat": "Username may only contain lowercase letters (a–z), numbers, hyphens, and underscores."
+  },
+  "Common": {
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "change": "Change",
+    "save": "Save",
+    "saving": "Saving…",
+    "loading": "Loading…",
+    "or": "or",
+    "back": "Back",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "areYouSure": "Are you sure?",
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "success": "Success"
+  },
+  "Auth": {
+    "Login": {
+      "heading": "Log in",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Remember me",
+      "submit": "Log in",
+      "submitting": "Logging in…",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "noAccountLink": "Register"
+    },
+    "Register": {
+      "heading": "Create an account",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Choose a username",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Create a password",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "passwordRequirements": "At least 12 characters, including uppercase, lowercase, a number, and a special character.",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "hasAccount": "Already have an account?",
+      "hasAccountLink": "Log in"
+    },
+    "ForgotPassword": {
+      "heading": "Forgot your password?",
+      "description": "Enter your email and we'll send you a reset link.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Send reset link",
+      "submitting": "Sending…",
+      "success": "If an account with that email exists, a reset link has been sent."
+    },
+    "ResetPassword": {
+      "heading": "Set a new password",
+      "passwordLabel": "New password",
+      "passwordPlaceholder": "Enter your new password",
+      "confirmPasswordLabel": "Confirm new password",
+      "confirmPasswordPlaceholder": "Repeat your new password",
+      "submit": "Reset password",
+      "submitting": "Resetting…",
+      "success": "Your password has been reset.",
+      "goToLogin": "Go to login"
+    },
+    "VerifyEmail": {
+      "heading": "Check your email",
+      "description": "We've sent a verification link to {email}.",
+      "resend": "Resend verification email",
+      "resending": "Resending…",
+      "resendSuccess": "Verification email resent.",
+      "verified": "Your email has been verified."
+    },
+    "logout": "Log out",
+    "logoutSuccess": "You have been logged out."
+  },
+  "User": {
+    "Profile": {
+      "heading": "Profile",
+      "myProfile": "My Profile",
+      "displayName": "Display name",
+      "bio": "Bio",
+      "memberSince": "Member since"
+    },
+    "Settings": {
+      "heading": "Settings",
+      "tabs": {
+        "profile": "Profile",
+        "account": "Account"
+      },
+      "Profile": {
+        "displayNameLabel": "Display name",
+        "displayNamePlaceholder": "Your display name",
+        "bioLabel": "Bio",
+        "bioPlaceholder": "Tell us about yourself",
+        "submit": "Save changes",
+        "submitting": "Saving…",
+        "success": "Profile updated."
+      },
+      "Account": {
+        "emailLabel": "Email",
+        "usernameLabel": "Username",
+        "passwordLabel": "Password",
+        "passwordMask": "••••••••",
+        "EditEmail": {
+          "newEmailLabel": "New email address",
+          "newEmailPlaceholder": "new@example.com",
+          "currentPasswordLabel": "Current password",
+          "currentPasswordPlaceholder": "Enter your current password",
+          "submit": "Save",
+          "submitting": "Saving…",
+          "success": "A verification link has been sent to your new email."
+        },
+        "EditUsername": {
+          "newUsernameLabel": "New username",
+          "newUsernamePlaceholder": "Choose a new username",
+          "submit": "Save",
+          "submitting": "Saving…",
+          "success": "Username updated."
+        },
+        "EditPassword": {
+          "currentPasswordLabel": "Current password",
+          "currentPasswordPlaceholder": "Enter your current password",
+          "newPasswordLabel": "New password",
+          "newPasswordPlaceholder": "Enter your new password",
+          "confirmPasswordLabel": "Confirm new password",
+          "confirmPasswordPlaceholder": "Repeat your new password",
+          "submit": "Save",
+          "submitting": "Saving…",
+          "success": "Password updated."
+        },
+        "DeleteAccount": {
+          "trigger": "Delete account",
+          "warning": "This action is permanent and cannot be undone.",
+          "description": "Enter your password to confirm.",
+          "currentPasswordLabel": "Current password",
+          "currentPasswordPlaceholder": "Enter your current password",
+          "submit": "Delete my account",
+          "submitting": "Deleting…"
+        }
+      }
+    }
+  },
+  "Nav": {
+    "home": "Home",
+    "login": "Log in",
+    "register": "Sign up",
+    "profile": "Profile",
+    "settings": "Settings",
+    "admin": "Admin",
+    "logout": "Log out",
+    "loggedInAs": "Logged in as {name}"
+  },
+  "Admin": {
+    "Users": {
+      "heading": "User Management",
+      "tableHeading": "Users",
+      "columnUsername": "Username",
+      "columnEmail": "Email",
+      "columnStatus": "Status",
+      "columnRole": "Role",
+      "columnCreated": "Created",
+      "columnLastLogin": "Last login",
+      "actionSuspend": "Suspend",
+      "actionActivate": "Activate",
+      "actionDelete": "Delete",
+      "createUser": "Create user",
+      "emptyState": "No users found.",
+      "Pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "pageOf": "Page {page} of {total}"
+      }
+    }
+  }
+}

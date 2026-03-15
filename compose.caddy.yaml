@@ -1,0 +1,40 @@
+# =============================================================================
+# Caddy — shared reverse proxy for all deployed environments.
+#
+# Runs independently of the app stacks. Connects to staging and production
+# app containers via the shared caddy_net network.
+#
+# Setup (once on VPS):
+#   docker network create caddy_net
+#   docker compose -f compose.caddy.yaml up -d
+#
+# Caddy auto-provisions TLS certificates via Let's Encrypt.
+# =============================================================================
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - caddy_net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  caddy_net:
+    external: true

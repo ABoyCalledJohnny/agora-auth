@@ -1,0 +1,37 @@
+# =============================================================================
+# Local Development Override — TEMPLATE
+#
+# Copy this file to compose.override.yaml and adjust to your needs.
+# compose.override.yaml is gitignored and auto-merged when you run:
+#   docker compose up
+#
+# Only starts Postgres. The app runs on bare metal (bun dev) for speed.
+# =============================================================================
+
+services:
+  postgres:
+    restart: "no"
+    env_file:
+      - .env
+      - .env.development
+      - .env.local
+    ports:
+      - "${DB_PORT}:5432"
+
+  # App runs on bare metal (bun dev), not in Docker
+  app:
+    restart: "no"
+    profiles: ["docker"]
+    command: bun run dev # <--- Overrides standard Next.js start command
+    volumes:
+      - .:/app # <--- Mounts your local folder into the container
+      - /app/node_modules # <--- (Optional/Recommended) Keeps container modules isolated
+    ports:
+      - "3000:3000" # <--- Exposes the Next.js dev server to your host
+    env_file:
+      - .env
+      - .env.development
+      - .env.local
+
+  migrator:
+    profiles: ["manual"]

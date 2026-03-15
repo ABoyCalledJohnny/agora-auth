@@ -1,0 +1,95 @@
+# ===================================================================
+# Dependencies
+# Reinstalled inside the container — exclude from build context.
+# ===================================================================
+node_modules/
+vendor/
+bower_components/
+
+# ===================================================================
+# Build Artifacts
+# The image builds from source — old outputs are not needed.
+# ===================================================================
+.next/
+dist/
+build/
+public/build/
+.output/
+coverage/
+*.d.ts
+
+# ===================================================================
+# Environment Secrets
+# Same entries as .gitignore — keep secrets out of the image.
+# ===================================================================
+.env.local
+.env.*.local
+
+# ===================================================================
+# Docker & Git
+# Not needed inside the build context.
+# (.gitignore only excludes compose.override.yaml here.)
+# ===================================================================
+.git/
+.gitignore
+.dockerignore
+docker/
+compose*.yaml
+Dockerfile
+
+# ===================================================================
+# Logs
+# ===================================================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-crash.txt
+
+# ===================================================================
+# OS & IDE
+# (.gitignore also allowlists specific .vscode/ files;
+#  Docker doesn't need any of them.)
+# ===================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===================================================================
+# Tests & Dev Tooling
+# Not needed for a production build.
+# (.gitignore does not exclude these — they are version-controlled.)
+# ===================================================================
+tests/
+vitest.config.ts
+
+# ===================================================================
+# Documentation
+# Not needed for a production build.
+# (.gitignore does not exclude these — they are version-controlled.)
+# ===================================================================
+docs/
+*.md
+LICENSE
+
+# ===================================================================
+# User Content & Temporary Files
+# The Dockerfile creates the uploads/ directory itself.
+# Runtime data (existing uploads, test temp files) is not a build input.
+# (.gitignore keeps the directory structure via uploads/.gitkeep.)
+# ===================================================================
+uploads/
+tmp/

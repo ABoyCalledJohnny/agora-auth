@@ -1,0 +1,20 @@
+{
+  "npm": false,
+  "github": {
+    "release": true,
+    "releaseName": "v${version}"
+  },
+  "plugins": {
+    "@release-it/bumper": {
+      "out": "package.json"
+    },
+    "@release-it/conventional-changelog": {
+      "infile": "CHANGELOG.md",
+      "preset": "conventionalcommits"
+    }
+  },
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}"
+  }
+}

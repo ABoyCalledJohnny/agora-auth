@@ -1,0 +1,48 @@
+# =============================================================================
+# Production Override
+#
+# Usage (on VPS, via CI/CD):
+#   docker compose -p production -f compose.yaml -f compose.prod.yaml up -d
+#
+# Config is loaded from committed .env files.
+# Secrets are injected via CI/CD into the shell environment (${VAR} references).
+#
+# Caddy runs separately via compose.caddy.yaml on the same caddy_net network.
+# =============================================================================
+
+services:
+  postgres:
+    env_file:
+      - .env
+      - .env.production
+      - .env.secret
+
+  app:
+    env_file:
+      - .env
+      - .env.production
+      - .env.secret
+    volumes:
+      - next_cache:/app/.next/cache
+    networks:
+      default:
+      caddy_net:
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+
+  migrator:
+    profiles: ["manual"]
+    env_file:
+      - .env
+      - .env.production
+      - .env.secret
+
+volumes:
+  next_cache:
+
+networks:
+  caddy_net:
+    external: true
