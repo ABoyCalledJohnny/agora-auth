@@ -10,6 +10,14 @@ on:
 
 env:
   BUN_VERSION: "1.3.10"
+  APP_DB_USER: "ci_app_user"
+  APP_DB_PASSWORD: "ci_app_password"
+  JWT_PRIVATE_KEY: "ci_dummy_private_key"
+  JWT_PUBLIC_KEY: "ci_dummy_public_key"
+  SMTP_HOST: "localhost"
+  SMTP_PORT: "1025"
+  SMTP_USER: "ci_dummy_smtp_user"
+  SMTP_PASSWORD: "ci_dummy_smtp_password"
 
 jobs:
   verify-and-build:
