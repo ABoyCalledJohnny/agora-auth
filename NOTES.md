@@ -372,7 +372,10 @@ All values in this table are **never committed** to version control. They are st
 openssl rand -base64 32
 
 # DEFAULT_CLIENT_SECRET (raw API key)
-node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+bun -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+
+# CLIENT ID
+bun -e 'import { customAlphabet } from "nanoid"; console.log(customAlphabet("abcdefghijklmnopqrstuvwxyz", 27)())'
 
 # JWT RS256 key pair
 openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
