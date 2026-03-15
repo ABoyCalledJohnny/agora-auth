@@ -1,6 +1,7 @@
 # Agora Auth
 
-> [!WARNING] Aktive Entwicklung
+> [!WARNING]
+> **Aktive Entwicklung**
 > Dieses Projekt befindet sich derzeit in der **anfänglichen Einrichtungsphase**. Die Kernarchitektur ist in Arbeit und viele Funktionen sind noch unvollständig.
 
 Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-Lösung, die mit Next.js, Drizzle ORM und PostgreSQL entwickelt wurde.

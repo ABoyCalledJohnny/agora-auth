@@ -2,7 +2,8 @@
 
 ## Overview
 
-> [!NOTE] Design & Reference
+> [!NOTE]
+> **Design & Reference**
 > Design decisions, research, specifications, and reference material that informed the [project roadmap](TODO.md#project-roadmap).
 
 1. **[Preparation and Planning](#1-preparation-and-planning)**
@@ -307,7 +308,8 @@ Implement a unified `AgoraError` class driven by a fixed union of `ErrorCode` ty
 
 ##### Environment and Config Variables
 
-> [!NOTE] Project Scope
+> [!NOTE]
+> **Project Scope**
 >
 > - This project only uses `development` and `production` environments. There are no dedicated test or staging environments - the staging/test columns below are included for reference and completeness only.
 > - This list serves as a comprehensive reference guide for the underlying boilerplate. Not all environment variables listed in these tables (e.g., `RATE_LIMIT_*`, `UPLOAD_DIR`, `MAX_UPLOAD_SIZE`) are actively used or strictly required by the current project scope.
@@ -353,7 +355,8 @@ All values in this table are **never committed** to version control. They are st
 | `PROD_CRON_SECRET`               | `CRON_SECRET`            |  prod   | Bearer token for cron / webhook endpoints               |
 | `STAGING_CRON_SECRET`            | `CRON_SECRET`            | staging | Bearer token for cron / webhook endpoints               |
 
-> [!NOTE] Details
+> [!NOTE]
+> **Details**
 >
 > - `POSTGRES_DB` is **not** a secret - it stays in the committed `.env.staging` / `.env.production` files alongside the other environments. The secret manager only holds credentials that grant access.
 > - The app and superuser credentials inject into their respective env var names (`APP_DB_USER` vs. `POSTGRES_USER`). `config/index.ts` uses the **app user** creds while `drizzle.config.ts` uses the **superuser** creds.
@@ -405,7 +408,8 @@ JWT_PUBLIC_KEY=""
 # MAIL_FROM=""       # Override sender address (default: noreply@localhost)
 ```
 
-> [!NOTE] Details
+> [!NOTE]
+> **Details**
 >
 > - `AUTH_SECRET` is already set as a dummy in `.env.development` - no need to duplicate here.
 > - `POSTGRES_*` are already set as dummy values in `.env.development`.
@@ -464,7 +468,8 @@ Complete matrix of every variable across all committed `.env` files. Replace `{p
 | **Infrastructure**                |               |                              |                               |                            |                    |
 | `CRON_SECRET`                     |               |                              |                               |          🔒 CI/CD          |      🔒 CI/CD      |
 
-> [!NOTE] Details
+> [!NOTE]
+> **Details**
 > **Legend:** `-` = inherits from base `.env` · 🔒 = secret, not in committed files · empty cell = not set / not applicable
 >
 > ¹ `${PORT}` is interpolated by Bun's built-in env variable expansion. `.env` loads first and sets `PORT=3000`, so `.env.development` resolves to `http://localhost:3000`. `.env.test` overrides `PORT=3001` before `APP_URL`, so it resolves to `http://localhost:3001`.
@@ -498,7 +503,8 @@ Hardcoded, non-secret defaults that live in code. The `config/index.ts` module i
 |                     | `maxUploadSize`           | `Number(env.MAX_UPLOAD_SIZE) \|\| 5_242_880`                                        | Bytes (5 MB)                                   |
 | **Logging**         | `logLevel`                | `env.LOG_LEVEL \|\| "info"`                                                         | `debug \| info \| warn \| error`               |
 
-> [!NOTE] Details
+> [!NOTE]
+> **Details**
 > **Pattern:** `.env` files → Next.js injects into `process.env` → `config/index.ts` reads, applies defaults, composes URLs, validates with Zod → application code imports `appConfig`. This gives type safety, runtime validation, and a single source of truth while keeping `.env` files for Docker Compose and CI/CD which also need them.
 >
 > **Why not move `HOSTNAME`/`PORT` to `config/index.ts`?** - Next.js reads these _before_ your app code runs to decide which interface and port to bind. They must stay in `.env` files. Same applies to `NEXT_PUBLIC_*` flags which are inlined at build time. Everything else that your app reads at runtime belongs in `config/index.ts`.
@@ -609,14 +615,16 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
 | `/settings`               | `SettingsPage`       | Auth   | Settings shell with tab navigation (Profile, Account).                                        |
 | `/admin`                  | `AdminUserTable`     | Admin  | Paginated user management table.                                                              |
 
-> [!NOTE] Route Authentication & Redirection
+> [!NOTE]
+> **Route Authentication & Redirection**
 > **Auth column legend:** Public = anyone, Guest = unauthenticated only (redirect to `/settings` if logged in), Auth = authenticated only, Admin = admin role only.
 >
 > **Redirect-after-login:** When middleware redirects an unauthenticated user to `/login`, it appends `?next=/original-path`. The `LoginForm` reads this param and passes it to the login Server Action, which redirects there on success (after validating the path starts with `/` to prevent open redirects). Default post-login destination: `/settings` for regular users, `/admin` for admins.
 >
 > **Token routes:** Keep both `/verify-email` (prompt/resend UI) and `/verify-email/[token]` (token-consumption entry route). For password reset, `/forgot-password` sends the mail and `/reset-password/[token]` is where the new password is submitted.
 
-> [!NOTE] API Client Redirect Metadata
+> [!NOTE]
+> **API Client Redirect Metadata**
 > For third-party clients, `api_clients.domain_name` is not enough on its own for email links. Store client-specific path templates as well (e.g., `verify_email_path = '/verify-email/{token}'`, `reset_password_path = '/reset-password/{token}'`) and build links as `https://{domain_name}{path_with_token}`.
 
 **Frontend -> Server Action -> API Mapping (Auth Flows)**
@@ -631,7 +639,8 @@ _Rule of thumb:_ frontend routes are UX pages, API routes are transport endpoint
 | Forgot password request | `/forgot-password`        | `ForgotPasswordForm` | `requestPasswordResetAction`                     | `POST /api/auth/reset-password/request` | Sends reset mail if account exists (generic response).                                |
 | Reset password submit   | `/reset-password/[token]` | `ResetPasswordForm`  | `confirmResetPasswordAction(token, newPassword)` | `POST /api/auth/reset-password/confirm` | Token is in URL for web UX; API variant receives token in payload.                    |
 
-> [!NOTE] Why `/verify-email/[token]` and `/reset-password/[token]` exist on frontend
+> [!NOTE]
+> **Why `/verify-email/[token]` and `/reset-password/[token]` exist on frontend**
 > Users click links in emails. Those links need page routes to land on.
 > The page can be minimal, but it must exist in App Router (`page.tsx`).
 >

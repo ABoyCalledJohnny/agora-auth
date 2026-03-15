@@ -21,7 +21,8 @@
     5. **[Documentation](#5-documentation-day-17):** Finalise README, API documentation, and prepare project presentation.
     6. **[Initial Major Release and Deployment](#6-initial-major-release-and-deployment-days-16-17):** Configure DNS, Docker, Caddy, CI/CD pipeline, and deploy to production.
 
-> [!NOTE] Design & Reference
+> [!NOTE]
+> **Design & Reference**
 > All design decisions, research, feature backlogs, and detailed architecture notes can be found in **[NOTES.md](NOTES.md)**.
 
 ---
