@@ -478,12 +478,12 @@ Einfaches Modell im Kopf:
 
 Zweck:
 
-- stellt oeffentliche Schluessel bereit, damit externe Services JWTs verifizieren koennen.
+- stellt öffentliche Schlüssel bereit, damit externe Services JWTs verifizieren können.
 
 Implementierungs-Hinweis:
 
 - Die JWKS-Response ist nicht der rohe `JWT_PUBLIC_KEY`-PEM-String.
-- Der Server konvertiert den Public Key in JWK-Format und liefert ihn in `keys[]` zurueck.
+- Der Server konvertiert den Public Key in JWK-Format und liefert ihn in `keys[]` zurück.
 - Bei einem aktiven Key: ein Objekt in `keys`; bei Key-Rotation: mehrere.
 
 Request:
@@ -608,4 +608,4 @@ if (logoutRes.status === 204) {
 ## 7. Implementierungsstatus
 
 Das ist weiterhin ein Draft/Entwurf.
-Aktuelle Route-Handler koennen `501 Not Implemented` zurueckgeben, bis die Services komplett verbunden sind.
+Aktuelle Route-Handler können `501 Not Implemented` zurückgeben, bis die Services komplett verbunden sind.
