@@ -126,8 +126,8 @@
 ##### 2.5 Verification and Initial Commit
 
 - [x] **Launch:** Start Docker containers / development servers and verify basic functionality (`bun verify:build`, check `http://localhost:3000/api/health` in the browser).
-- [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `project-init`).
-- [ ] **Cooperation:** Message classmate date for first connection test, initial `api_DRAFT_de.md`, client data).
+- [x] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `project-init`).
+- [x] **Cooperation:** Message classmate date for first connection test, initial `api_DRAFT_de.md`, client data.
 
 ---
 
