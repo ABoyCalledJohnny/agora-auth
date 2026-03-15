@@ -100,6 +100,46 @@ Wichtige Umgebungsvariablen umfassen:
 >
 > **Sie ist nicht darauf ausgelegt, out-of-the-box von anderen bereitgestellt zu werden.** Ein unabhängiges Deployment dieses Systems würde umfangreiche Änderungen am Docker-Setup, an den Konfigurationsdateien und an den Bereitstellungspipelines erfordern, an denen derzeit aktiv gearbeitet wird.
 
+Aktuelle Struktur des VPS-Deployment-Artefakts (vereinfacht):
+
+```text
+deployment/
+    app_build/
+        server.js
+        package.json
+        node_modules/
+        .next/
+            server/
+            static/
+            BUILD_ID
+            app-path-routes-manifest.json
+            build-manifest.json
+            package.json
+            prerender-manifest.json
+            required-server-files.json
+            routes-manifest.json
+        public/
+            robots.txt
+            ...
+    docker/
+        app/
+            Dockerfile
+        migrator/
+            Dockerfile
+        postgres/
+            init-db.sh
+        caddy/
+            Caddyfile
+    compose.yaml
+    compose.production.yaml
+    compose.caddy.yaml
+    .env
+    .env.production
+    .env.secrets.production.app
+    .env.secrets.production.postgres
+    .env.secrets.production.migrator
+```
+
 ---
 
 ## Projektstruktur

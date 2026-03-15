@@ -50,12 +50,13 @@ jobs:
       # Prepare the artifact for deployment
       - name: 📦 Prepare Deployment Artifact
         run: |
+          set -euo pipefail
           mkdir -p deployment/app_build
           
           # Copy environment configs (so Rsync pushes them to the VPS)
           # Note: We don't need to rename them to 'env.public' anymore since rsync handles dotfiles easily!
-          cp .env deployment/.env || true
-          cp .env.production deployment/.env.production || true
+          cp .env deployment/.env
+          cp .env.production deployment/.env.production
           
           # Copy standalone build (server.js, node_modules, etc.)
           cp -r .next/standalone/. deployment/app_build/
@@ -105,6 +106,8 @@ jobs:
           SSH_USER: ${{ secrets.VPS_USER }}
           SSH_PORT: ${{ secrets.VPS_PORT }}
         run: |
+          set -euo pipefail
+
           # 1. Setup SSH agent
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
@@ -116,10 +119,12 @@ jobs:
           # 2. Rsync the deployment directory
           # --delete removes files on the VPS that no longer exist in our deployment/ folder
           # We explicitly exclude persistent folders like uploads/ so they aren't deleted remotely.
-          # .env.secrets is excluded so rsync's --delete doesn't remove it before the SSH script recreates it.
+          # Secret env files are excluded so rsync's --delete does not remove them before recreation.
           rsync -avz --delete \
             -e "ssh -p $SSH_PORT" \
-            --exclude '.env.secrets' \
+            --exclude '.env.secrets.production.postgres' \
+            --exclude '.env.secrets.production.app' \
+            --exclude '.env.secrets.production.migrator' \
             --exclude 'uploads/' \
             deployment/ $SSH_USER@$SSH_HOST:/srv/webapps/mini-project/
 
@@ -130,20 +135,46 @@ jobs:
             POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
             AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
             POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+            APP_DB_USER: ${{ secrets.APP_DB_USER }}
+            APP_DB_PASSWORD: ${{ secrets.APP_DB_PASSWORD }}
+            JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
+            JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
+            SMTP_HOST: ${{ secrets.SMTP_HOST }}
+            SMTP_PORT: ${{ secrets.SMTP_PORT }}
+            SMTP_USER: ${{ secrets.SMTP_USER }}
+            SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: POSTGRES_USER,POSTGRES_PASSWORD,AUTH_SECRET,POSTGRES_DB
+          envs: POSTGRES_USER,POSTGRES_PASSWORD,AUTH_SECRET,POSTGRES_DB,APP_DB_USER,APP_DB_PASSWORD,JWT_PRIVATE_KEY,JWT_PUBLIC_KEY,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD
           script: |
+            set -euo pipefail
+
             cd /srv/webapps/mini-project
             
-            # 1. Generate the secrets .env.secrets
-            echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets
-            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets
-            echo "AUTH_SECRET=$AUTH_SECRET" >> .env.secrets
-            echo "POSTGRES_DB=$POSTGRES_DB" >> .env.secrets
+            # 1. Generate service-specific secret files
+            # postgres service
+            echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.postgres
+            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.postgres
+            echo "POSTGRES_DB=$POSTGRES_DB" >> .env.secrets.production.postgres
+
+            # app service
+            echo "APP_DB_USER=$APP_DB_USER" > .env.secrets.production.app
+            echo "APP_DB_PASSWORD=$APP_DB_PASSWORD" >> .env.secrets.production.app
+            echo "JWT_PRIVATE_KEY=$JWT_PRIVATE_KEY" >> .env.secrets.production.app
+            echo "JWT_PUBLIC_KEY=$JWT_PUBLIC_KEY" >> .env.secrets.production.app
+            echo "SMTP_HOST=$SMTP_HOST" >> .env.secrets.production.app
+            echo "SMTP_PORT=$SMTP_PORT" >> .env.secrets.production.app
+            echo "SMTP_USER=$SMTP_USER" >> .env.secrets.production.app
+            echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env.secrets.production.app
+            echo "AUTH_SECRET=$AUTH_SECRET" >> .env.secrets.production.app
+
+            # migrator service
+            echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.migrator
+            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.migrator
+            echo "POSTGRES_DB=$POSTGRES_DB" >> .env.secrets.production.migrator
 
             # 2. Network Setup
             docker network inspect caddy_net >/dev/null 2>&1 || docker network create caddy_net
@@ -183,8 +214,8 @@ jobs:
 
 
 # # Pass the pipeline's dynamic SHA into the VPS's environment file
-# echo "IMAGE_TAG=${{ github.sha }}" >> .env.secrets
-# echo "IMAGE_REGISTRY=ghcr.io/${{ github.repository_owner }}" >> .env.secrets
+# echo "IMAGE_TAG=${{ github.sha }}" >> .env.secrets.production.app
+# echo "IMAGE_REGISTRY=ghcr.io/${{ github.repository_owner }}" >> .env.secrets.production.app
 
 
 # - name: Compute image tag

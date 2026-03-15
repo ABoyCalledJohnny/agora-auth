@@ -100,6 +100,46 @@ Key environment variables include:
 >
 > **It is not designed to be deployed by others out-of-the-box.** Deploying this system independently would require extensive modifications to the Docker setup, configuration files, and deployment pipelines, which are currently active works in progress.
 
+Current VPS deployment artifact layout (simplified):
+
+```text
+deployment/
+    app_build/
+        server.js
+        package.json
+        node_modules/
+        .next/
+            server/
+            static/
+            BUILD_ID
+            app-path-routes-manifest.json
+            build-manifest.json
+            package.json
+            prerender-manifest.json
+            required-server-files.json
+            routes-manifest.json
+        public/
+            robots.txt
+            ...
+    docker/
+        app/
+            Dockerfile
+        migrator/
+            Dockerfile
+        postgres/
+            init-db.sh
+        caddy/
+            Caddyfile
+    compose.yaml
+    compose.production.yaml
+    compose.caddy.yaml
+    .env
+    .env.production
+    .env.secrets.production.app
+    .env.secrets.production.postgres
+    .env.secrets.production.migrator
+```
+
 ---
 
 ## Project Structure
