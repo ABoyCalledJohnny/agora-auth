@@ -143,15 +143,15 @@
         - **Drizzle schemas:** Translate the ERD into Drizzle schema and relation files.
             - **Validation:** Import shared validators/types from `validation.ts` where applicable.
             - **Types:** Export inferred TypeScript types from Drizzle schemas (e.g., `User`, `Session`, `Role`).
-            - [ ] Users Tables (`users.ts`)
-            - [ ] Auth Tables (`auth.ts`)
+            - [x] Users Tables (`users.ts`)
+            - [x] Auth Tables (`auth.ts`)
             - [x] Role Tables (`rbac.ts`)
-            - [ ] Client Table (`client.ts`)
-        - [ ] **Migrations:** Generate and apply the initial migration (`bun run db:generate` and `bun run db:migrate`).
+            - [x] Client Table (`client.ts`)
+        - [x] **Migrations:** Generate and apply the initial migration (`bun run db:generate` and `bun run db:migrate`).
         - [ ] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap`).
         - [ ] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).
         - [ ] **Database connection:** Verify `src/db/index.ts` pool configuration and ensure `src/config` provides the composed `DATABASE_URL`.
-        - **Repositories:** Create repositories and interfaces:
+        - **Repositories:** Create repositories as well as interfaces:
             - [ ] **`UserRepository`:** Data access for user records in `src/repositories/`. Shared across Auth and User features.
             - [ ] **`SessionRepository`:** Session CRUD (create, find, revoke, rotate) in `src/repositories/`.
             - [ ] **`VerificationTokenRepository`:** Token storage and lookup in `src/repositories/`.

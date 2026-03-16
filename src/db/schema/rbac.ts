@@ -1,11 +1,11 @@
 import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
-import { index, pgTable, primaryKey, uuid } from "drizzle-orm/pg-core";
-import { createdAtColumn, idColumn, uniqueNotNullableTextColumn, updatedAtColumn } from "./_helpers";
+import { index, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
+import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers";
 import { users } from "./users";
 
 export const roles = pgTable("roles", {
   id: idColumn(),
-  name: uniqueNotNullableTextColumn(),
+  name: text().notNull().unique(),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
 });

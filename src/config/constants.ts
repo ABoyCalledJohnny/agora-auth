@@ -1,3 +1,11 @@
+// App routes / Route templates
+export const DEFAULT_VERIFY_EMAIL_PATH = "/verify-email/{token}";
+export const DEFAULT_RESET_PASSWORD_PATH = "/reset-password/{token}";
+
+// Internationalization
+export const LOCALES = ["en", "de"] as const;
+export const DEFAULT_LOCALE = "en" as const;
+
 export const NO_STORE_HEADERS = {
   "Cache-Control": "no-store, max-age=0",
 };

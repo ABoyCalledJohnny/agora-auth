@@ -179,7 +179,7 @@ Table api_clients {
   api_key_hash text [not null, unique, note: "SHA-256 hash of a securely generated random string (e.g. 32 bytes hex/base64)."]
 
   // Routing / Domain
-  domain_name text [not null, unique, note: "Allowed origin/domain for CORS/redirects"]
+  base_url text [not null, unique, note: "e.g., https://example.com. Allowed origin/base URL for CORS/redirects"]
   verify_email_path text [not null, default: '/verify-email/{token}', note: "Client route template. {token} is replaced server-side when generating links."]
   reset_password_path text [not null, default: '/reset-password/{token}', note: "Client route template. {token} is replaced server-side when generating links."]
 

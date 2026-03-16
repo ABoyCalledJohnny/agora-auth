@@ -1,5 +1,4 @@
-import { PUBLIC_ID_LENGTH, RESERVED_USERNAMES } from "@/src/config/constants";
-import { defaultLocale, locales } from "@/src/config/index";
+import { DEFAULT_LOCALE, LOCALES, PUBLIC_ID_LENGTH, RESERVED_USERNAMES } from "@/src/config/constants";
 import { z } from "zod";
 
 // ============================================================================
@@ -118,57 +117,63 @@ export const paginationSchema = z.object({
 });
 
 /** Standardized privacy toggles for user profiles */
+export const DEFAULT_PRIVACY_SETTINGS = {
+  profileVisibility: "private",
+  showOnlineStatus: false,
+  allowIndexing: false,
+} as const;
+
 export const privacySettingsSchema = z.object({
-  profileVisibility: z.enum(["members_only", "private"]).default("private"),
-  showOnlineStatus: z.boolean().default(false),
-  allowIndexing: z.boolean().default(false),
+  profileVisibility: z.enum(["members_only", "private"]).default(DEFAULT_PRIVACY_SETTINGS.profileVisibility),
+  showOnlineStatus: z.boolean().default(DEFAULT_PRIVACY_SETTINGS.showOnlineStatus),
+  allowIndexing: z.boolean().default(DEFAULT_PRIVACY_SETTINGS.allowIndexing),
 });
+
+export type PrivacySettings = z.infer<typeof privacySettingsSchema>;
+
+export const DEFAULT_PREFERENCES = {
+  theme: "system",
+  language: DEFAULT_LOCALE,
+  notifications: {
+    email: {
+      transactional: true,
+      marketing: false,
+      security: true,
+      newsletter: false,
+    },
+    push: {
+      messages: false,
+      mentions: false,
+      updates: false,
+      posts: false,
+    },
+  },
+} as const;
 
 /** Deeply nested User Application Preferences structure with safe fallbacks */
 export const preferencesSchema = z.object({
-  theme: z.enum(["system", "light", "dark"]).default("system"),
-  language: z.enum(locales).default(defaultLocale),
+  theme: z.enum(["system", "light", "dark"]).default(DEFAULT_PREFERENCES.theme),
+  language: z.enum(LOCALES).default(DEFAULT_PREFERENCES.language), // Type assertion to avoid literal vs enum mismatch
   notifications: z
     .object({
       email: z
         .object({
-          transactional: z.boolean().default(true), // Essential system emails
-          marketing: z.boolean().default(false),
-          security: z.boolean().default(true), // Password changed, new login anomaly
-          newsletter: z.boolean().default(false),
+          transactional: z.boolean().default(DEFAULT_PREFERENCES.notifications.email.transactional), // Essential system emails
+          marketing: z.boolean().default(DEFAULT_PREFERENCES.notifications.email.marketing),
+          security: z.boolean().default(DEFAULT_PREFERENCES.notifications.email.security), // Password changed, new login anomaly
+          newsletter: z.boolean().default(DEFAULT_PREFERENCES.notifications.email.newsletter),
         })
-        .default({
-          transactional: true,
-          marketing: false,
-          security: true,
-          newsletter: false,
-        }),
+        .default(DEFAULT_PREFERENCES.notifications.email),
       push: z
         .object({
-          messages: z.boolean().default(false),
-          mentions: z.boolean().default(false),
-          updates: z.boolean().default(false),
-          posts: z.boolean().default(false),
+          messages: z.boolean().default(DEFAULT_PREFERENCES.notifications.push.messages),
+          mentions: z.boolean().default(DEFAULT_PREFERENCES.notifications.push.mentions),
+          updates: z.boolean().default(DEFAULT_PREFERENCES.notifications.push.updates),
+          posts: z.boolean().default(DEFAULT_PREFERENCES.notifications.push.posts),
         })
-        .default({
-          messages: false,
-          mentions: false,
-          updates: false,
-          posts: false,
-        }),
+        .default(DEFAULT_PREFERENCES.notifications.push),
     })
-    .default({
-      email: {
-        transactional: true,
-        marketing: false,
-        security: true,
-        newsletter: false,
-      },
-      push: {
-        messages: false,
-        mentions: false,
-        updates: false,
-        posts: false,
-      },
-    }),
+    .default(DEFAULT_PREFERENCES.notifications),
 });
+
+export type Preferences = z.infer<typeof preferencesSchema>;

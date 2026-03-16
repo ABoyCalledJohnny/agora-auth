@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_LOCALE, LOCALES } from "./constants";
 
 // ---------------------------------------------------------------------------
 // 1. Environment schema — validates process.env at import time.
@@ -70,8 +71,8 @@ export const appConfig = {
   },
 
   i18n: {
-    locales: ["en", "de"],
-    defaultLocale: "en",
+    locales: LOCALES,
+    defaultLocale: DEFAULT_LOCALE,
   },
 
   db: {
