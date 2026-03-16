@@ -138,10 +138,15 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Shared Validation and Domain Rules:**
-        - [ ] **Validation module:** Create `src/lib/validation.ts` with reusable domain rules (password requirements, username format) and complex JSON type schemas (`UserPreferences`, `PrivacySettings`) needed by the database schema.
+        - [x] **Validation module:** Create `src/lib/validation.ts` with reusable domain rules (password requirements, username format) and complex JSON type schemas (`UserPreferences`, `PrivacySettings`) needed by the database schema.
     - **Database Layer:**
-        - [ ] **Drizzle schemas:** Translate the ERD into Drizzle schema files (`users.ts`, `auth.ts`, `rbac.ts`, `clients.ts`). Import shared validators/types from `validation.ts` where applicable.
-        - [ ] **Types:** Export inferred TypeScript types from Drizzle schemas (e.g., `User`, `Session`, `Role`).
+        - **Drizzle schemas:** Translate the ERD into Drizzle schema and relation files.
+            - **Validation:** Import shared validators/types from `validation.ts` where applicable.
+            - **Types:** Export inferred TypeScript types from Drizzle schemas (e.g., `User`, `Session`, `Role`).
+            - [ ] Users Tables (`users.ts`)
+            - [ ] Auth Tables (`auth.ts`)
+            - [x] Role Tables (`rbac.ts`)
+            - [ ] Client Table (`client.ts`)
         - [ ] **Migrations:** Generate and apply the initial migration (`bun run db:generate` and `bun run db:migrate`).
         - [ ] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap`).
         - [ ] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).

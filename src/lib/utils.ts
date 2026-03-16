@@ -6,13 +6,16 @@
  * - `setSessionCookies`: Sets the session cookie pair with secure defaults.
  * - `clearSessionCookies`: Clears both session cookies.
  * - `cn`: A utility to merge Tailwind classes cleanly using clsx and tailwind-merge.
+ * - `createPublicId`: Creates a unique public ID consisting of PUBLIC_ID_LENGTH (27) PUBLIC_ID_ALPHABET (a-z) letters.
  */
 
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { cookies } from "next/headers";
 import { appConfig } from "@/src/config/";
+import { PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH } from "@/src/config/constants";
 import { AgoraError } from "@/src/lib/errors";
+import { clsx, type ClassValue } from "clsx";
+import { customAlphabet } from "nanoid";
+import { cookies } from "next/headers";
+import { twMerge } from "tailwind-merge";
 
 /**
  * Recursively sanitises string values in the input by trimming whitespace.
@@ -92,3 +95,9 @@ export async function clearSessionCookies() {
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+/**
+ * Creates a unique public ID consisting of 27 lowercase a-z letters.
+ * Matches the publicIdSchema defined in src/lib/validation.ts.
+ */
+export const createPublicId = customAlphabet(PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH);

@@ -178,7 +178,7 @@ https://dbdiagram.io/d/Auth-Wright-695f8d2ed6e030a024753b90
 
 **User Settings (JSON columns):**
 
-- Privacy: `profileVisibility` (`'public' | 'members_only' | 'private'`), `showOnlineStatus`, `allowIndexing`
+- Privacy: `profileVisibility` (`'members_only' | 'private'`), `showOnlineStatus`, `allowIndexing`
 - Preferences:
     - `theme: 'system' | 'light' | 'dark'`
     - `language`

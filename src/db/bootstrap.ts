@@ -2,10 +2,16 @@
 // Import your schemas here once created
 // import * as schema from './schema';
 
+import { db } from ".";
+import { roles } from "./schema";
+import { SYSTEM_ROLE_NAMES } from "@/src/lib/validation";
+
 async function seedRoles() {
   console.log("Seeding user roles...");
-  // TODO: Insert 'admin' and 'user' roles
-  // Use ON CONFLICT DO NOTHING to ensure idempotency
+  await db
+    .insert(roles)
+    .values(SYSTEM_ROLE_NAMES.map((name) => ({ name })))
+    .onConflictDoNothing({ target: roles.name });
 }
 
 async function seedAdminAccount() {
