@@ -1,10 +1,7 @@
-// import { db } from './index';
-// Import your schemas here once created
-// import * as schema from './schema';
-
 import { db } from ".";
 import { roles } from "./schema";
 import { SYSTEM_ROLE_NAMES } from "@/src/lib/validation";
+// import { RoleRepository } from "../repositories/RoleRepository";
 
 async function seedRoles() {
   console.log("Seeding user roles...");
@@ -16,13 +13,13 @@ async function seedRoles() {
 
 async function seedAdminAccount() {
   console.log("Seeding initial admin account...");
-  // TODO: Check for INITIAL_ADMIN_EMAIL / INITIAL_ADMIN_PASSWORD in env
+
   // TODO: Hash password and insert admin user if it doesn't exist
 }
 
 async function seedDefaultClient() {
   console.log("Seeding default API client...");
-  // TODO: Check for DEFAULT_CLIENT_SECRET in env
+
   // TODO: Hash secret and insert default API client if it doesn't exist
 }
 

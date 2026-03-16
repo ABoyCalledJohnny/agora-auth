@@ -457,7 +457,7 @@ Complete matrix of every variable across all committed `.env` files. Replace `{p
 | `SMTP_PORT`                       |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
 | `SMTP_USER`                       |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
 | `SMTP_PASSWORD`                   |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
-| `MAIL_FROM`                       |               |     `noreply@localhost`      |   `noreply@test.localhost"`   | `noreply@staging.{domain}` | `noreply@{domain}` |
+| `MAIL_FROM`                       |               |   `noreply@localhost.com`    | `noreply@test.localhost.cm"`  | `noreply@staging.{domain}` | `noreply@{domain}` |
 | **Feature Flags**                 |               |                              |                               |                            |                    |
 | `NEXT_PUBLIC_ENABLE_REGISTRATION` |    `true`     |              -               |               -               |             -              |      `false`       |
 | **Files & Uploads**               |               |                              |                               |                            |                    |
@@ -499,7 +499,7 @@ Hardcoded, non-secret defaults that live in code. The `config/index.ts` module i
 | **Auth · Security** | `allowSessionIpChange`    | `true`                                                                              | If `false`, session is revoked on IP change    |
 |                     | `allowSessionAgentChange` | `true`                                                                              | If `false`, session is revoked on UA change    |
 | **Clients**         | `defaultClientId`         | `"agora_web_default"`                                                               | Internal app client for Server Actions         |
-| **Email**           | `mailFrom`                | `env.MAIL_FROM \|\| "noreply@localhost"`                                            | Sender address                                 |
+| **Email**           | `mailFrom`                | `env.MAIL_FROM \|\| "noreply@localhost.com"`                                        | Sender address                                 |
 | **Rate Limiting**   | `rateLimitMax`            | `Number(env.RATE_LIMIT_MAX) \|\| 100`                                               | Per IP per window                              |
 |                     | `rateLimitWindow`         | `Number(env.RATE_LIMIT_WINDOW) \|\| 60`                                             | Seconds                                        |
 | **Files**           | `uploadDir`               | `env.UPLOAD_DIR \|\| "./uploads"`                                                   |                                                |
