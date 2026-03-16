@@ -25,7 +25,6 @@
     "verify": "bun run lint && bun run typecheck && bun run format:check",
     "verify:build": "bun run lint && bun run typecheck && bun run format:check && bun run build",
     "db:studio": "drizzle-kit studio",
-    "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:bootstrap": "bun src/db/bootstrap.ts",
@@ -38,7 +37,13 @@
     "docker:db:shell": "sudo docker compose exec postgres psql -U postgres",
     "release": "release-it",
     "cleanup": "rm -rf .next node_modules",
-    "reinstall": "bun run cleanup && bun install"
+    "reinstall": "bun run cleanup && bun install",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -78,6 +83,8 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.1.6",
     "globals": "^17.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "postcss": "^8.5.8",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
