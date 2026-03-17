@@ -1,13 +1,13 @@
 // import { db } from ".";
 // import { roles } from "./schema";
 import { SYSTEM_ROLE_NAMES } from "@/src/config/constants";
-import { DrizzleRoleRepository } from "../repositories/RoleRepository";
-import { createPublicId } from "../lib/utils";
-import { appConfig } from "../config";
-import { userCredentials, users, usersRoles } from "./schema";
-import { hashPassword } from "../lib/crypto";
 import { db } from ".";
+import { appConfig } from "../config";
+import { hashPassword } from "../lib/crypto";
 import { AgoraError } from "../lib/errors";
+import { createPublicId } from "../lib/utils";
+import { DrizzleRoleRepository } from "../repositories/RoleRepository";
+import { userCredentials, users, usersRoles } from "./schema";
 
 async function seedRoles() {
   console.log("Seeding user roles...");
