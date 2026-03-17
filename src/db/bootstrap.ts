@@ -1,12 +1,13 @@
 // import { db } from ".";
 // import { roles } from "./schema";
-import { SYSTEM_ROLE_NAMES } from "@/src/config/constants";
+import { SYSTEM_ROLE_NAMES } from "@/src/config/constants.ts";
 import { db } from ".";
 import { appConfig } from "../config";
-import { hashPassword } from "../lib/crypto";
-import { AgoraError } from "../lib/errors";
-import { createPublicId } from "../lib/utils";
-import { DrizzleRoleRepository } from "../repositories/RoleRepository";
+import { hashApiKey, hashPassword } from "../lib/crypto.ts";
+import { AgoraError } from "../lib/errors.ts";
+import { createPublicId } from "../lib/utils.ts";
+import { DrizzleApiClientRepository } from "../repositories/ApiClientRepository.ts";
+import { DrizzleRoleRepository } from "../repositories/RoleRepository.ts";
 import { userCredentials, users, usersRoles } from "./schema";
 
 async function seedRoles() {
@@ -51,7 +52,14 @@ async function seedAdminAccount() {
 async function seedDefaultClient() {
   console.log("Seeding default API client...");
 
-  // TODO: Hash secret and insert default API client if it doesn't exist
+  await DrizzleApiClientRepository.create({
+    name: appConfig.clients.defaultClientName,
+    clientId: appConfig.clients.defaultClientId,
+    apiKeyHash: hashApiKey(appConfig.bootstrap.defaultClientSecret),
+    baseUrl: appConfig.app.url,
+    verifyEmailPath: appConfig.clients.defaultVerifyEmailPath,
+    resetPasswordPath: appConfig.clients.defaultResetPasswordPath,
+  });
 }
 
 async function bootstrap() {

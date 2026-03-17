@@ -339,7 +339,8 @@ All values in this table are **never committed** to version control. They are st
 | `PROD_INITIAL_ADMIN_EMAIL`       | `INITIAL_ADMIN_EMAIL`    |  prod   | Email for the initial admin account                     |
 | `PROD_INITIAL_ADMIN_USERNAME`    | `INITIAL_ADMIN_USERNAME` |  prod   | Username for the initial admin account                  |
 | `PROD_INITIAL_ADMIN_PASSWORD`    | `INITIAL_ADMIN_PASSWORD` |  prod   | Password for the initial admin account                  |
-| `PROD_DEFAULT_CLIENT_SECRET`     | `DEFAULT_CLIENT_SECRET`  |  prod   | Raw API Key for the default system client               |
+|                                  |                          |  prod   | Default System Client ID                                |
+|                                  |                          |  prod   | Raw API Key for the default system client               |
 | `STAGING_INITIAL_ADMIN_EMAIL`    | `INITIAL_ADMIN_EMAIL`    | staging | Email for the initial admin account (staging)           |
 | `STAGING_INITIAL_ADMIN_USERNAME` | `INITIAL_ADMIN_USERNAME` | staging | Username for the initial admin account (staging)        |
 | `STAGING_INITIAL_ADMIN_PASSWORD` | `INITIAL_ADMIN_PASSWORD` | staging | Password for the initial admin account (staging)        |

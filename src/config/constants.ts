@@ -11,10 +11,11 @@
  */
 
 // ============================================================================
-// 1. APP ROUTES
+// 1. APP ROUTES & CLIENTS
 // ============================================================================
 export const DEFAULT_VERIFY_EMAIL_PATH = "/verify-email/{token}";
 export const DEFAULT_RESET_PASSWORD_PATH = "/reset-password/{token}";
+export const DEFAULT_CLIENT_NAME = "Agora Default Client";
 
 // ============================================================================
 // 2. I18N

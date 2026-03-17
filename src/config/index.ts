@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { DEFAULT_LOCALE, LOCALES } from "./constants";
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  DEFAULT_CLIENT_NAME,
+  DEFAULT_VERIFY_EMAIL_PATH,
+  DEFAULT_RESET_PASSWORD_PATH,
+} from "./constants";
 
 // ---------------------------------------------------------------------------
 // 1. Environment schema — validates process.env at import time.
@@ -37,6 +43,7 @@ const envSchema = z.object({
   INITIAL_ADMIN_EMAIL: z.string().email(),
   INITIAL_ADMIN_USERNAME: z.string().min(1),
   INITIAL_ADMIN_PASSWORD: z.string().min(1),
+  DEFAULT_CLIENT_ID: z.string().min(1),
   DEFAULT_CLIENT_SECRET: z.string().min(1),
 
   // Email (SMTP)
@@ -105,7 +112,10 @@ export const appConfig = {
   },
 
   clients: {
-    defaultClientId: "agora_web_default",
+    defaultClientName: DEFAULT_CLIENT_NAME,
+    defaultClientId: env.DEFAULT_CLIENT_ID,
+    defaultVerifyEmailPath: DEFAULT_VERIFY_EMAIL_PATH,
+    defaultResetPasswordPath: DEFAULT_RESET_PASSWORD_PATH,
   },
 
   email: {
