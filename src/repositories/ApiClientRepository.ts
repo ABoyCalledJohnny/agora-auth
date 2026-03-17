@@ -49,11 +49,7 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   // Update
   // ---------------------------------------------------------------------------
   async update(id: string, data: Partial<Omit<NewApiClient, "id" | "createdAt" | "updatedAt">>): Promise<ApiClient> {
-    const [updatedClient] = await db
-      .update(apiClients)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(apiClients.id, id))
-      .returning();
+    const [updatedClient] = await db.update(apiClients).set(data).where(eq(apiClients.id, id)).returning();
 
     if (!updatedClient) throw new AgoraError("NOT_FOUND", "Client not found.");
     return updatedClient;

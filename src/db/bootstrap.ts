@@ -2,7 +2,12 @@
 // import { roles } from "./schema";
 import { SYSTEM_ROLE_NAMES } from "@/src/config/constants";
 import { DrizzleRoleRepository } from "../repositories/RoleRepository";
-// import { DrizzleUserRepository } from "../repositories/UserRepository";
+import { createPublicId } from "../lib/utils";
+import { appConfig } from "../config";
+import { userCredentials, users, usersRoles } from "./schema";
+import { hashPassword } from "../lib/crypto";
+import { db } from ".";
+import { AgoraError } from "../lib/errors";
 
 async function seedRoles() {
   console.log("Seeding user roles...");
@@ -10,20 +15,37 @@ async function seedRoles() {
   for (const role of SYSTEM_ROLE_NAMES) {
     await DrizzleRoleRepository.create({ name: role });
   }
-
-  // await db
-  //   .insert(roles)
-  //   .values(SYSTEM_ROLE_NAMES.map((name) => ({ name })))
-  //   .onConflictDoNothing({ target: roles.name });
 }
 
 async function seedAdminAccount() {
   console.log("Seeding initial admin account...");
 
-  // TODO: Fix seed parameters
-  // await DrizzleUserRepository.create({
-  //   username: appConfig.bootstrap.initialAdminUsername
-  // })
+  await db.transaction(async (tx) => {
+    // 1. Create base user (using the raw Drizzle transaction tx)
+    const [adminUser] = await tx
+      .insert(users)
+      .values({
+        publicId: createPublicId(),
+        username: appConfig.bootstrap.initialAdminUsername,
+        email: appConfig.bootstrap.initialAdminEmail,
+        status: "active",
+        emailVerifiedAt: new Date(),
+      })
+      .returning();
+
+    if (!adminUser) throw new AgoraError("INTERNAL", "Error creating bootstrap admin user");
+
+    // 2. Set credentials
+    const hashedPassword = await hashPassword(appConfig.bootstrap.initialAdminPassword); // Need a hashing tool here!
+    await tx.insert(userCredentials).values({ userId: adminUser.id, passwordHash: hashedPassword });
+
+    // 3. Find admin role and assign it
+    // Note: DrizzleRoleRepository.findByName isn't inherently transaction aware, but lookups are safe
+    const adminRole = await DrizzleRoleRepository.findByName("admin");
+    if (adminRole) {
+      await tx.insert(usersRoles).values({ userId: adminUser.id, roleId: adminRole.id });
+    }
+  });
 }
 
 async function seedDefaultClient() {

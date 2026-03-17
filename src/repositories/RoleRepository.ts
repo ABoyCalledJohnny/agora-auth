@@ -64,11 +64,7 @@ export const DrizzleRoleRepository: RoleRepository = {
   },
 
   async update(id: string, data: Partial<Omit<NewRole, "id" | "createdAt" | "updatedAt">>): Promise<Role> {
-    const [updatedRole] = await db
-      .update(roles)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(roles.id, id))
-      .returning();
+    const [updatedRole] = await db.update(roles).set(data).where(eq(roles.id, id)).returning();
 
     if (!updatedRole) throw new AgoraError("NOT_FOUND", "Role not found.");
     return updatedRole;

@@ -113,11 +113,7 @@ export const DrizzleUserRepository: UserRepository = {
   // Update
   // -------------------------------------------------------------------------
   async update(id: string, data: Partial<Omit<NewUser, "id" | "createdAt" | "updatedAt">>): Promise<User> {
-    const [updatedUser] = await db
-      .update(users)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(users.id, id))
-      .returning();
+    const [updatedUser] = await db.update(users).set(data).where(eq(users.id, id)).returning();
 
     if (!updatedUser) throw new AgoraError("NOT_FOUND", "User not found.");
     return updatedUser;
@@ -130,7 +126,7 @@ export const DrizzleUserRepository: UserRepository = {
   ): Promise<UserProfile> {
     const [updatedUserProfile] = await db
       .update(userProfiles)
-      .set({ ...data, updatedAt: new Date() })
+      .set(data)
       .where(eq(userProfiles.userId, userId))
       .returning();
 
@@ -144,7 +140,7 @@ export const DrizzleUserRepository: UserRepository = {
   ): Promise<UserSettings> {
     const [updatedUserSettings] = await db
       .update(userSettings)
-      .set({ ...data, updatedAt: new Date() })
+      .set(data)
       .where(eq(userSettings.userId, userId))
       .returning();
 
@@ -163,6 +159,13 @@ export const DrizzleUserRepository: UserRepository = {
       .limit(1);
 
     return result[0]?.passwordHash || null;
+  },
+
+  async setPasswordHash(userId: string, passwordHash: string): Promise<void> {
+    await db.insert(userCredentials).values({ userId, passwordHash }).onConflictDoUpdate({
+      target: userCredentials.userId,
+      set: { passwordHash },
+    });
   },
 
   // -------------------------------------------------------------------------

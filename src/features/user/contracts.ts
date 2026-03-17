@@ -35,4 +35,5 @@ export interface UserRepository extends CrudRepository<
   // Security
   // -------------------------------------------------------------------------
   getPasswordHash(userId: string): Promise<string | null>;
+  setPasswordHash(userId: string, passwordHash: string): Promise<void>;
 }
