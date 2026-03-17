@@ -46,7 +46,7 @@ export function sanitizeInput<T>(data: T): T {
 export function parseDuration(str: string): number {
   const match = str.match(/^(\d+)([mhd])$/);
   if (!match) {
-    throw new AgoraError("INTERNAL", `Invalid configuration duration string provided: ${str}`);
+    throw new AgoraError("INTERNAL", `Invalid configuration duration string provided: ${str}.`);
   }
   const [, value, unit] = match;
   const multipliers = { m: 60_000, h: 3_600_000, d: 86_400_000 };

@@ -150,16 +150,16 @@
             - [x] Client Table (`client.ts`)
         - [x] **Migrations:** Generate and apply the initial migration (`bun run db:generate` and `bun run db:migrate`).
         - **Repositories:** Create repositories as well as interfaces:
-            - [ ] **`UserRepository`:** Data access for user records in `src/repositories/`. Shared across Auth and User features.
-            - [ ] **`SessionRepository`:** Session CRUD (create, find, revoke, rotate) in `src/repositories/`.
-            - [ ] **`VerificationTokenRepository`:** Token storage and lookup in `src/repositories/`.
+            - [x] **`UserRepository`:** Data access for user records in `src/repositories/`. Shared across Auth and User features.
+            - [x] **`SessionRepository`:** Session CRUD (create, find, revoke, rotate) in `src/repositories/`.
+            - [x] **`VerificationTokenRepository`:** Token storage and lookup in `src/repositories/`.
             - [x] **`RoleRepository`:** Role and user-role assignment queries in `src/repositories/`.
-            - [ ] **`ApiClientRepository`:** API client lookup and domain validation in `src/repositories/`.
+            - [x] **`ApiClientRepository`:** API client lookup and domain validation in `src/repositories/`.
         - [ ] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap`).
         - [ ] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).
     - **Core Library:**
-        - [ ] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) — Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
-        - [ ] **`withActionHandler`:** Implement Server Action wrapper (`src/lib/action-wrapper.ts`) — Zod input validation, structured error state, authentication/authorisation guards, cookie management, and redirect to `/login?next=…` on auth failure.
+        - [ ] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) - Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
+        - [ ] **`withActionHandler`:** Implement Server Action wrapper (`src/lib/action-wrapper.ts`) - Zod input validation, structured error state, authentication/authorisation guards, cookie management, and redirect to `/login?next=…` on auth failure.
     - **Frontend Shell:**
         - [ ] **Root layout:** Set up `layout.tsx` with `NextIntlClientProvider` and `Toaster`. (`SessionProvider` is created and added later in the Auth feature.)
         - [ ] **Landing page:** Implement `/` route (`page.tsx`) — marketing/welcome page.

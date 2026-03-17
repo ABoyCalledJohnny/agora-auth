@@ -1,0 +1,74 @@
+import { db } from "@/src/db";
+import { type NewVerificationToken, type VerificationToken, verificationTokens } from "@/src/db/schema";
+import type { VerificationTokenRepository } from "@/src/features/auth/contracts";
+import { AgoraError } from "@/src/lib/errors";
+import { and, eq, lt } from "drizzle-orm";
+import type { VerificationTokenType } from "../config/constants";
+
+export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
+  // ---------------------------------------------------------------------------
+  // Create
+  // ---------------------------------------------------------------------------
+  async create(data: NewVerificationToken): Promise<VerificationToken> {
+    const [token] = await db.insert(verificationTokens).values(data).returning();
+
+    if (!token) throw new AgoraError("INTERNAL", "Failed to create verification token.");
+    return token;
+  },
+
+  // ---------------------------------------------------------------------------
+  // Read
+  // ---------------------------------------------------------------------------
+  async findById(id: string): Promise<VerificationToken | null> {
+    const result = await db.select().from(verificationTokens).where(eq(verificationTokens.id, id)).limit(1);
+
+    return result[0] || null;
+  },
+
+  async findByToken(tokenHash: string): Promise<VerificationToken | null> {
+    const result = await db
+      .select()
+      .from(verificationTokens)
+      .where(eq(verificationTokens.tokenHash, tokenHash))
+      .limit(1);
+
+    return result[0] || null;
+  },
+
+  async findByUserIdAndType(userId: string, type: VerificationTokenType): Promise<VerificationToken[]> {
+    const tokens = await db
+      .select()
+      .from(verificationTokens)
+      .where(and(eq(verificationTokens.userId, userId), eq(verificationTokens.type, type)));
+
+    return tokens;
+  },
+
+  // ---------------------------------------------------------------------------
+  // Delete
+  // ---------------------------------------------------------------------------
+  async delete(id: string): Promise<VerificationToken> {
+    const [deletedToken] = await db.delete(verificationTokens).where(eq(verificationTokens.id, id)).returning();
+
+    if (!deletedToken) throw new AgoraError("NOT_FOUND", "Verification token not found.");
+    return deletedToken;
+  },
+
+  async deleteByUserIdAndType(userId: string, type: VerificationTokenType): Promise<number> {
+    const deletedTokens = await db
+      .delete(verificationTokens)
+      .where(and(eq(verificationTokens.userId, userId), eq(verificationTokens.type, type)))
+      .returning({ id: verificationTokens.id }); // Only return the ID to keep the payload light
+
+    return deletedTokens.length;
+  },
+
+  async deleteExpired(): Promise<VerificationToken[]> {
+    const expiredTokens = await db
+      .delete(verificationTokens)
+      .where(lt(verificationTokens.expiresAt, new Date()))
+      .returning();
+
+    return expiredTokens;
+  },
+};

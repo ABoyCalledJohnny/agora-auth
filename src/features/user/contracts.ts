@@ -1,19 +1,17 @@
 import type { UserStatus } from "@/src/config/constants";
 import type { FullUser, NewUser, User, UserProfile, UserSettings } from "@/src/db/schema";
+import type { CrudRepository } from "@/src/repositories/contracts";
 
-export interface UserRepository {
-  // -------------------------------------------------------------------------
-  // Create
-  // -------------------------------------------------------------------------
-  create(data: NewUser): Promise<User>;
-
+export interface UserRepository extends CrudRepository<
+  User,
+  NewUser,
+  Partial<Omit<NewUser, "id" | "createdAt" | "updatedAt">>
+> {
   // -------------------------------------------------------------------------
   // Read
   // -------------------------------------------------------------------------
-  findById(id: string): Promise<User | null>;
   findByUsername(username: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
-  findAll(): Promise<User[]>;
   findByRoleId(roleId: string): Promise<User[]>;
   findByStatus(status: UserStatus): Promise<User[]>;
 
@@ -23,14 +21,18 @@ export interface UserRepository {
   // -------------------------------------------------------------------------
   // Update
   // -------------------------------------------------------------------------
-  update(id: string, data: Partial<NewUser>): Promise<User>;
-
   // Sub-Entities (Profile & Settings)
-  updateProfile(userId: string, data: Partial<UserProfile>): Promise<UserProfile>;
-  updateSettings(userId: string, data: Partial<UserSettings>): Promise<UserSettings>;
+  updateProfile(
+    userId: string,
+    data: Partial<Omit<UserProfile, "id" | "userId" | "createdAt" | "updatedAt">>,
+  ): Promise<UserProfile>;
+  updateSettings(
+    userId: string,
+    data: Partial<Omit<UserSettings, "id" | "userId" | "createdAt" | "updatedAt">>,
+  ): Promise<UserSettings>;
 
   // -------------------------------------------------------------------------
-  // Delete
+  // Security
   // -------------------------------------------------------------------------
-  delete(id: string): Promise<User>;
+  getPasswordHash(userId: string): Promise<string | null>;
 }
