@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers.ts";
 import { users } from "./users.ts";
@@ -78,3 +78,9 @@ export const userSessionsRelations = relations(userSessions, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export type Session = InferSelectModel<typeof userSessions>;
+export type NewSession = InferInsertModel<typeof userSessions>;
+
+export type VerificationToken = InferSelectModel<typeof verificationTokens>;
+export type NewVerificationToken = InferInsertModel<typeof verificationTokens>;
