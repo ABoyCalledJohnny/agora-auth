@@ -18,6 +18,11 @@ env:
   SMTP_PORT: "1025"
   SMTP_USER: "ci_dummy_smtp_user"
   SMTP_PASSWORD: "ci_dummy_smtp_password"
+  AUTH_SECRET: "ci_dummy_auth_secret_must_be_32_chars_long"
+  INITIAL_ADMIN_EMAIL: "admin@localhost.com"
+  INITIAL_ADMIN_PASSWORD: "ci_dummy_admin_password"
+  DEFAULT_CLIENT_SECRET: "ci_dummy_client_secret"
+  POSTGRES_DB: "ci_dummy_db"
 
 jobs:
   verify-and-build:
