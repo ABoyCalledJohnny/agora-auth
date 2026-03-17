@@ -1,4 +1,30 @@
-import { DEFAULT_LOCALE, LOCALES, PUBLIC_ID_LENGTH, RESERVED_USERNAMES } from "@/src/config/constants";
+/**
+ * @module validation
+ * @description
+ * Centralised Zod validation schemas and translation maps for the application.
+ *
+ * Sections:
+ * 1. MESSAGES & I18N - Types for bridging translation keys with validation errors.
+ * 2. PRIMITIVE CONSTANTS - Helper sets and pure values used strictly for validation.
+ * 3. ENUMS & SYSTEM TYPES - Zod enum schemas tying into our database/routing constants.
+ * 4. REUSABLE FIELD SCHEMAS - Base field schemas (passwords, slugs, etc.) with i18n support.
+ * 5. COMPOSITE DOMAIN SCHEMAS - Complex object definitions for configurations and forms.
+ */
+
+import {
+  DEFAULT_PREFERENCES,
+  DEFAULT_PRIVACY_SETTINGS,
+  LOCALES,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  PUBLIC_ID_LENGTH,
+  RESERVED_USERNAMES,
+  SYSTEM_ROLE_NAMES,
+  USER_STATUS,
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  VERIFICATION_TOKEN_TYPE,
+} from "@/src/config/constants.ts";
 import { z } from "zod";
 
 // ============================================================================
@@ -32,32 +58,20 @@ export type ValidationTranslator = (key: ValidationMessageKey) => string;
 // Validation limits and sets used to power the schemas below.
 
 const RESERVED_USERNAME_SET = new Set<string>(RESERVED_USERNAMES);
-const PASSWORD_MIN_LENGTH = 12;
-const PASSWORD_MAX_LENGTH = 72;
-const USERNAME_MIN_LENGTH = 3;
-const USERNAME_MAX_LENGTH = 30;
 
 // ============================================================================
 // 3. ENUMS & SYSTEM TYPES
 // ============================================================================
 // Data enums that are strictly tied to Database representations or routing.
 
-type ZodEnumTuple = readonly [string, ...string[]];
-
 /** Status lifecycle of a user account (e.g., active, suspended) */
-export const USER_STATUS = ["pending", "active", "suspended"] as const satisfies ZodEnumTuple;
-export type UserStatus = (typeof USER_STATUS)[number];
 export const statusSchema = z.enum(USER_STATUS);
 
 /** Core RBAC system roles (e.g., admin, user) */
-export const SYSTEM_ROLE_NAMES = ["admin", "user"] as const satisfies ZodEnumTuple;
-export type SystemRoleName = (typeof SYSTEM_ROLE_NAMES)[number];
 export const systemRoleSchema = z.enum(SYSTEM_ROLE_NAMES);
 
 /** Types of short-lived verification tokens (e.g., email_verification) */
-export const VERIFICATION_TOKEN_TYPE = ["email_verification", "password_reset"] as const satisfies ZodEnumTuple;
 export const verificationTokenTypeSchema = z.enum(VERIFICATION_TOKEN_TYPE);
-export type VerificationTokenType = (typeof VERIFICATION_TOKEN_TYPE)[number];
 
 // ============================================================================
 // 4. REUSABLE FIELD SCHEMAS
@@ -117,12 +131,6 @@ export const paginationSchema = z.object({
 });
 
 /** Standardized privacy toggles for user profiles */
-export const DEFAULT_PRIVACY_SETTINGS = {
-  profileVisibility: "private",
-  showOnlineStatus: false,
-  allowIndexing: false,
-} as const;
-
 export const privacySettingsSchema = z.object({
   profileVisibility: z.enum(["members_only", "private"]).default(DEFAULT_PRIVACY_SETTINGS.profileVisibility),
   showOnlineStatus: z.boolean().default(DEFAULT_PRIVACY_SETTINGS.showOnlineStatus),
@@ -130,25 +138,6 @@ export const privacySettingsSchema = z.object({
 });
 
 export type PrivacySettings = z.infer<typeof privacySettingsSchema>;
-
-export const DEFAULT_PREFERENCES = {
-  theme: "system",
-  language: DEFAULT_LOCALE,
-  notifications: {
-    email: {
-      transactional: true,
-      marketing: false,
-      security: true,
-      newsletter: false,
-    },
-    push: {
-      messages: false,
-      mentions: false,
-      updates: false,
-      posts: false,
-    },
-  },
-} as const;
 
 /** Deeply nested User Application Preferences structure with safe fallbacks */
 export const preferencesSchema = z.object({

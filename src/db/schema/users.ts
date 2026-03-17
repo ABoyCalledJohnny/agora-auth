@@ -1,10 +1,5 @@
-import {
-  DEFAULT_PREFERENCES,
-  DEFAULT_PRIVACY_SETTINGS,
-  USER_STATUS,
-  type Preferences,
-  type PrivacySettings,
-} from "@/src/lib/validation";
+import { DEFAULT_PREFERENCES, DEFAULT_PRIVACY_SETTINGS, USER_STATUS } from "@/src/config/constants";
+import { type Preferences, type PrivacySettings } from "@/src/lib/validation";
 import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createdAtColumn, idColumn, updatedAtColumn, verifiedAtColumn } from "./_helpers.ts";

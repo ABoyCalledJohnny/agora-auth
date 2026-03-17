@@ -1,19 +1,9 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "@/src/db";
 import { roles, usersRoles, type Role, type NewRole } from "@/src/db/schema/rbac";
+import type { RoleRepository } from "@/src/features/user/contracts";
 
-export interface IRoleRepository {
-  findById(id: string): Promise<Role | null>;
-  findByName(name: string): Promise<Role | null>;
-  findAll(): Promise<Role[]>;
-  create(data: NewRole): Promise<Role>;
-  delete(id: string): Promise<void>;
-  getUserRoles(userId: string): Promise<Role[]>;
-  assignRoleToUser(userId: string, roleId: string): Promise<void>;
-  removeRoleFromUser(userId: string, roleId: string): Promise<void>;
-}
-
-export const RoleRepository: IRoleRepository = {
+export const DrizzleRoleRepository: RoleRepository = {
   async findById(id: string): Promise<Role | null> {
     const result = await db.select().from(roles).where(eq(roles.id, id)).limit(1);
     return result[0] || null;

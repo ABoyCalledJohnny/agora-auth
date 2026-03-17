@@ -1,6 +1,6 @@
 import { db } from ".";
 import { roles } from "./schema";
-import { SYSTEM_ROLE_NAMES } from "@/src/lib/validation";
+import { SYSTEM_ROLE_NAMES } from "@/src/config/constants";
 // import { RoleRepository } from "../repositories/RoleRepository";
 
 async function seedRoles() {

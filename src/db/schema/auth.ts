@@ -2,7 +2,7 @@ import { relations } from "drizzle-orm";
 import { index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers.ts";
 import { users } from "./users.ts";
-import { VERIFICATION_TOKEN_TYPE } from "@/src/lib/validation";
+import { VERIFICATION_TOKEN_TYPE } from "@/src/config/constants";
 
 export const verificationTokenTypeEnum = pgEnum("verification_token_type", VERIFICATION_TOKEN_TYPE);
 

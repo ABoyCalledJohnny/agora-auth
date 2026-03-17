@@ -138,10 +138,11 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Shared Validation and Domain Rules:**
-        - [x] **Validation module:** Create `src/lib/validation.ts` with reusable domain rules (password requirements, username format) and complex JSON type schemas (`UserPreferences`, `PrivacySettings`) needed by the database schema.
+        - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains.
+        - [ ] **Global types:** Create `src/types.ts` to define system-wide interfaces like `ApiErrorResponse`, `ApiSuccessResponse`, and standard action states for uniform client-server communication.
     - **Database Layer:**
         - **Drizzle schemas:** Translate the ERD into Drizzle schema and relation files.
-            - **Validation:** Import shared validators/types from `validation.ts` where applicable.
+            - **Validation:** Import shared constants and types from `constants.ts` and `validation.ts` where applicable.
             - **Types:** Export inferred TypeScript types from Drizzle schemas (e.g., `User`, `Session`, `Role`).
             - [x] Users Tables (`users.ts`)
             - [x] Auth Tables (`auth.ts`)
