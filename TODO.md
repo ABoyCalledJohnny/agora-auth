@@ -67,7 +67,7 @@
     - [x] **Validation Strategy:** Define core domain rules (e.g., Password complexity, user roles, user settings and preferences) (e.g., for `src/lib/validation.ts`).
 - **Service Architecture and Logic:**
     - [x] **Business Logic:** Define dedicated services for core operations (e.g., user management, authentication, token lifecycle) to decouple logic from the transport layer.
-    - [x] **Transport/API:** Plan the REST API structure and Next.js Server Actions for client-server communication, ensuring consistent validation and error handling.
+    - [x] **Transport/API:** Plan the REST API structure and Next.js Server Actions for client-server communication, ensuring consistent validation and error handling (define standard `ApiSuccessResponse` and `ApiErrorResponse` shapes).
     - [x] **Logic Flow:** Map out critical data flows (e.g., authentication lifecycle, complex transactions).
 - **Core Configuration and Standards:**
     - [x] **Error Types and Messages:** Define necessary error types / codes, messages, and HTTP statuses.
@@ -153,7 +153,7 @@
             - [ ] **`UserRepository`:** Data access for user records in `src/repositories/`. Shared across Auth and User features.
             - [ ] **`SessionRepository`:** Session CRUD (create, find, revoke, rotate) in `src/repositories/`.
             - [ ] **`VerificationTokenRepository`:** Token storage and lookup in `src/repositories/`.
-            - [ ] **`RoleRepository`:** Role and user-role assignment queries in `src/repositories/`.
+            - [x] **`RoleRepository`:** Role and user-role assignment queries in `src/repositories/`.
             - [ ] **`ApiClientRepository`:** API client lookup and domain validation in `src/repositories/`.
         - [ ] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap`).
         - [ ] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).

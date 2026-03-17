@@ -5,7 +5,7 @@ export interface RoleRepository {
   findByName(name: string): Promise<Role | null>;
   findAll(): Promise<Role[]>;
   create(data: NewRole): Promise<Role>;
-  delete(id: string): Promise<void>;
+  delete(id: string): Promise<Role>;
   getUserRoles(userId: string): Promise<Role[]>;
   assignRoleToUser(userId: string, roleId: string): Promise<void>;
   removeRoleFromUser(userId: string, roleId: string): Promise<void>;

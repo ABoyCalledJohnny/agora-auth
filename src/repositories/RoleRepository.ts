@@ -2,6 +2,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "@/src/db";
 import { roles, usersRoles, type Role, type NewRole } from "@/src/db/schema/rbac";
 import type { RoleRepository } from "@/src/features/auth/contracts";
+import { AgoraError } from "@/src/lib/errors";
 
 export const DrizzleRoleRepository: RoleRepository = {
   async findById(id: string): Promise<Role | null> {
@@ -19,13 +20,20 @@ export const DrizzleRoleRepository: RoleRepository = {
   },
 
   async create(data: NewRole): Promise<Role> {
-    const [result] = await db.insert(roles).values(data).returning();
-    if (!result) throw new Error("Failed to create role");
-    return result;
-  },
+    const [result] = await db.insert(roles).values(data).onConflictDoNothing({ target: roles.name }).returning();
 
-  async delete(id: string): Promise<void> {
-    await db.delete(roles).where(eq(roles.id, id));
+    if (result) return result;
+
+    // If we got no result, a conflict occurred, so fetch and return the existing one.
+    const [existingRole] = await db.select().from(roles).where(eq(roles.name, data.name)).limit(1);
+    if (!existingRole) throw new AgoraError("INTERNAL", "Failed to create or fetch role");
+
+    return existingRole;
+  },
+  async delete(id: string): Promise<Role> {
+    const [deletedRole] = await db.delete(roles).where(eq(roles.id, id)).returning();
+    if (!deletedRole) throw new AgoraError("NOT_FOUND", "Role not found");
+    return deletedRole;
   },
 
   async getUserRoles(userId: string): Promise<Role[]> {

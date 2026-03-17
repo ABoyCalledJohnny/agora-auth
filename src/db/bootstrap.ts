@@ -1,14 +1,19 @@
-import { db } from ".";
-import { roles } from "./schema";
+// import { db } from ".";
+// import { roles } from "./schema";
 import { SYSTEM_ROLE_NAMES } from "@/src/config/constants";
-// import { RoleRepository } from "../repositories/RoleRepository";
+import { DrizzleRoleRepository } from "../repositories/RoleRepository";
 
 async function seedRoles() {
   console.log("Seeding user roles...");
-  await db
-    .insert(roles)
-    .values(SYSTEM_ROLE_NAMES.map((name) => ({ name })))
-    .onConflictDoNothing({ target: roles.name });
+
+  for (const role of SYSTEM_ROLE_NAMES) {
+    await DrizzleRoleRepository.create({ name: role });
+  }
+
+  // await db
+  //   .insert(roles)
+  //   .values(SYSTEM_ROLE_NAMES.map((name) => ({ name })))
+  //   .onConflictDoNothing({ target: roles.name });
 }
 
 async function seedAdminAccount() {
