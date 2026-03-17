@@ -155,7 +155,7 @@
             - [x] **`VerificationTokenRepository`:** Token storage and lookup in `src/repositories/`.
             - [x] **`RoleRepository`:** Role and user-role assignment queries in `src/repositories/`.
             - [x] **`ApiClientRepository`:** API client lookup and domain validation in `src/repositories/`.
-        - [ ] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap`).
+        - [x] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap`).
         - [ ] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).
     - **Core Library:**
         - [ ] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) - Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
