@@ -10,8 +10,8 @@
     },
     "@release-it/conventional-changelog": {
       "infile": "CHANGELOG.md",
-      "preset": "conventionalcommits",
-      "presetConfig": {
+      "preset": {
+        "name": "conventionalcommits",
         "types": [
           {
             "type": "feat",
