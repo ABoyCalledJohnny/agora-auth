@@ -35,6 +35,7 @@ const envSchema = z.object({
 
   // Bootstrap / Initialization
   INITIAL_ADMIN_EMAIL: z.string().email(),
+  INITIAL_ADMIN_USERNAME: z.string().min(1),
   INITIAL_ADMIN_PASSWORD: z.string().min(1),
   DEFAULT_CLIENT_SECRET: z.string().min(1),
 
@@ -117,6 +118,7 @@ export const appConfig = {
 
   bootstrap: {
     initialAdminEmail: env.INITIAL_ADMIN_EMAIL,
+    initialAdminUsername: env.INITIAL_ADMIN_USERNAME,
     initialAdminPassword: env.INITIAL_ADMIN_PASSWORD,
     defaultClientSecret: env.DEFAULT_CLIENT_SECRET,
   },

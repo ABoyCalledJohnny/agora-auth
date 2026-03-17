@@ -2,6 +2,7 @@
 // import { roles } from "./schema";
 import { SYSTEM_ROLE_NAMES } from "@/src/config/constants";
 import { DrizzleRoleRepository } from "../repositories/RoleRepository";
+// import { DrizzleUserRepository } from "../repositories/UserRepository";
 
 async function seedRoles() {
   console.log("Seeding user roles...");
@@ -19,7 +20,10 @@ async function seedRoles() {
 async function seedAdminAccount() {
   console.log("Seeding initial admin account...");
 
-  // TODO: Hash password and insert admin user if it doesn't exist
+  // TODO: Fix seed parameters
+  // await DrizzleUserRepository.create({
+  //   username: appConfig.bootstrap.initialAdminUsername
+  // })
 }
 
 async function seedDefaultClient() {

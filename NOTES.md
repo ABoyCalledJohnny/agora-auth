@@ -337,9 +337,11 @@ All values in this table are **never committed** to version control. They are st
 | `STAGING_JWT_PRIVATE_KEY`        | `JWT_PRIVATE_KEY`        | staging | RS256 private key for signing access JWTs               |
 | `STAGING_JWT_PUBLIC_KEY`         | `JWT_PUBLIC_KEY`         | staging | RS256 public key (served via JWKS endpoint)             |
 | `PROD_INITIAL_ADMIN_EMAIL`       | `INITIAL_ADMIN_EMAIL`    |  prod   | Email for the initial admin account                     |
+| `PROD_INITIAL_ADMIN_USERNAME`    | `INITIAL_ADMIN_USERNAME` |  prod   | Username for the initial admin account                  |
 | `PROD_INITIAL_ADMIN_PASSWORD`    | `INITIAL_ADMIN_PASSWORD` |  prod   | Password for the initial admin account                  |
 | `PROD_DEFAULT_CLIENT_SECRET`     | `DEFAULT_CLIENT_SECRET`  |  prod   | Raw API Key for the default system client               |
 | `STAGING_INITIAL_ADMIN_EMAIL`    | `INITIAL_ADMIN_EMAIL`    | staging | Email for the initial admin account (staging)           |
+| `STAGING_INITIAL_ADMIN_USERNAME` | `INITIAL_ADMIN_USERNAME` | staging | Username for the initial admin account (staging)        |
 | `STAGING_INITIAL_ADMIN_PASSWORD` | `INITIAL_ADMIN_PASSWORD` | staging | Password for the initial admin account (staging)        |
 | `STAGING_DEFAULT_CLIENT_SECRET`  | `DEFAULT_CLIENT_SECRET`  | staging | Raw API Key for the default system client (staging)     |
 | **Email (SMTP)**                 |                          |         |                                                         |
@@ -414,8 +416,8 @@ JWT_PUBLIC_KEY=""
 > [!NOTE]
 > **Details**
 >
-> - `AUTH_SECRET` is already set as a dummy in `.env.development` - no need to duplicate here.
-> - `POSTGRES_*` are already set as dummy values in `.env.development`.
+> - `AUTH_SECRET`, `DEFAULT_CLIENT_SECRET`, and `INITIAL_ADMIN_*` fields must be placed in `.env.local`.
+> - `POSTGRES_*` are still set as dummy values in `.env.development`.
 > - `APP_DB_USER` and `APP_DB_PASSWORD` must also be present in `.env.local` for local `next build` runs. Build mode loads `.env.production` + `.env.local` (not `.env.development`), and `config/index.ts` validates these fields at import time.
 > - JWT keys are structurally complex PEM files (unlike `AUTH_SECRET` which is just a random string). A dummy won't work - real dev-only keys are needed. Alternatively, you could auto-generate in dev mode at startup.
 > - For tests, SMTP and JWT are typically mocked; `.env.test` does not need real secrets for these.
@@ -446,18 +448,19 @@ Complete matrix of every variable across all committed `.env` files. Replace `{p
 | `APP_DB_USER`                     |               |   `{project}_dev_app_user`   |   `{project}_test_app_user`   |          🔒 CI/CD          |      🔒 CI/CD      |
 | `APP_DB_PASSWORD`                 |               | `{project}_dev_app_password` | `{project}_test_app_password` |          🔒 CI/CD          |      🔒 CI/CD      |
 | **Auth & Bootstrapping**          |               |                              |                               |                            |                    |
-| `AUTH_SECRET`                     |               |      `dev_dummy_secret`      |      `test_dummy_secret`      |          🔒 CI/CD          |      🔒 CI/CD      |
-| `JWT_PRIVATE_KEY`                 |               |       🔒 `.env.local`        |      mock / `.env.local`      |          🔒 CI/CD          |      🔒 CI/CD      |
-| `JWT_PUBLIC_KEY`                  |               |       🔒 `.env.local`        |      mock / `.env.local`      |          🔒 CI/CD          |      🔒 CI/CD      |
-| `INITIAL_ADMIN_EMAIL`             |               |      `admin@localhost`       |       `admin@localhost`       |          🔒 CI/CD          |      🔒 CI/CD      |
-| `INITIAL_ADMIN_PASSWORD`          |               |     `dev_dummy_password`     |     `test_dummy_password`     |          🔒 CI/CD          |      🔒 CI/CD      |
-| `DEFAULT_CLIENT_SECRET`           |               |  `dev_dummy_client_secret`   |  `test_dummy_client_secret`   |          🔒 CI/CD          |      🔒 CI/CD      |
+| `AUTH_SECRET`                     |               |       🔒 `.env.local`        |      `test_dummy_secret`      |          🔒 CI/CD          |      🔒 CI/CD      |
+| `JWT_PRIVATE_KEY`                 |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
+| `JWT_PUBLIC_KEY`                  |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
+| `INITIAL_ADMIN_EMAIL`             |               |       🔒 `.env.local`        |     `admin@localhost.com`     |          🔒 CI/CD          |      🔒 CI/CD      |
+| `INITIAL_ADMIN_USERNAME`          |               |       🔒 `.env.local`        |            `admin`            |          🔒 CI/CD          |      🔒 CI/CD      |
+| `INITIAL_ADMIN_PASSWORD`          |               |       🔒 `.env.local`        |     `test_dummy_password`     |          🔒 CI/CD          |      🔒 CI/CD      |
+| `DEFAULT_CLIENT_SECRET`           |               |       🔒 `.env.local`        |  `test_dummy_client_secret`   |          🔒 CI/CD          |      🔒 CI/CD      |
 | **Email (SMTP)**                  |               |                              |                               |                            |                    |
 | `SMTP_HOST`                       |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
 | `SMTP_PORT`                       |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
 | `SMTP_USER`                       |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
 | `SMTP_PASSWORD`                   |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
-| `MAIL_FROM`                       |               |   `noreply@localhost.com`    | `noreply@test.localhost.cm"`  | `noreply@staging.{domain}` | `noreply@{domain}` |
+| `MAIL_FROM`                       |               |   `noreply@localhost.com`    | `noreply@test.localhost.com"` | `noreply@staging.{domain}` | `noreply@{domain}` |
 | **Feature Flags**                 |               |                              |                               |                            |                    |
 | `NEXT_PUBLIC_ENABLE_REGISTRATION` |    `true`     |              -               |               -               |             -              |      `false`       |
 | **Files & Uploads**               |               |                              |                               |                            |                    |
