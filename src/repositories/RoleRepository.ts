@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "@/src/db";
 import { roles, usersRoles, type Role, type NewRole } from "@/src/db/schema/rbac";
-import type { RoleRepository } from "@/src/features/user/contracts";
+import type { RoleRepository } from "@/src/features/auth/contracts";
 
 export const DrizzleRoleRepository: RoleRepository = {
   async findById(id: string): Promise<Role | null> {
