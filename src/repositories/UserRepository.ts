@@ -13,7 +13,7 @@ import {
   userCredentials,
 } from "@/src/db/schema";
 import type { UserRepository } from "@/src/features/user/contracts";
-import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { AgoraError } from "../lib/errors";
 
 export const DrizzleUserRepository: UserRepository = {
@@ -45,18 +45,18 @@ export const DrizzleUserRepository: UserRepository = {
   // Read
   // -------------------------------------------------------------------------
   async findById(id: string): Promise<User | null> {
-    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
-    return result[0] || null;
+    const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return user ?? null;
   },
 
   async findByUsername(username: string): Promise<User | null> {
-    const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
-    return result[0] || null;
+    const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return user ?? null;
   },
 
   async findByEmail(email: string): Promise<User | null> {
-    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    return result[0] || null;
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return user ?? null;
   },
 
   async findAll(): Promise<User[]> {
@@ -88,23 +88,44 @@ export const DrizzleUserRepository: UserRepository = {
     return result;
   },
 
-  async listPage({ page, pageSize, status, search, sortBy = "createdAt", sortDirection = "desc" }) {
-    const safePage = Math.max(1, page);
-    const safePageSize = Math.max(1, pageSize);
-    const offset = (safePage - 1) * safePageSize;
+  /**
+   * Retrieves a paginated list of users, with optional filtering, searching, and sorting.
+   *
+   * @param page - The current page number (e.g. 1). Used to calculate how many records to skip.
+   * @param limit - How many records to return per page (e.g. 10).
+   * @param status - (Optional) Filter users by their account status (e.g. 'active', 'suspended'). If omitted, all statuses are returned.
+   * @param roleId - (Optional) Filter users by a specific assigned role ID.
+   * @param search - (Optional) Text string to search for. If provided, checks if the username OR email contains this text (case-insensitive).
+   * @param sortBy - Which column to sort the results by (e.g. 'username', 'email', 'createdAt'). Defaults to 'createdAt'.
+   * @param sortDirection - The direction to sort the column ('asc' for A-Z / newest first, 'desc' for Z-A / oldest first).
+   */
+  async listPage({ page, limit, status, search, roleId, sortBy = "createdAt", sortDirection = "desc" }) {
+    // Offset calculates the number of rows to skip before beginning to return rows.
+    // If you are on page 2 and want 10 items, you skip the first 10 items: (2 - 1) * 10 = 10.
+    const offset = (page - 1) * limit;
 
-    const searchValue = search?.trim();
-    const searchCondition = searchValue
-      ? or(ilike(users.username, `%${searchValue}%`), ilike(users.email, `%${searchValue}%`))
+    // Search condition: We use Drizzle's `ilike` operator (case-insensitive LIKE) to check
+    // if the substring (`%search%`) matches either the username or the email.
+    // If `search` is not provided, this simply evaluates to `undefined` and Drizzle ignores it.
+    const searchCondition = search
+      ? or(ilike(users.username, `%${search}%`), ilike(users.email, `%${search}%`))
       : undefined;
 
-    const whereClause =
-      status && searchCondition
-        ? and(eq(users.status, status), searchCondition)
-        : status
-          ? eq(users.status, status)
-          : searchCondition;
+    // Role condition: If filtering by a roleId, we look up users whose ID exists in the usersRoles junction table.
+    const roleCondition = roleId
+      ? inArray(
+          users.id,
+          db.select({ userId: usersRoles.userId }).from(usersRoles).where(eq(usersRoles.roleId, roleId)),
+        )
+      : undefined;
 
+    // Filter condition: We use `and()` to combine multiple conditions.
+    // In Drizzle, if any condition passed to `and()` is `undefined`, it is safely ignored.
+    const whereClause = and(status ? eq(users.status, status) : undefined, roleCondition, searchCondition);
+
+    // Sorting string to DB column mapping: Since user input (`sortBy` 'username') is just a string,
+    // we explicitly map it to the actual database column reference (like `users.username`) to
+    // guarantee no generic strings end up in the raw SQL (which prevents SQL injection).
     const sortColumn =
       sortBy === "username"
         ? users.username
@@ -114,12 +135,17 @@ export const DrizzleUserRepository: UserRepository = {
             ? users.updatedAt
             : users.createdAt;
 
+    // Create the final ORDER BY clause utilizing Drizzle's `asc` and `desc` helper functions
+    // wrapping our chosen database column.
     const orderByClause = sortDirection === "asc" ? asc(sortColumn) : desc(sortColumn);
 
+    // Fetch the paginated rows from the database (e.g. "select * from users where ... order by ... limit 10 offset 10")
     const items = whereClause
-      ? await db.select().from(users).where(whereClause).orderBy(orderByClause).limit(safePageSize).offset(offset)
-      : await db.select().from(users).orderBy(orderByClause).limit(safePageSize).offset(offset);
+      ? await db.select().from(users).where(whereClause).orderBy(orderByClause).limit(limit).offset(offset)
+      : await db.select().from(users).orderBy(orderByClause).limit(limit).offset(offset);
 
+    // Count query: A data table needs to know the total number of items available to render
+    // its pagination numbers (e.g. "Page 1 of 5"). We issue a separate query to just get the count.
     const totalResult = whereClause
       ? await db
           .select({ count: sql<number>`count(*)` })
@@ -129,11 +155,12 @@ export const DrizzleUserRepository: UserRepository = {
 
     const total = totalResult[0]?.count ?? 0;
 
+    // Return the required struct for standard paginated responses.
     return {
       items,
       total,
-      page: safePage,
-      pageSize: safePageSize,
+      page,
+      limit,
     };
   },
 

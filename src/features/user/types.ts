@@ -6,9 +6,10 @@ export type UserListSortDirection = "asc" | "desc";
 
 export type ListUsersPageInput = {
   page: number;
-  pageSize: number;
+  limit: number;
   status?: UserStatus;
   search?: string;
+  roleId?: string;
   sortBy?: UserListSortBy;
   sortDirection?: UserListSortDirection;
 };
@@ -17,5 +18,5 @@ export type ListUsersPageResult = {
   items: User[];
   total: number;
   page: number;
-  pageSize: number;
+  limit: number;
 };

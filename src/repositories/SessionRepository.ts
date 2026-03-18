@@ -23,17 +23,17 @@ export const DrizzleSessionRepository: SessionRepository = {
   // Read
   // ---------------------------------------------------------------------------
   async findById(id: string): Promise<Session | null> {
-    const result = await db.select().from(userSessions).where(eq(userSessions.id, id)).limit(1);
-    return result[0] || null;
+    const [session] = await db.select().from(userSessions).where(eq(userSessions.id, id)).limit(1);
+    return session ?? null;
   },
 
   async findByToken(tokenHash: string): Promise<Session | null> {
-    const result = await db.select().from(userSessions).where(eq(userSessions.sessionTokenHash, tokenHash)).limit(1);
-    return result[0] || null;
+    const [session] = await db.select().from(userSessions).where(eq(userSessions.sessionTokenHash, tokenHash)).limit(1);
+    return session ?? null;
   },
 
   async findActiveByToken(tokenHash: string): Promise<Session | null> {
-    const result = await db
+    const [session] = await db
       .select()
       .from(userSessions)
       .where(
@@ -45,17 +45,17 @@ export const DrizzleSessionRepository: SessionRepository = {
       )
       .limit(1);
 
-    return result[0] || null;
+    return session ?? null;
   },
 
   async findByPreviousToken(tokenHash: string): Promise<Session | null> {
-    const result = await db
+    const [session] = await db
       .select()
       .from(userSessions)
       .where(eq(userSessions.previousSessionTokenHash, tokenHash))
       .limit(1);
 
-    return result[0] || null;
+    return session ?? null;
   },
 
   // ---------------------------------------------------------------------------

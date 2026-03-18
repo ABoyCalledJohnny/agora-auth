@@ -34,18 +34,18 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   // Read
   // ---------------------------------------------------------------------------
   async findById(id: string): Promise<ApiClient | null> {
-    const result = await db.select().from(apiClients).where(eq(apiClients.id, id)).limit(1);
-    return result[0] || null;
+    const [client] = await db.select().from(apiClients).where(eq(apiClients.id, id)).limit(1);
+    return client ?? null;
   },
 
   async findByName(name: string): Promise<ApiClient | null> {
-    const result = await db.select().from(apiClients).where(eq(apiClients.name, name)).limit(1);
-    return result[0] || null;
+    const [client] = await db.select().from(apiClients).where(eq(apiClients.name, name)).limit(1);
+    return client ?? null;
   },
 
   async findByClientId(clientId: string): Promise<ApiClient | null> {
-    const result = await db.select().from(apiClients).where(eq(apiClients.clientId, clientId)).limit(1);
-    return result[0] || null;
+    const [client] = await db.select().from(apiClients).where(eq(apiClients.clientId, clientId)).limit(1);
+    return client ?? null;
   },
 
   async findAll(): Promise<ApiClient[]> {

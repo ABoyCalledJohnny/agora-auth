@@ -24,13 +24,13 @@ export const DrizzleRoleRepository: RoleRepository = {
   // Read
   // ---------------------------------------------------------------------------
   async findById(id: string): Promise<Role | null> {
-    const result = await db.select().from(roles).where(eq(roles.id, id)).limit(1);
-    return result[0] || null;
+    const [role] = await db.select().from(roles).where(eq(roles.id, id)).limit(1);
+    return role ?? null;
   },
 
   async findByName(name: string): Promise<Role | null> {
-    const result = await db.select().from(roles).where(eq(roles.name, name)).limit(1);
-    return result[0] || null;
+    const [role] = await db.select().from(roles).where(eq(roles.name, name)).limit(1);
+    return role ?? null;
   },
 
   async findAll(): Promise<Role[]> {

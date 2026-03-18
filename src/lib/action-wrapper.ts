@@ -2,6 +2,7 @@ import type { z } from "zod";
 import { type Session, authenticate, authorize } from "@/src/lib/auth";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
+import type { HandlerConfig } from "@/src/lib/wrapper-types";
 import type { ApiErrorResponse, ApiResponse } from "@/src/types";
 import { sanitizeInput } from "@/src/lib/utils";
 
@@ -11,16 +12,6 @@ import { sanitizeInput } from "@/src/lib/utils";
 
 /** Discriminated union returned by every wrapped server action. */
 export type ActionResult<T = void> = ApiResponse<T>;
-
-/** Configuration for `withActionHandler`. */
-type ActionConfig<TSchema extends z.ZodType = z.ZodType> = {
-  /** Zod schema to validate (and infer the type of) the raw input. */
-  schema?: TSchema;
-  /** Require authentication. Defaults to `false`. */
-  auth?: boolean;
-  /** Roles the user must hold (only checked when `auth` is `true`). */
-  roles?: string[];
-};
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
 // TypeScript still types it as `Session | null` — use `session!` or a guard.
@@ -61,19 +52,19 @@ function parseFormData(input: unknown): unknown {
 
 /** With schema — handler receives `{ data, session }`. */
 export function withActionHandler<TSchema extends z.ZodType, TResult>(
-  config: ActionConfig<TSchema> & { schema: TSchema },
+  config: HandlerConfig<TSchema> & { schema: TSchema },
   handler: (context: { data: z.infer<TSchema>; session: Session | null }) => Promise<TResult>,
 ): (rawInput: z.input<TSchema> | FormData) => Promise<ActionResult<TResult>>;
 
 /** Without schema — handler receives `{ session }`. */
 export function withActionHandler<TResult>(
-  config: Omit<ActionConfig, "schema">,
+  config: Omit<HandlerConfig, "schema">,
   handler: (context: { session: Session | null }) => Promise<TResult>,
 ): () => Promise<ActionResult<TResult>>;
 
 // Implementation
 export function withActionHandler(
-  config: ActionConfig,
+  config: HandlerConfig,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- required for overload compatibility
   handler: (context: any) => Promise<unknown>,
 ) {

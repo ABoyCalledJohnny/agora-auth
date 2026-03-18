@@ -1,28 +1,23 @@
+import { authenticate, authorize, type Session } from "@/src/lib/auth.ts";
+import { AgoraError, defaultErrorMessages } from "@/src/lib/errors";
+import { logger } from "@/src/lib/logger.ts";
+import { sanitizeInput } from "@/src/lib/utils";
+import type { HandlerConfig } from "@/src/lib/wrapper-types";
+import type { ApiErrorResponse } from "@/src/types";
 import { type NextRequest, NextResponse } from "next/server";
 import type { z } from "zod";
-import { type Session, authenticate, authorize } from "@/src/lib/auth";
-import { AgoraError } from "@/src/lib/errors";
-import { logger } from "@/src/lib/logger.ts";
-import type { ApiErrorResponse } from "@/src/types";
-import { sanitizeInput } from "@/src/lib/utils";
 
-//  TODO catch all for not implemented routes
+// TODO catch all for not implemented routes
+// TODO param validation
+// TODO rate limiting (e.g. strict limits for public routes vs authenticated routes)
+// TODO query parameter parsing (e.g. pagination, sorting filters for GET requests)
+// TODO metrics & request tracing (e.g. calculating handler execution time to log slow requests)
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 type RouteParams = Promise<Record<string, string>>;
-
-/** Configuration for `withApiHandler`. */
-type ApiConfig<TSchema extends z.ZodType = z.ZodType> = {
-  /** Zod schema to validate the JSON request body. Omit for bodyless routes (GET, DELETE). */
-  schema?: TSchema;
-  /** Require authentication. Defaults to `false`. */
-  auth?: boolean;
-  /** Roles the user must hold (only checked when `auth` is `true`). */
-  roles?: string[];
-};
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
 // TypeScript still types it as `Session | null` — use `session!` or a guard.
@@ -40,15 +35,21 @@ function formatApiError(error: unknown): NextResponse {
       details: error.details,
     };
 
-    // TODO(auth): For 401 responses, include `WWW-Authenticate` header
-    // (e.g. `Bearer` or `Bearer error="invalid_token"`) so clients can
-    // reliably detect authentication challenges.
-    return NextResponse.json(response, { status: error.status });
+    const headers = new Headers();
+    if (error.status === 401) {
+      const isTokenError =
+        error.code === "TOKEN_EXPIRED" || error.code === "TOKEN_INVALID" || error.code === "TOKEN_REVOKED";
+
+      const authParams = isTokenError ? ' error="invalid_token"' : "";
+      headers.set("WWW-Authenticate", `Bearer${authParams}`);
+    }
+
+    return NextResponse.json(response, { status: error.status, headers });
   }
   logger.error("Unhandled API error", error);
   const response: ApiErrorResponse = {
     success: false,
-    error: "An unexpected error occurred.",
+    error: defaultErrorMessages.INTERNAL,
     code: "INTERNAL",
   };
   return NextResponse.json(response, { status: 500 });
@@ -60,7 +61,7 @@ function formatApiError(error: unknown): NextResponse {
 
 /** With schema — handler receives `{ request, data, session, params }`. */
 export function withApiHandler<TSchema extends z.ZodType>(
-  config: ApiConfig<TSchema> & { schema: TSchema },
+  config: HandlerConfig<TSchema> & { schema: TSchema },
   handler: (context: {
     request: NextRequest;
     data: z.infer<TSchema>;
@@ -71,13 +72,13 @@ export function withApiHandler<TSchema extends z.ZodType>(
 
 /** Without schema — handler receives `{ request, session, params }`. */
 export function withApiHandler(
-  config: Omit<ApiConfig, "schema">,
+  config: Omit<HandlerConfig, "schema">,
   handler: (context: { request: NextRequest; session: Session | null; params: RouteParams }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
 
 // Implementation
 export function withApiHandler(
-  config: ApiConfig,
+  config: HandlerConfig,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- required for overload compatibility
   handler: (context: any) => Promise<NextResponse>,
 ) {
@@ -107,7 +108,7 @@ export function withApiHandler(
         const result = config.schema.safeParse(sanitised);
         if (!result.success) {
           throw new AgoraError("VALIDATION_ERROR", "Validation failed.", {
-            details: result.error.flatten(),
+            details: result.error.issues,
           });
         }
         data = result.data;

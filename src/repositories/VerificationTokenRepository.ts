@@ -20,19 +20,19 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
   // Read
   // ---------------------------------------------------------------------------
   async findById(id: string): Promise<VerificationToken | null> {
-    const result = await db.select().from(verificationTokens).where(eq(verificationTokens.id, id)).limit(1);
+    const [token] = await db.select().from(verificationTokens).where(eq(verificationTokens.id, id)).limit(1);
 
-    return result[0] || null;
+    return token ?? null;
   },
 
   async findByToken(tokenHash: string): Promise<VerificationToken | null> {
-    const result = await db
+    const [token] = await db
       .select()
       .from(verificationTokens)
       .where(eq(verificationTokens.tokenHash, tokenHash))
       .limit(1);
 
-    return result[0] || null;
+    return token ?? null;
   },
 
   async findByUserIdAndType(userId: string, type: VerificationTokenType): Promise<VerificationToken[]> {
@@ -62,6 +62,15 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
   // ---------------------------------------------------------------------------
   // Delete
   // ---------------------------------------------------------------------------
+
+  /**
+   * Hard-deletes a verification token by its unique database ID.
+   *
+   * SECURITY WARNING: If you are verifying a token for a user action (e.g., password reset,
+   * email verification), DO NOT use `findByToken` -> validate -> `delete(id)`.
+   * That multi-step sequence introduces a Time-of-Check to Time-of-Use (TOCTOU) race condition.
+   * Attempting to consume a token must be done atomically via `tryConsumeByToken()` instead.
+   */
   async delete(id: string): Promise<VerificationToken> {
     const [deletedToken] = await db.delete(verificationTokens).where(eq(verificationTokens.id, id)).returning();
 
