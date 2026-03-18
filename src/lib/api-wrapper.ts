@@ -3,6 +3,7 @@ import type { z } from "zod";
 import { type Session, authenticate, authorize } from "@/src/lib/auth";
 import { AgoraError } from "@/src/lib/errors";
 import { logger } from "@/src/lib/logger.ts";
+import type { ApiErrorResponse } from "@/src/types";
 import { sanitizeInput } from "@/src/lib/utils";
 
 //  TODO catch all for not implemented routes
@@ -32,10 +33,25 @@ type ApiConfig<TSchema extends z.ZodType = z.ZodType> = {
 
 function formatApiError(error: unknown): NextResponse {
   if (error instanceof AgoraError) {
-    return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
+    const response: ApiErrorResponse = {
+      success: false,
+      error: error.message,
+      code: error.code,
+      details: error.details,
+    };
+
+    // TODO(auth): For 401 responses, include `WWW-Authenticate` header
+    // (e.g. `Bearer` or `Bearer error="invalid_token"`) so clients can
+    // reliably detect authentication challenges.
+    return NextResponse.json(response, { status: error.status });
   }
   logger.error("Unhandled API error", error);
-  return NextResponse.json({ error: "An unexpected error occurred.", code: "INTERNAL" }, { status: 500 });
+  const response: ApiErrorResponse = {
+    success: false,
+    error: "An unexpected error occurred.",
+    code: "INTERNAL",
+  };
+  return NextResponse.json(response, { status: 500 });
 }
 
 // ---------------------------------------------------------------------------

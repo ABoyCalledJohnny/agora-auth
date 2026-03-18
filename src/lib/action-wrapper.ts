@@ -2,6 +2,7 @@ import type { z } from "zod";
 import { type Session, authenticate, authorize } from "@/src/lib/auth";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
+import type { ApiErrorResponse, ApiResponse } from "@/src/types";
 import { sanitizeInput } from "@/src/lib/utils";
 
 // ---------------------------------------------------------------------------
@@ -9,7 +10,7 @@ import { sanitizeInput } from "@/src/lib/utils";
 // ---------------------------------------------------------------------------
 
 /** Discriminated union returned by every wrapped server action. */
-export type ActionResult<T = void> = { success: true; data: T } | { success: false; error: string; code: string };
+export type ActionResult<T = void> = ApiResponse<T>;
 
 /** Configuration for `withActionHandler`. */
 type ActionConfig<TSchema extends z.ZodType = z.ZodType> = {
@@ -30,14 +31,21 @@ type ActionConfig<TSchema extends z.ZodType = z.ZodType> = {
 
 function formatActionError(error: unknown): ActionResult<never> {
   if (error instanceof AgoraError) {
-    return { success: false, error: error.message, code: error.code };
+    const response: ApiErrorResponse = {
+      success: false,
+      error: error.message,
+      code: error.code,
+      details: error.details,
+    };
+    return response;
   }
   logger.error("Unhandled action error", error);
-  return {
+  const response: ApiErrorResponse = {
     success: false,
     error: "An unexpected error occurred.",
     code: "INTERNAL",
   };
+  return response;
 }
 
 function parseFormData(input: unknown): unknown {

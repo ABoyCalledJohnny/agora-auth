@@ -2,6 +2,7 @@
   "Errors": {
     "VALIDATION_ERROR": "The provided data is invalid.",
     "NOT_FOUND": "The requested resource could not be found.",
+    "NOT_IMPLEMENTED": "This endpoint is not implemented yet.",
     "INTERNAL": "An unexpected internal server error occurred.",
     "UNAUTHORIZED": "You must be logged in to perform this action.",
     "FORBIDDEN": "You do not have permission to perform this action.",

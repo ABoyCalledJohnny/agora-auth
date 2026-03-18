@@ -2,6 +2,7 @@
   "Errors": {
     "VALIDATION_ERROR": "Die angegebenen Daten sind ungültig.",
     "NOT_FOUND": "Die angeforderte Ressource konnte nicht gefunden werden.",
+    "NOT_IMPLEMENTED": "Dieser Endpunkt ist noch nicht implementiert.",
     "INTERNAL": "Ein unerwarteter Serverfehler ist aufgetreten.",
     "UNAUTHORIZED": "Du musst angemeldet sein, um diese Aktion auszuführen.",
     "FORBIDDEN": "Du hast keine Berechtigung für diese Aktion.",
