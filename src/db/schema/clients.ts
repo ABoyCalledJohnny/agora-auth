@@ -4,7 +4,7 @@ import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers.ts";
 
 export const apiClients = pgTable("api_clients", {
   id: idColumn(),
-  name: text().notNull(),
+  name: text().notNull().unique(),
   clientId: text().notNull().unique(),
   apiKeyHash: text().notNull().unique(),
   baseUrl: text().notNull().unique(), // e.g., "https://example.com" or "http://localhost:3000"

@@ -2,7 +2,7 @@ import { db } from "@/src/db";
 import { type NewVerificationToken, type VerificationToken, verificationTokens } from "@/src/db/schema";
 import type { VerificationTokenRepository } from "@/src/features/auth/contracts";
 import { AgoraError } from "@/src/lib/errors";
-import { and, eq, lt } from "drizzle-orm";
+import { and, eq, gt, lt } from "drizzle-orm";
 import type { VerificationTokenType } from "../config/constants";
 
 export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
@@ -42,6 +42,21 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
       .where(and(eq(verificationTokens.userId, userId), eq(verificationTokens.type, type)));
 
     return tokens;
+  },
+
+  async tryConsumeByToken(tokenHash: string, type: VerificationTokenType): Promise<VerificationToken | null> {
+    const [consumedToken] = await db
+      .delete(verificationTokens)
+      .where(
+        and(
+          eq(verificationTokens.tokenHash, tokenHash),
+          eq(verificationTokens.type, type),
+          gt(verificationTokens.expiresAt, new Date()),
+        ),
+      )
+      .returning();
+
+    return consumedToken ?? null;
   },
 
   // ---------------------------------------------------------------------------

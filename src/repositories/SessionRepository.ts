@@ -2,7 +2,7 @@ import { db } from "@/src/db";
 import { type NewSession, type Session, userSessions } from "@/src/db/schema";
 import type { SessionRepository } from "@/src/features/auth/contracts";
 import { AgoraError } from "@/src/lib/errors";
-import { eq, lt } from "drizzle-orm";
+import { and, eq, gt, isNull, lt } from "drizzle-orm";
 
 export const DrizzleSessionRepository: SessionRepository = {
   // ---------------------------------------------------------------------------
@@ -29,6 +29,32 @@ export const DrizzleSessionRepository: SessionRepository = {
 
   async findByToken(tokenHash: string): Promise<Session | null> {
     const result = await db.select().from(userSessions).where(eq(userSessions.sessionTokenHash, tokenHash)).limit(1);
+    return result[0] || null;
+  },
+
+  async findActiveByToken(tokenHash: string): Promise<Session | null> {
+    const result = await db
+      .select()
+      .from(userSessions)
+      .where(
+        and(
+          eq(userSessions.sessionTokenHash, tokenHash),
+          isNull(userSessions.revokedAt),
+          gt(userSessions.expiresAt, new Date()),
+        ),
+      )
+      .limit(1);
+
+    return result[0] || null;
+  },
+
+  async findByPreviousToken(tokenHash: string): Promise<Session | null> {
+    const result = await db
+      .select()
+      .from(userSessions)
+      .where(eq(userSessions.previousSessionTokenHash, tokenHash))
+      .limit(1);
+
     return result[0] || null;
   },
 

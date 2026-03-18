@@ -144,14 +144,14 @@ Die aktuellen Next.js- und Bun-Skripte in der `package.json` unterstützen berei
 
 ### Nützliche Befehle
 
-| **Befehl**            | **Beschreibung**                                                   |
-| --------------------- | ------------------------------------------------------------------ |
-| `bun run dev`         | Startet Docker-Dienste und führt danach `next dev --turbopack` aus |
-| `bun run build`       | Baut die Anwendung für die Produktionsumgebung                     |
-| `bun run db:generate` | Generiert Drizzle SQL-Migrationen basierend auf Schema-Änderungen  |
-| `bun run db:migrate`  | Wendet ausstehende Datenbankmigrationen an                         |
-| `bun run typecheck`   | Führt die TypeScript-Typprüfung im gesamten Projekt aus            |
-| `bun run verify`      | Führt Linting, Typecheck und Format-Checks aus                     |
+| **Befehl**               | **Beschreibung**                                                   |
+| ------------------------ | ------------------------------------------------------------------ |
+| `bun run dev`            | Startet Docker-Dienste und führt danach `next dev --turbopack` aus |
+| `bun run build`          | Baut die Anwendung für die Produktionsumgebung                     |
+| `bun run db:generate`    | Generiert Drizzle SQL-Migrationen basierend auf Schema-Änderungen  |
+| `bun run db:migrate:dev` | Wendet ausstehende Datenbankmigrationen an                         |
+| `bun run typecheck`      | Führt die TypeScript-Typprüfung im gesamten Projekt aus            |
+| `bun run verify`         | Führt Linting, Typecheck und Format-Checks aus                     |
 
 ---
 

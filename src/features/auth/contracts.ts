@@ -37,6 +37,8 @@ export interface ApiClientRepository extends CrudRepository<
 export interface SessionRepository extends BaseRepository<Session, NewSession> {
   // Read
   findByToken(tokenHash: string): Promise<Session | null>;
+  findActiveByToken(tokenHash: string): Promise<Session | null>;
+  findByPreviousToken(tokenHash: string): Promise<Session | null>;
 
   // Update
   updateToken(id: string, newTokenHash: string, oldTokenHash: string): Promise<Session>;
@@ -53,6 +55,7 @@ export interface VerificationTokenRepository extends BaseRepository<Verification
   // Read
   findByToken(tokenHash: string): Promise<VerificationToken | null>;
   findByUserIdAndType(userId: string, type: VerificationTokenType): Promise<VerificationToken[]>;
+  tryConsumeByToken(tokenHash: string, type: VerificationTokenType): Promise<VerificationToken | null>;
 
   // Delete
   deleteByUserIdAndType(userId: string, type: VerificationTokenType): Promise<number>;

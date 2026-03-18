@@ -27,4 +27,4 @@ COPY src/lib ./src/lib
 COPY src/db ./src/db
 
 # 3. Execute migrations and bootstrap scripts
-CMD ["sh", "-c", "bun run db:migrate && bun run db:bootstrap"]
+CMD ["sh", "-c", "bun run db:migrate:prod && bun run db:bootstrap:prod"]

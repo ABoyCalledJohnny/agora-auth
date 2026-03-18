@@ -13,7 +13,7 @@ import {
   userCredentials,
 } from "@/src/db/schema";
 import type { UserRepository } from "@/src/features/user/contracts";
-import { eq } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { AgoraError } from "../lib/errors";
 
 export const DrizzleUserRepository: UserRepository = {
@@ -84,8 +84,57 @@ export const DrizzleUserRepository: UserRepository = {
   },
 
   async findByStatus(status: UserStatus): Promise<User[]> {
-    const result = await db.select().from(users).where(eq(users.status, status)).limit(1);
+    const result = await db.select().from(users).where(eq(users.status, status));
     return result;
+  },
+
+  async listPage({ page, pageSize, status, search, sortBy = "createdAt", sortDirection = "desc" }) {
+    const safePage = Math.max(1, page);
+    const safePageSize = Math.max(1, pageSize);
+    const offset = (safePage - 1) * safePageSize;
+
+    const searchValue = search?.trim();
+    const searchCondition = searchValue
+      ? or(ilike(users.username, `%${searchValue}%`), ilike(users.email, `%${searchValue}%`))
+      : undefined;
+
+    const whereClause =
+      status && searchCondition
+        ? and(eq(users.status, status), searchCondition)
+        : status
+          ? eq(users.status, status)
+          : searchCondition;
+
+    const sortColumn =
+      sortBy === "username"
+        ? users.username
+        : sortBy === "email"
+          ? users.email
+          : sortBy === "updatedAt"
+            ? users.updatedAt
+            : users.createdAt;
+
+    const orderByClause = sortDirection === "asc" ? asc(sortColumn) : desc(sortColumn);
+
+    const items = whereClause
+      ? await db.select().from(users).where(whereClause).orderBy(orderByClause).limit(safePageSize).offset(offset)
+      : await db.select().from(users).orderBy(orderByClause).limit(safePageSize).offset(offset);
+
+    const totalResult = whereClause
+      ? await db
+          .select({ count: sql<number>`count(*)` })
+          .from(users)
+          .where(whereClause)
+      : await db.select({ count: sql<number>`count(*)` }).from(users);
+
+    const total = totalResult[0]?.count ?? 0;
+
+    return {
+      items,
+      total,
+      page: safePage,
+      pageSize: safePageSize,
+    };
   },
 
   // -------------------------------------------------------------------------

@@ -12,15 +12,22 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
     const [result] = await db
       .insert(apiClients)
       .values(data)
-      .onConflictDoNothing({ target: apiClients.name })
+      .onConflictDoUpdate({
+        target: apiClients.name,
+        set: {
+          clientId: data.clientId,
+          apiKeyHash: data.apiKeyHash,
+          baseUrl: data.baseUrl,
+          verifyEmailPath: data.verifyEmailPath,
+          resetPasswordPath: data.resetPasswordPath,
+          isActive: data.isActive,
+        },
+      })
       .returning();
 
-    if (result) return result;
+    if (!result) throw new AgoraError("INTERNAL", "Failed to create or fetch client.");
 
-    const [existingClient] = await db.select().from(apiClients).where(eq(apiClients.name, data.name)).limit(1);
-    if (!existingClient) throw new AgoraError("INTERNAL", "Failed to create or fetch client.");
-
-    return existingClient;
+    return result;
   },
 
   // ---------------------------------------------------------------------------

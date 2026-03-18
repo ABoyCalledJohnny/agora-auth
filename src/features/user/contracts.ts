@@ -1,6 +1,7 @@
 import type { UserStatus } from "@/src/config/constants";
 import type { FullUser, NewUser, User, UserProfile, UserSettings } from "@/src/db/schema";
 import type { CrudRepository } from "@/src/repositories/contracts";
+import type { ListUsersPageInput, ListUsersPageResult } from "./types";
 
 export interface UserRepository extends CrudRepository<
   User,
@@ -14,6 +15,7 @@ export interface UserRepository extends CrudRepository<
   findByEmail(email: string): Promise<User | null>;
   findByRoleId(roleId: string): Promise<User[]>;
   findByStatus(status: UserStatus): Promise<User[]>;
+  listPage(input: ListUsersPageInput): Promise<ListUsersPageResult>;
 
   // Aggregate Reads
   findByIdWithDetails(id: string): Promise<FullUser | null>;

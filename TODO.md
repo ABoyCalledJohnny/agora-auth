@@ -100,7 +100,7 @@
 
 - [x] **Git Repository:** Initialise local Git repository, create remote on GitHub, and link them.
 - [x] **Repository Layout:** Create project directory layout (using Turbine as a basis).
-- [ ] **Infrastructure:** Copy, update/complete documentation, basic infrastructure and configuration files (from Turbine).
+- [x] **Infrastructure:** Copy, update/complete documentation, basic infrastructure and configuration files (from Turbine).
 - [x] **Application Scaffold:** Copy reusable application structure from Turbine (layout, components, utilities). Feature-specific adaptations happen during development (Section 3).
 - [x] **File Skeleton Creation:** Scaffold additional project directories and empty placeholder files (UI components, repositories, providers, database scripts) identified during the architecture phase to establish a visual roadmap in the codebase before writing logic.
 
@@ -148,14 +148,14 @@
             - [x] Auth Tables (`auth.ts`)
             - [x] Role Tables (`rbac.ts`)
             - [x] Client Table (`client.ts`)
-        - [x] **Migrations:** Generate and apply the initial migration (`bun run db:generate` and `bun run db:migrate`).
+        - [x] **Migrations:** Generate and apply the initial migration (`bun run db:generate` and `bun run db:migrate:dev`).
         - **Repositories:** Create repositories as well as interfaces:
             - [x] **`UserRepository`:** Data access for user records in `src/repositories/`. Shared across Auth and User features.
             - [x] **`SessionRepository`:** Session CRUD (create, find, revoke, rotate) in `src/repositories/`.
             - [x] **`VerificationTokenRepository`:** Token storage and lookup in `src/repositories/`.
             - [x] **`RoleRepository`:** Role and user-role assignment queries in `src/repositories/`.
             - [x] **`ApiClientRepository`:** API client lookup and domain validation in `src/repositories/`.
-        - [x] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap`).
+        - [x] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap:dev`).
         - [ ] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).
     - **Core Library:**
         - [ ] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) - Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
