@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0-rc.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.1.0...v0.2.0-rc.0) (2026-03-19)
+
+### Features
+
+- **core:** establish database layer, repositories, and API wrappers ([#1](https://github.com/ABoyCalledJohnny/agora-auth/issues/1)) ([5303ca3](https://github.com/ABoyCalledJohnny/agora-auth/commit/5303ca3e4afaff2ab4631e32c651d2a30fd2c066))
+
+### Documentation
+
+- **todo:** update project todo ([7bd380d](https://github.com/ABoyCalledJohnny/agora-auth/commit/7bd380def8488fffc1145091c5c215636226604f))
+
+### Chores
+
+- **scripts:** add release it with rc tag command ([0ddbda3](https://github.com/ABoyCalledJohnny/agora-auth/commit/0ddbda31865b9c10155b71314abc048f0002c262))
+
 ## [0.1.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.1.0-rc.0...v0.1.0) (2026-03-19)
 
 ### Features
