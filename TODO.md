@@ -158,7 +158,7 @@
         - [x] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap:dev`).
         - [x] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).
     - **Core Library:**
-        - [ ] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) - Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
+        - [x] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) - Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
         - [ ] **`withActionHandler`:** Implement Server Action wrapper (`src/lib/action-wrapper.ts`) - Zod input validation, structured error state, authentication/authorisation guards, cookie management, and redirect to `/login?next=…` on auth failure.
     - **Frontend Shell:**
         - [ ] **Root layout:** Set up `layout.tsx` with `NextIntlClientProvider` and `Toaster`. (`SessionProvider` is created and added later in the Auth feature.)
