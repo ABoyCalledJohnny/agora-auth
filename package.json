@@ -42,6 +42,7 @@
     "docker:dev:db:shell": "sudo docker compose --env-file .env --env-file .env.development exec postgres sh -lc 'psql -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\"'",
     "docker:prod:db:shell": "sudo docker compose -f compose.yaml -f compose.production.yaml exec postgres sh -lc 'psql -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\"'",
     "release": "release-it",
+    "release:rc": "release-it --preRelease=rc",
     "cleanup": "rm -rf .next node_modules",
     "reinstall": "bun run cleanup && bun install",
     "prepare": "husky"
