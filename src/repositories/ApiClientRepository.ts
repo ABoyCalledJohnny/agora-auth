@@ -1,8 +1,10 @@
-import { db } from "@/src/db";
-import { type ApiClient, type NewApiClient, apiClients } from "@/src/db/schema";
 import type { ApiClientRepository } from "@/src/features/auth/contracts.ts";
-import { AgoraError } from "@/src/lib/errors.ts";
+
 import { eq } from "drizzle-orm";
+
+import { db } from "@/src/db/index.ts";
+import { type ApiClient, apiClients, type NewApiClient } from "@/src/db/schema/index.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
 
 export const DrizzleApiClientRepository: ApiClientRepository = {
   // ---------------------------------------------------------------------------

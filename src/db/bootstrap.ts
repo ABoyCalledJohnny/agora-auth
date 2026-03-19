@@ -1,14 +1,15 @@
-// import { db } from ".";
-// import { roles } from "./schema";
+// import { db } from "./index.ts";
+// import { roles } from "./schema/index.ts";
 import { DEFAULT_PREFERENCES, DEFAULT_PRIVACY_SETTINGS, SYSTEM_ROLE_NAMES } from "@/src/config/constants.ts";
-import { db } from ".";
-import { appConfig } from "../config";
+
+import { appConfig } from "../config/index.ts";
 import { hashApiKey, hashPassword } from "../lib/crypto.ts";
 import { AgoraError } from "../lib/errors.ts";
 import { createPublicId } from "../lib/utils.ts";
 import { DrizzleApiClientRepository } from "../repositories/ApiClientRepository.ts";
 import { DrizzleRoleRepository } from "../repositories/RoleRepository.ts";
-import { userCredentials, userProfiles, userSettings, users, usersRoles } from "./schema";
+import { db } from "./index.ts";
+import { userCredentials, userProfiles, users, userSettings, usersRoles } from "./schema/index.ts";
 
 async function seedRoles() {
   console.log("Seeding user roles...");

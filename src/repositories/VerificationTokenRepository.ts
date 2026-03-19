@@ -1,9 +1,11 @@
-import { db } from "@/src/db";
-import { type NewVerificationToken, type VerificationToken, verificationTokens } from "@/src/db/schema";
-import type { VerificationTokenRepository } from "@/src/features/auth/contracts.ts";
-import { AgoraError } from "@/src/lib/errors.ts";
-import { and, eq, gt, lt } from "drizzle-orm";
 import type { VerificationTokenType } from "../config/constants.ts";
+import type { VerificationTokenRepository } from "@/src/features/auth/contracts.ts";
+
+import { and, eq, gt, lt } from "drizzle-orm";
+
+import { db } from "@/src/db/index.ts";
+import { type NewVerificationToken, type VerificationToken, verificationTokens } from "@/src/db/schema/index.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
 
 export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
   // ---------------------------------------------------------------------------

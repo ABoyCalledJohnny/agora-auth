@@ -1,7 +1,9 @@
-import { eq, and } from "drizzle-orm";
-import { db } from "@/src/db";
-import { roles, usersRoles, type Role, type NewRole } from "@/src/db/schema/rbac.ts";
 import type { RoleRepository } from "@/src/features/auth/contracts.ts";
+
+import { and, eq } from "drizzle-orm";
+
+import { db } from "@/src/db/index.ts";
+import { type NewRole, type Role, roles, usersRoles } from "@/src/db/schema/rbac.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 
 export const DrizzleRoleRepository: RoleRepository = {

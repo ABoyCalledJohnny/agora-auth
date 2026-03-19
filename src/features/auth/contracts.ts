@@ -6,13 +6,15 @@ import type {
   NewVerificationToken,
   Session,
   VerificationToken,
-} from "@/src/db/schema";
-import { apiClients, users } from "@/src/db/schema";
+} from "@/src/db/schema/index.ts";
 import type { NewRole, Role } from "@/src/db/schema/rbac.ts";
-import { passwordRules } from "@/src/lib/validation.ts";
 import type { BaseRepository, CrudRepository } from "@/src/repositories/contracts.ts";
+
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+import { apiClients, users } from "@/src/db/schema/index.ts";
+import { passwordRules } from "@/src/lib/validation.ts";
 
 export interface RoleRepository extends CrudRepository<
   Role,

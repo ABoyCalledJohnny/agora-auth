@@ -1,4 +1,4 @@
-import { appConfig } from "../config";
+import { appConfig } from "../config/index.ts";
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 

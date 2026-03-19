@@ -9,13 +9,14 @@
  * - `createPublicId`: Creates a unique public ID consisting of PUBLIC_ID_LENGTH (27) PUBLIC_ID_ALPHABET (a-z) letters.
  */
 
-import { appConfig } from "@/src/config";
-import { PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH } from "@/src/config/constants.ts";
-import { AgoraError } from "@/src/lib/errors.ts";
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { customAlphabet } from "nanoid";
 import { cookies } from "next/headers";
 import { twMerge } from "tailwind-merge";
+
+import { PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH } from "@/src/config/constants.ts";
+import { appConfig } from "@/src/config/index.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
 
 /**
  * Recursively sanitises string values in the input by trimming whitespace.

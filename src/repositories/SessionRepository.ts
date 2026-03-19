@@ -1,8 +1,10 @@
-import { db } from "@/src/db";
-import { type NewSession, type Session, userSessions } from "@/src/db/schema";
 import type { SessionRepository } from "@/src/features/auth/contracts.ts";
-import { AgoraError } from "@/src/lib/errors.ts";
+
 import { and, eq, gt, isNull, lt } from "drizzle-orm";
+
+import { db } from "@/src/db/index.ts";
+import { type NewSession, type Session, userSessions } from "@/src/db/schema/index.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
 
 export const DrizzleSessionRepository: SessionRepository = {
   // ---------------------------------------------------------------------------

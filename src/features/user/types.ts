@@ -1,5 +1,5 @@
 import type { UserStatus } from "@/src/config/constants.ts";
-import type { User } from "@/src/db/schema";
+import type { User } from "@/src/db/schema/index.ts";
 
 export type UserListSortBy = "createdAt" | "updatedAt" | "username" | "email";
 export type UserListSortDirection = "asc" | "desc";

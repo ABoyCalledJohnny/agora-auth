@@ -1,7 +1,8 @@
 // src/i18n.ts
 import { getRequestConfig } from "next-intl/server";
 import { headers } from "next/headers";
-import { LOCALES, DEFAULT_LOCALE } from "./config/constants.ts";
+
+import { DEFAULT_LOCALE, LOCALES } from "./config/constants.ts";
 
 /**
  * Parses the Accept-Language header and returns the first locale

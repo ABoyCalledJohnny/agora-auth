@@ -1,19 +1,22 @@
 import type { UserStatus } from "@/src/config/constants.ts";
-import { db } from "@/src/db";
+import type { UserRepository } from "@/src/features/user/contracts.ts";
+
+import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+
+import { db } from "@/src/db/index.ts";
 import {
   type FullUser,
   type NewUser,
   type User,
-  type UserProfile,
-  type UserSettings,
-  userProfiles,
-  userSettings,
-  users,
-  usersRoles,
   userCredentials,
-} from "@/src/db/schema";
-import type { UserRepository } from "@/src/features/user/contracts.ts";
-import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+  type UserProfile,
+  userProfiles,
+  users,
+  type UserSettings,
+  userSettings,
+  usersRoles,
+} from "@/src/db/schema/index.ts";
+
 import { AgoraError } from "../lib/errors.ts";
 
 export const DrizzleUserRepository: UserRepository = {

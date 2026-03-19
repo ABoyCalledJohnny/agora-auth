@@ -1,10 +1,11 @@
-import type { ApiClient } from "@/src/db/schema";
-import { DrizzleApiClientRepository } from "@/src/repositories/ApiClientRepository.ts";
+import type { CreateClientRequest, UpdateClientRequest } from "../contracts.ts";
+import type { ApiClient } from "@/src/db/schema/index.ts";
+
 import { hashApiKey, verifyApiKey } from "@/src/lib/crypto.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
-import type { CreateClientRequest, UpdateClientRequest } from "../contracts.ts";
-import { createPublicId, stripUndefined, isSafeRedirect } from "@/src/lib/utils.ts";
+import { createPublicId, isSafeRedirect, stripUndefined } from "@/src/lib/utils.ts";
+import { DrizzleApiClientRepository } from "@/src/repositories/ApiClientRepository.ts";
 
 /**
  * Service responsible for validating external API clients and resolving

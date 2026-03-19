@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
-import { AgoraError } from "@/src/lib/errors.ts";
 import type { ApiErrorResponse } from "@/src/types.ts";
+
+import { NextResponse } from "next/server";
+
+import { AgoraError } from "@/src/lib/errors.ts";
 
 export function notImplementedResponse(endpoint: string) {
   const error = new AgoraError("NOT_IMPLEMENTED", undefined, {

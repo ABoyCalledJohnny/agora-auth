@@ -1,5 +1,6 @@
 import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { boolean, pgTable, text } from "drizzle-orm/pg-core";
+
 import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers.ts";
 
 export const apiClients = pgTable("api_clients", {
