@@ -31,18 +31,29 @@ export function hashApiKey(key: string): string {
 }
 
 /**
- * Verify a plaintext API key against its SHA-256 hash securely,
- * protecting against timing attacks.
+ * Verify a plaintext API key against its SHA-256 hash securely.
+ *
+ * Why not use `===`?
+ * Standard string comparison (`===`) stops at the first mismatched character.
+ * Attackers can measure the time it takes for the comparison to fail to
+ * guess the hash character by character (a "timing attack").
+ * This function uses a constant-time comparison to prevent that.
  */
 export function verifyApiKey(plainKey: string, hashedKey: string): boolean {
   const plainHash = hashApiKey(plainKey);
+
+  // Convert hex strings to byte arrays (Buffers).
+  // timingSafeEqual requires binary data formats, not standard JS strings.
   const plainHashBuffer = Buffer.from(plainHash, "hex");
   const hashedKeyBuffer = Buffer.from(hashedKey, "hex");
 
-  // timingSafeEqual requires buffers to be the same length
+  // timingSafeEqual throws an error if the buffers are different lengths.
+  // Different lengths inherently take different times to process anyway.
   if (plainHashBuffer.length !== hashedKeyBuffer.length) {
     return false;
   }
 
+  // Evaluates the entire buffer in constant time, regardless of where
+  // the first mismatch occurs, completely neutralizing timing attacks.
   return timingSafeEqual(plainHashBuffer, hashedKeyBuffer);
 }

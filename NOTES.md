@@ -729,20 +729,19 @@ See `./messages/{language}.json`
 
 #### Schedule
 
-| Task                                      | Est. | Dates         | Notes                                                                                          |
-| :---------------------------------------- | :--- | :------------ | :--------------------------------------------------------------------------------------------- |
-| **1. Preparation and Planning**           | Pre  | before 16/03  | Completed before development starts.                                                           |
-| **2. Setup**                              | Pre  | before 16/03  | Mostly pre-development. 2.3 (Project Identity) spills into Day 1.                              |
-| **3.1 Infrastructure & Core Setup**       | ~4   | 16/03 - 20/03 | Validation, DB, repos, wrappers.                                                               |
-| **3.2 Auth - Backend**<br>**5. API Docs** | ~4.5 | 20/03 - 27/03 | 6 services, 9 dual-channel endpoints, `auth.ts`, `proxy.ts`. <br>Final `api.md`                |
-| **6. Deploy**<br>**External connection**  | ~1.5 | 27/03 - 31/03 | Docker, Pipeline, DNS, client and seeding<br>External client hookup.                           |
-| **3.1 Frontend Shell**                    | ~1.5 | 31/03 - 02/04 | Root layout, landing page, header/footer, nav, error pages, UI primitives.                     |
-| **3.2 User Mgmt - Backend**               | ~2   | 02/04 - 07/04 | UserService, 7 endpoints. Patterns from Auth. Easter break (03-06/04) in between.              |
-| **3.2 Auth - Frontend**                   | ~1.5 | 07/04 - 09/04 | Minimal forms, SessionProvider, nav update, hooks.                                             |
-| **3.2 Admin Dashboard**                   | ~1   | 09/04 - 10/04 | 3 endpoints, AdminUserTable (primitives from 3.1).                                             |
-| **6. CI/CD + 5. Docs + Presentation**     | ~1   | 10/04 - 13/04 | Pipeline, env vars, README, presentation prep.                                                 |
-| **4. Site Health & Standards**            | -    | -             | Out of scope for this project.                                                                 |
-| _Buffer_                                  | ~2.5 | 13/04 - 15/04 | Overflow, polish, bug fixes. **User profile + settings frontend if time allows.** Pres: 16/04. |
+| Task                                      | Est. | Dates         | Notes                                                                                         |
+| :---------------------------------------- | :--- | :------------ | :-------------------------------------------------------------------------------------------- |
+| **1. Preparation and Planning**           | Pre  | before 16/03  | Completed before development starts.                                                          |
+| **2. Setup**                              | Pre  | before 16/03  | Mostly pre-development. 2.3 (Project Identity) spills into Day 1.                             |
+| **3.1 Infrastructure & Core Setup**       | ~4   | 16/03 - 20/03 | Validation, DB, repos, wrappers.                                                              |
+| **3.2 Auth - Backend**<br>**5. API Docs** | ~4.5 | 20/03 - 27/03 | 6 services, 9 dual-channel endpoints, `auth.ts`, `proxy.ts`. <br>Final `api.md`               |
+| **6. Deploy**<br>**External connection**  | ~1.5 | 27/03 - 31/03 | Docker, Pipeline, DNS, client and seeding<br>External client hookup.                          |
+| **3.1 Frontend Shell**                    | ~1.5 | 31/03 - 02/04 | Root layout, landing page, header/footer, nav, error pages, UI primitives.                    |
+| **3.2 User Mgmt - Backend**               | ~1   | 02/04 - 07/04 | Minimal UserService + DTOs for Admin Dashboard only. Easter break (03-06/04) in between.      |
+| **3.2 Auth - Frontend**                   | ~1.5 | 07/04 - 09/04 | Minimal forms, SessionProvider, nav update, hooks.                                            |
+| **3.2 Admin Dashboard**                   | ~2   | 09/04 - 12/04 | 3 endpoints, AdminUserTable (primitives from 3.1, plus extra time for a rich UI).             |
+| **6. CI/CD + 5. Docs + Presentation**     | ~1   | 12/04 - 13/04 | Pipeline, env vars, README, presentation prep.                                                |
+| _Buffer_                                  | ~2.5 | 13/04 - 15/04 | Overflow, bug fixes. **Finish User Mgmt backend, then profile + settings UI if time allows.** |
 
 ---
 
