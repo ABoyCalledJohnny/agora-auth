@@ -180,7 +180,7 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
+        - [x] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
     - **Services:**
         - [ ] **`AuthService`:** Registration and login orchestration.
         - [ ] **`SessionService`:** DB session CRUD and Refresh Token Rotation.

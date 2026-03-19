@@ -1,3 +1,4 @@
+import type { VerificationTokenType } from "@/src/config/constants";
 import type {
   ApiClient,
   NewApiClient,
@@ -6,12 +7,12 @@ import type {
   Session,
   VerificationToken,
 } from "@/src/db/schema";
-import type { Role, NewRole } from "@/src/db/schema/rbac";
-import type { VerificationTokenType } from "@/src/config/constants";
+import { apiClients, users } from "@/src/db/schema/index.ts";
+import type { NewRole, Role } from "@/src/db/schema/rbac";
+import { passwordRules } from "@/src/lib/validation";
 import type { BaseRepository, CrudRepository } from "@/src/repositories/contracts";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { apiClients } from "@/src/db/schema/index.ts";
 
 export interface RoleRepository extends CrudRepository<
   Role,
@@ -65,9 +66,9 @@ export interface VerificationTokenRepository extends BaseRepository<Verification
   deleteExpired(): Promise<VerificationToken[]>;
 }
 
-const ClientInsertSchema = createInsertSchema(apiClients);
+const ClientSchema = createInsertSchema(apiClients);
 
-export const createClientSchema = ClientInsertSchema.pick({
+export const createClientSchema = ClientSchema.pick({
   name: true,
   baseUrl: true,
   verifyEmailPath: true,
@@ -85,3 +86,34 @@ export type CreateClientRequest = z.infer<typeof createClientSchema>;
 export const updateClientSchema = createClientSchema.omit({ plainApiKey: true }).partial();
 
 export type UpdateClientRequest = z.infer<typeof updateClientSchema>;
+
+const UserSchema = createInsertSchema(users);
+
+export const registerSchema = UserSchema.pick({
+  username: true,
+  email: true,
+}).extend({
+  password: passwordRules((key) => key),
+});
+
+export type RegisterRequest = z.infer<typeof registerSchema>;
+
+export const loginSchema = UserSchema.pick({
+  email: true,
+}).extend({
+  password: z.string(),
+});
+
+export type LoginRequest = z.infer<typeof loginSchema>;
+
+export const resetPasswordSchema = UserSchema.pick({
+  email: true,
+});
+
+export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
+
+export const newPasswordSchema = z.object({
+  password: passwordRules((key) => key),
+});
+
+export type NewPasswordRequest = z.infer<typeof newPasswordSchema>;
