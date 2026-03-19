@@ -10,10 +10,15 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
   // Create
   // ---------------------------------------------------------------------------
   async create(data: NewVerificationToken): Promise<VerificationToken> {
-    const [token] = await db.insert(verificationTokens).values(data).returning();
+    try {
+      const [token] = await db.insert(verificationTokens).values(data).returning();
 
-    if (!token) throw new AgoraError("INTERNAL", "Failed to create verification token.");
-    return token;
+      if (!token) throw new AgoraError("INTERNAL", "Failed to create verification token.");
+      return token;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while creating the verification token.");
+    }
   },
 
   // ---------------------------------------------------------------------------
@@ -45,18 +50,23 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
   },
 
   async tryConsumeByToken(tokenHash: string, type: VerificationTokenType): Promise<VerificationToken | null> {
-    const [consumedToken] = await db
-      .delete(verificationTokens)
-      .where(
-        and(
-          eq(verificationTokens.tokenHash, tokenHash),
-          eq(verificationTokens.type, type),
-          gt(verificationTokens.expiresAt, new Date()),
-        ),
-      )
-      .returning();
+    try {
+      const [consumedToken] = await db
+        .delete(verificationTokens)
+        .where(
+          and(
+            eq(verificationTokens.tokenHash, tokenHash),
+            eq(verificationTokens.type, type),
+            gt(verificationTokens.expiresAt, new Date()),
+          ),
+        )
+        .returning();
 
-    return consumedToken ?? null;
+      return consumedToken ?? null;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while consuming the verification token.");
+    }
   },
 
   // ---------------------------------------------------------------------------
@@ -72,27 +82,42 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
    * Attempting to consume a token must be done atomically via `tryConsumeByToken()` instead.
    */
   async delete(id: string): Promise<VerificationToken> {
-    const [deletedToken] = await db.delete(verificationTokens).where(eq(verificationTokens.id, id)).returning();
+    try {
+      const [deletedToken] = await db.delete(verificationTokens).where(eq(verificationTokens.id, id)).returning();
 
-    if (!deletedToken) throw new AgoraError("NOT_FOUND", "Verification token not found.");
-    return deletedToken;
+      if (!deletedToken) throw new AgoraError("NOT_FOUND", "Verification token not found.");
+      return deletedToken;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while deleting the verification token.");
+    }
   },
 
   async deleteByUserIdAndType(userId: string, type: VerificationTokenType): Promise<number> {
-    const deletedTokens = await db
-      .delete(verificationTokens)
-      .where(and(eq(verificationTokens.userId, userId), eq(verificationTokens.type, type)))
-      .returning({ id: verificationTokens.id }); // Only return the ID to keep the payload light
+    try {
+      const deletedTokens = await db
+        .delete(verificationTokens)
+        .where(and(eq(verificationTokens.userId, userId), eq(verificationTokens.type, type)))
+        .returning({ id: verificationTokens.id }); // Only return the ID to keep the payload light
 
-    return deletedTokens.length;
+      return deletedTokens.length;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while deleting verification tokens by user ID.");
+    }
   },
 
   async deleteExpired(): Promise<VerificationToken[]> {
-    const expiredTokens = await db
-      .delete(verificationTokens)
-      .where(lt(verificationTokens.expiresAt, new Date()))
-      .returning();
+    try {
+      const expiredTokens = await db
+        .delete(verificationTokens)
+        .where(lt(verificationTokens.expiresAt, new Date()))
+        .returning();
 
-    return expiredTokens;
+      return expiredTokens;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while deleting expired verification tokens.");
+    }
   },
 };

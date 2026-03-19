@@ -16,7 +16,9 @@ export type ErrorCode =
   | "ACCOUNT_PENDING"
   // Conflicts
   | "EMAIL_EXISTS"
-  | "USERNAME_EXISTS";
+  | "USERNAME_EXISTS"
+  | "CLIENT_CONFLICT"
+  | "ROLE_EXISTS";
 
 export const defaultErrorMessages: Record<ErrorCode, string> = {
   // Standard Application Errors
@@ -40,6 +42,8 @@ export const defaultErrorMessages: Record<ErrorCode, string> = {
   // Conflicts
   EMAIL_EXISTS: "A user with this email address already exists.",
   USERNAME_EXISTS: "This username is not available.",
+  CLIENT_CONFLICT: "An API client with this name, clientId, or base URL already exists.",
+  ROLE_EXISTS: "A role with this name already exists.",
 };
 
 export const defaultHttpStatus = {
@@ -64,6 +68,8 @@ export const defaultHttpStatus = {
   // Conflicts
   EMAIL_EXISTS: 409,
   USERNAME_EXISTS: 409,
+  CLIENT_CONFLICT: 409,
+  ROLE_EXISTS: 409,
 } as const satisfies Record<ErrorCode, number>;
 
 export type AppHttpStatus = (typeof defaultHttpStatus)[ErrorCode];

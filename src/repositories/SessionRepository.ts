@@ -9,14 +9,19 @@ export const DrizzleSessionRepository: SessionRepository = {
   // Create
   // ---------------------------------------------------------------------------
   async create(data: NewSession): Promise<Session> {
-    const [session] = await db
-      .insert(userSessions)
-      // Drizzle usually allows inserting without id if it has a default
-      .values(data)
-      .returning();
+    try {
+      const [session] = await db
+        .insert(userSessions)
+        // Drizzle usually allows inserting without id if it has a default
+        .values(data)
+        .returning();
 
-    if (!session) throw new AgoraError("INTERNAL", "Failed to create session.");
-    return session;
+      if (!session) throw new AgoraError("INTERNAL", "Failed to create session.");
+      return session;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while creating the session.");
+    }
   },
 
   // ---------------------------------------------------------------------------
@@ -62,58 +67,83 @@ export const DrizzleSessionRepository: SessionRepository = {
   // Update
   // ---------------------------------------------------------------------------
   async updateToken(id: string, newTokenHash: string, oldTokenHash: string): Promise<Session> {
-    const [updatedSession] = await db
-      .update(userSessions)
-      .set({
-        sessionTokenHash: newTokenHash,
-        previousSessionTokenHash: oldTokenHash,
-        lastActiveAt: new Date(),
-      })
-      .where(eq(userSessions.id, id))
-      .returning();
+    try {
+      const [updatedSession] = await db
+        .update(userSessions)
+        .set({
+          sessionTokenHash: newTokenHash,
+          previousSessionTokenHash: oldTokenHash,
+          lastActiveAt: new Date(),
+        })
+        .where(eq(userSessions.id, id))
+        .returning();
 
-    if (!updatedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
-    return updatedSession;
+      if (!updatedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
+      return updatedSession;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while updating the session.");
+    }
   },
 
   // ---------------------------------------------------------------------------
   // Revoke (Soft-Delete)
   // ---------------------------------------------------------------------------
   async revoke(id: string): Promise<Session> {
-    const [revokedSession] = await db
-      .update(userSessions)
-      .set({ revokedAt: new Date() })
-      .where(eq(userSessions.id, id))
-      .returning();
+    try {
+      const [revokedSession] = await db
+        .update(userSessions)
+        .set({ revokedAt: new Date() })
+        .where(eq(userSessions.id, id))
+        .returning();
 
-    if (!revokedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
-    return revokedSession;
+      if (!revokedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
+      return revokedSession;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while revoking the session.");
+    }
   },
 
   async revokeAllForUser(userId: string): Promise<Session[]> {
-    const revokedSessions = await db
-      .update(userSessions)
-      .set({ revokedAt: new Date() })
-      .where(eq(userSessions.userId, userId))
-      .returning();
+    try {
+      const revokedSessions = await db
+        .update(userSessions)
+        .set({ revokedAt: new Date() })
+        .where(eq(userSessions.userId, userId))
+        .returning();
 
-    return revokedSessions; // Note: Drizzle always returns an array here, empty if no updates occurred
+      return revokedSessions; // Note: Drizzle always returns an array here, empty if no updates occurred
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while revoking user sessions.");
+    }
   },
 
   // ---------------------------------------------------------------------------
   // Delete (Hard-Delete)
   // ---------------------------------------------------------------------------
   async delete(id: string): Promise<Session> {
-    const [deletedSession] = await db.delete(userSessions).where(eq(userSessions.id, id)).returning();
+    try {
+      const [deletedSession] = await db.delete(userSessions).where(eq(userSessions.id, id)).returning();
 
-    if (!deletedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
-    return deletedSession;
+      if (!deletedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
+      return deletedSession;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while deleting the session.");
+    }
   },
 
   async deleteExpired(): Promise<Session[]> {
-    // We can do this in a single fast database round-trip without loops!
-    const expiredSessions = await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date())).returning();
+    try {
+      // We can do this in a single fast database round-trip without loops!
+      const expiredSessions = await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date())).returning();
 
-    return expiredSessions;
+      return expiredSessions;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while deleting expired sessions.");
+    }
   },
 };

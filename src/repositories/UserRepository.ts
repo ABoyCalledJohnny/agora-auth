@@ -21,24 +21,39 @@ export const DrizzleUserRepository: UserRepository = {
   // Create
   // -------------------------------------------------------------------------
   async create(data: NewUser): Promise<User> {
-    const newUser = await db.transaction(async (tx) => {
-      // 2. Do the first insert and capture it
-      const [createdUser] = await tx.insert(users).values(data).returning();
+    try {
+      const newUser = await db.transaction(async (tx) => {
+        // 2. Do the first insert and capture it
+        const [createdUser] = await tx.insert(users).values(data).returning();
 
-      if (!createdUser) {
-        // Throwing inside a transaction automatically triggers a ROLLBACK
-        throw new AgoraError("INTERNAL", "User creation failed.");
+        if (!createdUser) {
+          // Throwing inside a transaction automatically triggers a ROLLBACK
+          throw new AgoraError("INTERNAL", "User creation failed.");
+        }
+
+        // 3. Do the dependent inserts using the ID from step 2
+        await tx.insert(userProfiles).values({ userId: createdUser.id });
+        await tx.insert(userSettings).values({ userId: createdUser.id });
+
+        // 4. Return the object we want to "bubble up" out of the transaction
+        return createdUser;
+      });
+
+      return newUser;
+    } catch (e: unknown) {
+      if (e instanceof AgoraError) throw e;
+
+      // PostgreSQL unique constraint violation code is '23505'
+      const pgError = e as Record<string, unknown>;
+      if (pgError && pgError.code === "23505") {
+        const errorDetails = String(pgError.constraint || pgError.detail || pgError.message).toLowerCase();
+        if (errorDetails.includes("email")) throw new AgoraError("EMAIL_EXISTS");
+        if (errorDetails.includes("username")) throw new AgoraError("USERNAME_EXISTS");
+        throw new AgoraError("INTERNAL", "A duplicate user constraint violation occurred.");
       }
 
-      // 3. Do the dependent inserts using the ID from step 2
-      await tx.insert(userProfiles).values({ userId: createdUser.id });
-      await tx.insert(userSettings).values({ userId: createdUser.id });
-
-      // 4. Return the object we want to "bubble up" out of the transaction
-      return createdUser;
-    });
-
-    return newUser;
+      throw new AgoraError("INTERNAL", "A database error occurred while creating the user.");
+    }
   },
 
   // -------------------------------------------------------------------------
@@ -189,10 +204,22 @@ export const DrizzleUserRepository: UserRepository = {
   // Update
   // -------------------------------------------------------------------------
   async update(id: string, data: Partial<Omit<NewUser, "id" | "createdAt" | "updatedAt">>): Promise<User> {
-    const [updatedUser] = await db.update(users).set(data).where(eq(users.id, id)).returning();
+    try {
+      const [updatedUser] = await db.update(users).set(data).where(eq(users.id, id)).returning();
 
-    if (!updatedUser) throw new AgoraError("NOT_FOUND", "User not found.");
-    return updatedUser;
+      if (!updatedUser) throw new AgoraError("NOT_FOUND", "User not found.");
+      return updatedUser;
+    } catch (e: unknown) {
+      if (e instanceof AgoraError) throw e;
+      const pgError = e as Record<string, unknown>;
+      if (pgError && pgError.code === "23505") {
+        const errorDetails = String(pgError.constraint || pgError.detail || pgError.message).toLowerCase();
+        if (errorDetails.includes("email")) throw new AgoraError("EMAIL_EXISTS");
+        if (errorDetails.includes("username")) throw new AgoraError("USERNAME_EXISTS");
+        throw new AgoraError("INTERNAL", "A duplicate user constraint violation occurred.");
+      }
+      throw new AgoraError("INTERNAL", "A database error occurred while updating the user.");
+    }
   },
 
   // Sub-Entities (Profile & Settings)
@@ -200,28 +227,38 @@ export const DrizzleUserRepository: UserRepository = {
     userId: string,
     data: Partial<Omit<UserProfile, "id" | "userId" | "createdAt" | "updatedAt">>,
   ): Promise<UserProfile> {
-    const [updatedUserProfile] = await db
-      .update(userProfiles)
-      .set(data)
-      .where(eq(userProfiles.userId, userId))
-      .returning();
+    try {
+      const [updatedUserProfile] = await db
+        .update(userProfiles)
+        .set(data)
+        .where(eq(userProfiles.userId, userId))
+        .returning();
 
-    if (!updatedUserProfile) throw new AgoraError("NOT_FOUND", "User not found.");
-    return updatedUserProfile;
+      if (!updatedUserProfile) throw new AgoraError("NOT_FOUND", "User profile not found.");
+      return updatedUserProfile;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while updating the user profile.");
+    }
   },
 
   async updateSettings(
     userId: string,
     data: Partial<Omit<UserSettings, "id" | "userId" | "createdAt" | "updatedAt">>,
   ): Promise<UserSettings> {
-    const [updatedUserSettings] = await db
-      .update(userSettings)
-      .set(data)
-      .where(eq(userSettings.userId, userId))
-      .returning();
+    try {
+      const [updatedUserSettings] = await db
+        .update(userSettings)
+        .set(data)
+        .where(eq(userSettings.userId, userId))
+        .returning();
 
-    if (!updatedUserSettings) throw new AgoraError("NOT_FOUND", "User not found.");
-    return updatedUserSettings;
+      if (!updatedUserSettings) throw new AgoraError("NOT_FOUND", "User settings not found.");
+      return updatedUserSettings;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while updating the user settings.");
+    }
   },
 
   // -------------------------------------------------------------------------
