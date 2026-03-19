@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.1.0-rc.0...v0.1.0) (2026-03-19)
+
+### Features
+
+- **validation:** add publicId schema and document ID format rationale ([281495e](https://github.com/ABoyCalledJohnny/agora-auth/commit/281495eef74d1ac0fbd0516c381e30891f96fc49))
+
+### Documentation
+
+- **todo:** mark release and cooperation tasks as completed ([4d3c4d5](https://github.com/ABoyCalledJohnny/agora-auth/commit/4d3c4d5e91516b61637222a2c13349735881b2a8))
+
+### Chores
+
+- configure husky and lint-staged ([797b4cf](https://github.com/ABoyCalledJohnny/agora-auth/commit/797b4cfed819bdcec2b6299f38c45fda852b756c))
+- **husky:** add shebang to pre-commit script ([0f8cdb1](https://github.com/ABoyCalledJohnny/agora-auth/commit/0f8cdb10ef40cc4d07a206fee1980cf36fc5ed34))
+- **husky:** make pre-commit executable ([42d1f59](https://github.com/ABoyCalledJohnny/agora-auth/commit/42d1f59c7daf7d762b59c7e1efd9c60306c87f21))
+- **lint-staged:** update configuration ([1f2c1de](https://github.com/ABoyCalledJohnny/agora-auth/commit/1f2c1de8000f2719f066515261c10ac822dbef00))
+- **release:** fix conventional-changelog plugin config ([e925ba1](https://github.com/ABoyCalledJohnny/agora-auth/commit/e925ba1fe2fa9e6a65aa51ebb9afe8e78307d7ab))
+- **release:** normalise validation.ts ([0862271](https://github.com/ABoyCalledJohnny/agora-auth/commit/086227151f2c8b9ce3172be232014506fe44d319))
+
 ## 0.1.0-rc.0 (2026-03-15)
 
 ## 0.0.0 (2026-03-15)
