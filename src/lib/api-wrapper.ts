@@ -1,27 +1,17 @@
-import { type NextRequest, NextResponse } from "next/server";
-import type { z } from "zod";
-import { type Session, authenticate, authorize } from "@/src/lib/auth";
-import { AgoraError } from "@/src/lib/errors";
+import { authenticate, authorize, type Session } from "@/src/lib/auth.ts";
+import { AgoraError, defaultErrorMessages } from "@/src/lib/errors";
 import { logger } from "@/src/lib/logger.ts";
 import { sanitizeInput } from "@/src/lib/utils";
-
-//  TODO catch all for not implemented routes
+import type { HandlerConfig } from "@/src/lib/wrapper-types";
+import type { ApiErrorResponse } from "@/src/types";
+import { type NextRequest, NextResponse } from "next/server";
+import type { z } from "zod";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 type RouteParams = Promise<Record<string, string>>;
-
-/** Configuration for `withApiHandler`. */
-type ApiConfig<TSchema extends z.ZodType = z.ZodType> = {
-  /** Zod schema to validate the JSON request body. Omit for bodyless routes (GET, DELETE). */
-  schema?: TSchema;
-  /** Require authentication. Defaults to `false`. */
-  auth?: boolean;
-  /** Roles the user must hold (only checked when `auth` is `true`). */
-  roles?: string[];
-};
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
 // TypeScript still types it as `Session | null` — use `session!` or a guard.
@@ -32,10 +22,31 @@ type ApiConfig<TSchema extends z.ZodType = z.ZodType> = {
 
 function formatApiError(error: unknown): NextResponse {
   if (error instanceof AgoraError) {
-    return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
+    const response: ApiErrorResponse = {
+      success: false,
+      error: error.message,
+      code: error.code,
+      details: error.details,
+    };
+
+    const headers = new Headers();
+    if (error.status === 401) {
+      const isTokenError =
+        error.code === "TOKEN_EXPIRED" || error.code === "TOKEN_INVALID" || error.code === "TOKEN_REVOKED";
+
+      const authParams = isTokenError ? ' error="invalid_token"' : "";
+      headers.set("WWW-Authenticate", `Bearer${authParams}`);
+    }
+
+    return NextResponse.json(response, { status: error.status, headers });
   }
   logger.error("Unhandled API error", error);
-  return NextResponse.json({ error: "An unexpected error occurred.", code: "INTERNAL" }, { status: 500 });
+  const response: ApiErrorResponse = {
+    success: false,
+    error: defaultErrorMessages.INTERNAL,
+    code: "INTERNAL",
+  };
+  return NextResponse.json(response, { status: 500 });
 }
 
 // ---------------------------------------------------------------------------
@@ -44,7 +55,7 @@ function formatApiError(error: unknown): NextResponse {
 
 /** With schema — handler receives `{ request, data, session, params }`. */
 export function withApiHandler<TSchema extends z.ZodType>(
-  config: ApiConfig<TSchema> & { schema: TSchema },
+  config: HandlerConfig<TSchema> & { bodySchema: TSchema },
   handler: (context: {
     request: NextRequest;
     data: z.infer<TSchema>;
@@ -55,13 +66,13 @@ export function withApiHandler<TSchema extends z.ZodType>(
 
 /** Without schema — handler receives `{ request, session, params }`. */
 export function withApiHandler(
-  config: Omit<ApiConfig, "schema">,
+  config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: { request: NextRequest; session: Session | null; params: RouteParams }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
 
 // Implementation
 export function withApiHandler(
-  config: ApiConfig,
+  config: HandlerConfig,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- required for overload compatibility
   handler: (context: any) => Promise<NextResponse>,
 ) {
@@ -69,7 +80,8 @@ export function withApiHandler(
     try {
       // 1. Authentication
       let session: Session | null = null;
-      if (config.auth) {
+      // Check for roles also so that a forgotten auth `true` argument doesn't cause this step to be skipped.
+      if (config.auth || config.roles?.length) {
         session = await authenticate();
       }
 
@@ -80,7 +92,7 @@ export function withApiHandler(
 
       // 3. Validation & sanitisation (JSON body)
       let data: unknown;
-      if (config.schema) {
+      if (config.bodySchema) {
         let body: unknown;
         try {
           body = await request.json();
@@ -88,17 +100,17 @@ export function withApiHandler(
           throw new AgoraError("VALIDATION_ERROR", "Invalid or missing JSON body.");
         }
         const sanitised = sanitizeInput(body);
-        const result = config.schema.safeParse(sanitised);
+        const result = config.bodySchema.safeParse(sanitised);
         if (!result.success) {
           throw new AgoraError("VALIDATION_ERROR", "Validation failed.", {
-            details: result.error.flatten(),
+            details: result.error.issues,
           });
         }
         data = result.data;
       }
 
       // 4. Execute handler
-      const context = config.schema
+      const context = config.bodySchema
         ? { request, data, session, params: routeContext.params }
         : { request, session, params: routeContext.params };
 
@@ -125,7 +137,7 @@ export function withApiHandler(
 //
 // // POST (with body schema + auth):
 // export const POST = withApiHandler(
-//   { schema: createPostSchema, auth: true },
+//   { bodySchema: createPostSchema, auth: true },
 //   async ({ data, session }) => {
 //     const post = await postService.create(data, session!.userId);
 //     return NextResponse.json(post, { status: 201 });
@@ -134,7 +146,7 @@ export function withApiHandler(
 //
 // // Public POST (webhook, no auth):
 // export const POST = withApiHandler(
-//   { schema: webhookSchema },
+//   { bodySchema: webhookSchema },
 //   async ({ data }) => {
 //     await webhookService.handle(data);
 //     return NextResponse.json({ received: true });

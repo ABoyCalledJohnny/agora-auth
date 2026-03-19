@@ -2,6 +2,7 @@
   "Errors": {
     "VALIDATION_ERROR": "Die angegebenen Daten sind ungültig.",
     "NOT_FOUND": "Die angeforderte Ressource konnte nicht gefunden werden.",
+    "NOT_IMPLEMENTED": "Dieser Endpunkt ist noch nicht implementiert.",
     "INTERNAL": "Ein unerwarteter Serverfehler ist aufgetreten.",
     "UNAUTHORIZED": "Du musst angemeldet sein, um diese Aktion auszuführen.",
     "FORBIDDEN": "Du hast keine Berechtigung für diese Aktion.",
@@ -20,6 +21,7 @@
     "minLength": "{field} muss mindestens {min} Zeichen lang sein.",
     "maxLength": "{field} darf höchstens {max} Zeichen lang sein.",
     "passwordMinLength": "Das Passwort muss mindestens 12 Zeichen lang sein.",
+    "passwordMaxLength": "Password darf höchstens 71 Zeichen lang sein.",
     "passwordUppercase": "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
     "passwordLowercase": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
     "passwordNumber": "Das Passwort muss mindestens eine Zahl enthalten.",
@@ -27,7 +29,14 @@
     "passwordMismatch": "Die Passwörter stimmen nicht überein.",
     "usernameMinLength": "Der Benutzername muss mindestens 3 Zeichen lang sein.",
     "usernameMaxLength": "Der Benutzername darf höchstens 30 Zeichen lang sein.",
-    "usernameFormat": "Der Benutzername darf nur Kleinbuchstaben (a–z), Zahlen, Bindestriche und Unterstriche enthalten."
+    "usernameFormat": "Der Benutzername darf nur Kleinbuchstaben (a–z), Zahlen, Bindestriche und Unterstriche enthalten.",
+    "usernameReserved": "Dieser Benutzername ist reserviert und kann nicht verwendet werden.",
+    "publicIdFormat": "Ungültiges Public-ID-Format.",
+    "internalPathStartsWithSlash": "Der Pfad muss mit '/' beginnen.",
+    "internalPathProtocolRelative": "Protokoll-relative Pfade sind nicht erlaubt.",
+    "slugFormat": "Ungültiges Slug-Format.",
+    "slugMinLength": "Der Slug muss mindestens 3 Zeichen lang sein.",
+    "slugMaxLength": "Der Slug darf maximal 64 Zeichen lang sein."
   },
   "Common": {
     "email": "E-Mail",

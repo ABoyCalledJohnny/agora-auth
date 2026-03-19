@@ -86,10 +86,17 @@ Global response-body note:
 
 ```json
 {
+	"success": false,
 	"error": "Human readable message",
-	"code": "ERROR_CODE"
+	"code": "ERROR_CODE",
+	"details": {}
 }
 ```
+
+Notes:
+
+- `details` is optional and only present when additional context exists (for example flattened validation errors).
+- For not-yet-implemented handlers the code can be `NOT_IMPLEMENTED` with HTTP `501`.
 
 ### 3.3 Relevant Error Codes (from `src/lib/errors.ts`)
 
@@ -104,6 +111,7 @@ Global response-body note:
 - `ACCOUNT_SUSPENDED` (403)
 - `EMAIL_EXISTS` (409)
 - `USERNAME_EXISTS` (409)
+- `NOT_IMPLEMENTED` (501)
 - `INTERNAL` (500)
 
 ## 4. Client Identification (Recommended)

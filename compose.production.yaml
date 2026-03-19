@@ -2,7 +2,7 @@
 # Production Override
 #
 # Usage (on VPS, via CI/CD):
-#   docker compose -p production -f compose.yaml -f compose.prod.yaml up -d
+#   docker compose -p production -f compose.yaml -f compose.production.yaml up -d
 #
 # Config is loaded from committed .env files.
 # Secrets are injected via CI/CD into the shell environment (${VAR} references).

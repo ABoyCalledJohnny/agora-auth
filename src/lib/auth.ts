@@ -1,3 +1,4 @@
+import type { Session as DbSession } from "@/src/db/schema/auth";
 import { AgoraError } from "@/src/lib/errors";
 import { logger } from "@/src/lib/logger";
 
@@ -5,11 +6,13 @@ import { logger } from "@/src/lib/logger";
 // Types
 // ---------------------------------------------------------------------------
 
-/** Decoded Access JWT payload representing the authenticated user. */
-export type Session = {
-  userId: string;
-  email: string;
-  roles: string[];
+// This is the rich object your wrapper and handlers will actually use!
+export type Session = DbSession & {
+  user: {
+    id: string;
+    username: string;
+    roles: string[]; // <-- Attached seamlessly
+  };
 };
 
 // ---------------------------------------------------------------------------
@@ -58,11 +61,11 @@ export async function authenticate(): Promise<Session> {
 export function authorize(session: Session, requiredRoles: string[]): void {
   if (requiredRoles.length === 0) return;
 
-  const hasRole = requiredRoles.some((role) => session.roles.includes(role));
+  const hasRole = requiredRoles.some((role) => session.user.roles.includes(role));
   if (!hasRole) {
     logger.warn(`Authorisation denied for user ${session.userId}`, {
       required: requiredRoles,
-      actual: session.roles,
+      actual: session.user.roles,
     });
     throw new AgoraError("FORBIDDEN");
   }

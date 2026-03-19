@@ -2,6 +2,8 @@ import type { z } from "zod";
 import { type Session, authenticate, authorize } from "@/src/lib/auth";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
+import type { HandlerConfig } from "@/src/lib/wrapper-types";
+import type { ApiErrorResponse, ApiResponse } from "@/src/types";
 import { sanitizeInput } from "@/src/lib/utils";
 
 // ---------------------------------------------------------------------------
@@ -9,17 +11,7 @@ import { sanitizeInput } from "@/src/lib/utils";
 // ---------------------------------------------------------------------------
 
 /** Discriminated union returned by every wrapped server action. */
-export type ActionResult<T = void> = { success: true; data: T } | { success: false; error: string; code: string };
-
-/** Configuration for `withActionHandler`. */
-type ActionConfig<TSchema extends z.ZodType = z.ZodType> = {
-  /** Zod schema to validate (and infer the type of) the raw input. */
-  schema?: TSchema;
-  /** Require authentication. Defaults to `false`. */
-  auth?: boolean;
-  /** Roles the user must hold (only checked when `auth` is `true`). */
-  roles?: string[];
-};
+export type ActionResult<T = void> = ApiResponse<T>;
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
 // TypeScript still types it as `Session | null` — use `session!` or a guard.
@@ -30,14 +22,21 @@ type ActionConfig<TSchema extends z.ZodType = z.ZodType> = {
 
 function formatActionError(error: unknown): ActionResult<never> {
   if (error instanceof AgoraError) {
-    return { success: false, error: error.message, code: error.code };
+    const response: ApiErrorResponse = {
+      success: false,
+      error: error.message,
+      code: error.code,
+      details: error.details,
+    };
+    return response;
   }
   logger.error("Unhandled action error", error);
-  return {
+  const response: ApiErrorResponse = {
     success: false,
     error: "An unexpected error occurred.",
     code: "INTERNAL",
   };
+  return response;
 }
 
 function parseFormData(input: unknown): unknown {
@@ -53,19 +52,19 @@ function parseFormData(input: unknown): unknown {
 
 /** With schema — handler receives `{ data, session }`. */
 export function withActionHandler<TSchema extends z.ZodType, TResult>(
-  config: ActionConfig<TSchema> & { schema: TSchema },
+  config: HandlerConfig<TSchema> & { bodySchema: TSchema },
   handler: (context: { data: z.infer<TSchema>; session: Session | null }) => Promise<TResult>,
 ): (rawInput: z.input<TSchema> | FormData) => Promise<ActionResult<TResult>>;
 
 /** Without schema — handler receives `{ session }`. */
 export function withActionHandler<TResult>(
-  config: Omit<ActionConfig, "schema">,
+  config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: { session: Session | null }) => Promise<TResult>,
 ): () => Promise<ActionResult<TResult>>;
 
 // Implementation
 export function withActionHandler(
-  config: ActionConfig,
+  config: HandlerConfig,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- required for overload compatibility
   handler: (context: any) => Promise<unknown>,
 ) {
@@ -84,10 +83,10 @@ export function withActionHandler(
 
       // 3. Validation & sanitisation
       let data: unknown;
-      if (config.schema) {
+      if (config.bodySchema) {
         const input = parseFormData(rawInput);
         const sanitised = sanitizeInput(input);
-        const result = config.schema.safeParse(sanitised);
+        const result = config.bodySchema.safeParse(sanitised);
         if (!result.success) {
           throw new AgoraError("VALIDATION_ERROR", "Validation failed.", {
             details: result.error.flatten(),
@@ -97,7 +96,7 @@ export function withActionHandler(
       }
 
       // 4. Execute handler
-      const context = config.schema ? { data, session } : { session };
+      const context = config.bodySchema ? { data, session } : { session };
       const result = await handler(context);
 
       // 5. Return success
@@ -115,7 +114,7 @@ export function withActionHandler(
 // // With schema + auth:
 // "use server";
 // export const createPost = withActionHandler(
-//   { schema: createPostSchema, auth: true, roles: ["author"] },
+//   { bodySchema: createPostSchema, auth: true, roles: ["author"] },
 //   async ({ data, session }) => {
 //     return postService.create(data, session!.userId);
 //   },
@@ -133,7 +132,7 @@ export function withActionHandler(
 // // Public action with schema (e.g. newsletter signup):
 // "use server";
 // export const subscribe = withActionHandler(
-//   { schema: subscribeSchema },
+//   { bodySchema: subscribeSchema },
 //   async ({ data }) => {
 //     await newsletterService.subscribe(data.email);
 //   },

@@ -1,7 +1,7 @@
 // src/i18n.ts
 import { getRequestConfig } from "next-intl/server";
 import { headers } from "next/headers";
-import { locales, defaultLocale } from "./config";
+import { LOCALES, DEFAULT_LOCALE } from "./config/constants";
 
 /**
  * Parses the Accept-Language header and returns the first locale
@@ -29,11 +29,11 @@ function resolveFromHeader(acceptLanguageHeader: string): string | undefined {
   // Step 4: Walk through sorted languages and return the first one we support.
   for (const { languageCode } of sortedLanguages) {
     // Exact match: e.g. "en" is directly in our ["en", "de"] list
-    if ((locales as readonly string[]).includes(languageCode)) return languageCode;
+    if ((LOCALES as readonly string[]).includes(languageCode)) return languageCode;
 
     // Prefix match: e.g. "de-DE" → take "de" (before the hyphen) and check that
     const baseLanguage = languageCode.split("-")[0] ?? "";
-    if ((locales as readonly string[]).includes(baseLanguage)) return baseLanguage;
+    if ((LOCALES as readonly string[]).includes(baseLanguage)) return baseLanguage;
   }
 
   // No supported language found — caller will fall back to defaultLocale
@@ -44,7 +44,7 @@ export default getRequestConfig(async () => {
   const headersList = await headers();
 
   const fromHeader = resolveFromHeader(headersList.get("accept-language") ?? "");
-  const locale = fromHeader ?? defaultLocale;
+  const locale = fromHeader ?? DEFAULT_LOCALE;
 
   return {
     locale,

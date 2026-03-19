@@ -144,14 +144,14 @@ Current Next.js and Bun scripts in `package.json` already support operations suc
 
 ### Useful Commands
 
-| **Command**           | **Description**                                             |
-| --------------------- | ----------------------------------------------------------- |
-| `bun run dev`         | Starts Docker services and then runs `next dev --turbopack` |
-| `bun run build`       | Builds the application for production                       |
-| `bun run db:generate` | Generates Drizzle SQL migrations based on schema changes    |
-| `bun run db:migrate`  | Applies pending database migrations                         |
-| `bun run typecheck`   | Runs TypeScript type checking across the project            |
-| `bun run verify`      | Runs lint, typecheck, and format checks                     |
+| **Command**              | **Description**                                             |
+| ------------------------ | ----------------------------------------------------------- |
+| `bun run dev`            | Starts Docker services and then runs `next dev --turbopack` |
+| `bun run build`          | Builds the application for production                       |
+| `bun run db:generate`    | Generates Drizzle SQL migrations based on schema changes    |
+| `bun run db:migrate:dev` | Applies pending database migrations                         |
+| `bun run typecheck`      | Runs TypeScript type checking across the project            |
+| `bun run verify`         | Runs lint, typecheck, and format checks                     |
 
 ---
 

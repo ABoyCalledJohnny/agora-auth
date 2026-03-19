@@ -2,6 +2,7 @@
   "Errors": {
     "VALIDATION_ERROR": "The provided data is invalid.",
     "NOT_FOUND": "The requested resource could not be found.",
+    "NOT_IMPLEMENTED": "This endpoint is not implemented yet.",
     "INTERNAL": "An unexpected internal server error occurred.",
     "UNAUTHORIZED": "You must be logged in to perform this action.",
     "FORBIDDEN": "You do not have permission to perform this action.",
@@ -20,6 +21,7 @@
     "minLength": "{field} must be at least {min} characters.",
     "maxLength": "{field} must be at most {max} characters.",
     "passwordMinLength": "Password must be at least 12 characters.",
+    "passwordMaxLength": "Password must be at most 72 characters.",
     "passwordUppercase": "Password must contain at least one uppercase letter.",
     "passwordLowercase": "Password must contain at least one lowercase letter.",
     "passwordNumber": "Password must contain at least one number.",
@@ -27,7 +29,14 @@
     "passwordMismatch": "Passwords do not match.",
     "usernameMinLength": "Username must be at least 3 characters.",
     "usernameMaxLength": "Username must be at most 30 characters.",
-    "usernameFormat": "Username may only contain lowercase letters (a–z), numbers, hyphens, and underscores."
+    "usernameFormat": "Username may only contain lowercase letters (a–z), numbers, hyphens, and underscores.",
+    "usernameReserved": "This username is reserved and cannot be used.",
+    "publicIdFormat": "Invalid public id format.",
+    "internalPathStartsWithSlash": "Path must start with '/'.",
+    "internalPathProtocolRelative": "Protocol-relative paths are not allowed.",
+    "slugFormat": "Invalid slug format.",
+    "slugMinLength": "Slug must be at least 3 characters long.",
+    "slugMaxLength": "Slug must be a maximum of 64 characters long."
   },
   "Common": {
     "email": "Email",

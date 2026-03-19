@@ -1,4 +1,11 @@
 import { z } from "zod";
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  DEFAULT_CLIENT_NAME,
+  DEFAULT_VERIFY_EMAIL_PATH,
+  DEFAULT_RESET_PASSWORD_PATH,
+} from "./constants";
 
 // ---------------------------------------------------------------------------
 // 1. Environment schema — validates process.env at import time.
@@ -15,6 +22,8 @@ const envSchema = z.object({
   // App
   APP_ENV: z.enum(["development", "test", "staging", "production"]).default("development"),
   APP_URL: z.string().url().default("http://localhost:3000"),
+  HOSTNAME: z.string().default("0.0.0.0"),
+  PORT: z.coerce.number().int().positive().default(3000),
 
   // Database variables
   DB_HOST: z.string().default("localhost"),
@@ -28,13 +37,21 @@ const envSchema = z.object({
   // Auth
   JWT_PRIVATE_KEY: z.string(),
   JWT_PUBLIC_KEY: z.string(),
+  AUTH_SECRET: z.string().min(1),
+
+  // Bootstrap / Initialization
+  INITIAL_ADMIN_EMAIL: z.string().email(),
+  INITIAL_ADMIN_USERNAME: z.string().min(1),
+  INITIAL_ADMIN_PASSWORD: z.string().min(1),
+  DEFAULT_CLIENT_ID: z.string().min(1),
+  DEFAULT_CLIENT_SECRET: z.string().min(1),
 
   // Email (SMTP)
   SMTP_HOST: z.string(),
   SMTP_PORT: z.coerce.number().int().positive(),
   SMTP_USER: z.string(),
   SMTP_PASSWORD: z.string(),
-  MAIL_FROM: z.string().default("noreply@localhost"),
+  MAIL_FROM: z.string().default("noreply@localhost.com"),
 
   // Feature flags
   NEXT_PUBLIC_ENABLE_REGISTRATION: z.string().default("true"),
@@ -67,11 +84,13 @@ export const appConfig = {
     tagline: "A robust, secure, and modern authentication and user management system.",
     url: env.APP_URL,
     env: env.APP_ENV,
+    hostname: env.HOSTNAME,
+    port: env.PORT,
   },
 
   i18n: {
-    locales: ["en", "de"],
-    defaultLocale: "en",
+    locales: LOCALES,
+    defaultLocale: DEFAULT_LOCALE,
   },
 
   db: {
@@ -79,6 +98,7 @@ export const appConfig = {
   },
 
   auth: {
+    secret: env.AUTH_SECRET,
     jwtPrivateKey: env.JWT_PRIVATE_KEY,
     jwtPublicKey: env.JWT_PUBLIC_KEY,
     refreshCookieName: "agora_refresh",
@@ -92,7 +112,10 @@ export const appConfig = {
   },
 
   clients: {
-    defaultClientId: "agora_web_default",
+    defaultClientName: DEFAULT_CLIENT_NAME,
+    defaultClientId: env.DEFAULT_CLIENT_ID,
+    defaultVerifyEmailPath: DEFAULT_VERIFY_EMAIL_PATH,
+    defaultResetPasswordPath: DEFAULT_RESET_PASSWORD_PATH,
   },
 
   email: {
@@ -101,6 +124,13 @@ export const appConfig = {
     user: env.SMTP_USER,
     password: env.SMTP_PASSWORD,
     from: env.MAIL_FROM,
+  },
+
+  bootstrap: {
+    initialAdminEmail: env.INITIAL_ADMIN_EMAIL,
+    initialAdminUsername: env.INITIAL_ADMIN_USERNAME,
+    initialAdminPassword: env.INITIAL_ADMIN_PASSWORD,
+    defaultClientSecret: env.DEFAULT_CLIENT_SECRET,
   },
 
   logging: {

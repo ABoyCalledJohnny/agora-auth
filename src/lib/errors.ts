@@ -2,6 +2,7 @@ export type ErrorCode =
   // Standard Application Errors
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
+  | "NOT_IMPLEMENTED"
   | "INTERNAL"
   // Auth & Access
   | "UNAUTHORIZED"
@@ -21,6 +22,7 @@ export const defaultErrorMessages: Record<ErrorCode, string> = {
   // Standard Application Errors
   VALIDATION_ERROR: "The provided data is invalid.",
   NOT_FOUND: "The requested resource could not be found.",
+  NOT_IMPLEMENTED: "This endpoint is not implemented yet.",
   INTERNAL: "An unexpected internal server error occurred.",
 
   // Auth & Access
@@ -44,6 +46,7 @@ export const defaultHttpStatus = {
   // Standard Application Errors
   VALIDATION_ERROR: 400,
   NOT_FOUND: 404,
+  NOT_IMPLEMENTED: 501,
   INTERNAL: 500,
 
   // Auth & Access

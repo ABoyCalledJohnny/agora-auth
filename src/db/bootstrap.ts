@@ -1,23 +1,96 @@
-// import { db } from './index';
-// Import your schemas here once created
-// import * as schema from './schema';
+// import { db } from ".";
+// import { roles } from "./schema";
+import { DEFAULT_PREFERENCES, DEFAULT_PRIVACY_SETTINGS, SYSTEM_ROLE_NAMES } from "@/src/config/constants.ts";
+import { db } from ".";
+import { appConfig } from "../config";
+import { hashApiKey, hashPassword } from "../lib/crypto.ts";
+import { AgoraError } from "../lib/errors.ts";
+import { createPublicId } from "../lib/utils.ts";
+import { DrizzleApiClientRepository } from "../repositories/ApiClientRepository.ts";
+import { DrizzleRoleRepository } from "../repositories/RoleRepository.ts";
+import { userCredentials, userProfiles, userSettings, users, usersRoles } from "./schema";
 
 async function seedRoles() {
   console.log("Seeding user roles...");
-  // TODO: Insert 'admin' and 'user' roles
-  // Use ON CONFLICT DO NOTHING to ensure idempotency
+
+  for (const role of SYSTEM_ROLE_NAMES) {
+    await DrizzleRoleRepository.create({ name: role });
+  }
 }
 
 async function seedAdminAccount() {
   console.log("Seeding initial admin account...");
-  // TODO: Check for INITIAL_ADMIN_EMAIL / INITIAL_ADMIN_PASSWORD in env
-  // TODO: Hash password and insert admin user if it doesn't exist
+
+  await db.transaction(async (tx) => {
+    // 1. Create base user (using the raw Drizzle transaction tx)
+    const [adminUser] = await tx
+      .insert(users)
+      .values({
+        publicId: createPublicId(),
+        username: appConfig.bootstrap.initialAdminUsername,
+        email: appConfig.bootstrap.initialAdminEmail,
+        status: "active",
+        emailVerifiedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: users.email,
+        set: {
+          username: appConfig.bootstrap.initialAdminUsername,
+          email: appConfig.bootstrap.initialAdminEmail,
+        },
+      })
+      .returning();
+
+    if (!adminUser) throw new AgoraError("INTERNAL", "Error creating bootstrap admin user");
+
+    // 2. Set credentials
+    const hashedPassword = await hashPassword(appConfig.bootstrap.initialAdminPassword); // Need a hashing tool here!
+    await tx
+      .insert(userCredentials)
+      .values({ userId: adminUser.id, passwordHash: hashedPassword })
+      .onConflictDoUpdate({
+        target: userCredentials.userId,
+        set: { passwordHash: hashedPassword },
+      });
+
+    // 3. Profiles and Settings (Dependencies for app usage)
+    await tx.insert(userProfiles).values({ userId: adminUser.id }).onConflictDoNothing();
+
+    await tx
+      .insert(userSettings)
+      .values({
+        userId: adminUser.id,
+        privacySettings: DEFAULT_PRIVACY_SETTINGS,
+        preferences: DEFAULT_PREFERENCES,
+      })
+      .onConflictDoUpdate({
+        target: userSettings.userId,
+        set: {
+          privacySettings: DEFAULT_PRIVACY_SETTINGS,
+          preferences: DEFAULT_PREFERENCES,
+        },
+      });
+
+    // 4. Find admin role and assign it
+    // Note: DrizzleRoleRepository.findByName isn't inherently transaction aware, but lookups are safe
+    const adminRole = await DrizzleRoleRepository.findByName("admin");
+    if (adminRole) {
+      await tx.insert(usersRoles).values({ userId: adminUser.id, roleId: adminRole.id }).onConflictDoNothing();
+    }
+  });
 }
 
 async function seedDefaultClient() {
   console.log("Seeding default API client...");
-  // TODO: Check for DEFAULT_CLIENT_SECRET in env
-  // TODO: Hash secret and insert default API client if it doesn't exist
+
+  await DrizzleApiClientRepository.create({
+    name: appConfig.clients.defaultClientName,
+    clientId: appConfig.clients.defaultClientId,
+    apiKeyHash: hashApiKey(appConfig.bootstrap.defaultClientSecret),
+    baseUrl: appConfig.app.url,
+    verifyEmailPath: appConfig.clients.defaultVerifyEmailPath,
+    resetPasswordPath: appConfig.clients.defaultResetPasswordPath,
+  });
 }
 
 async function bootstrap() {
