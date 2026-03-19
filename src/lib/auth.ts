@@ -1,6 +1,6 @@
-import type { Session as DbSession } from "@/src/db/schema/auth";
-import { AgoraError } from "@/src/lib/errors";
-import { logger } from "@/src/lib/logger";
+import type { Session as DbSession } from "@/src/db/schema/auth.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
+import { logger } from "@/src/lib/logger.ts";
 
 // ---------------------------------------------------------------------------
 // Types

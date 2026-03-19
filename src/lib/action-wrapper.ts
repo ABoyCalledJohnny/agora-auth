@@ -1,10 +1,10 @@
 import type { z } from "zod";
-import { type Session, authenticate, authorize } from "@/src/lib/auth";
+import { type Session, authenticate, authorize } from "@/src/lib/auth.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
-import type { HandlerConfig } from "@/src/lib/wrapper-types";
-import type { ApiErrorResponse, ApiResponse } from "@/src/types";
-import { sanitizeInput } from "@/src/lib/utils";
+import type { HandlerConfig } from "@/src/lib/wrapper-types.ts";
+import type { ApiErrorResponse, ApiResponse } from "@/src/types.ts";
+import { sanitizeInput } from "@/src/lib/utils.ts";
 
 // ---------------------------------------------------------------------------
 // Types

@@ -1,10 +1,10 @@
 import { like } from "drizzle-orm";
 import { firstNames, lastNames, seed } from "drizzle-seed";
 import { USER_STATUS } from "../config/constants.ts";
-import { appConfig } from "../config/index.ts";
+import { appConfig } from "../config";
 import { createPublicId } from "../lib/utils.ts";
-import { db } from "./index.ts";
-import * as schema from "./schema/index.ts";
+import { db } from ".";
+import * as schema from "./schema";
 
 const seedSchema = {
   users: schema.users,

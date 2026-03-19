@@ -1,4 +1,4 @@
-import { NO_STORE_HEADERS } from "@/src/config/constants";
+import { NO_STORE_HEADERS } from "@/src/config/constants.ts";
 
 export async function GET() {
   return Response.json(

@@ -1,6 +1,6 @@
-import { NO_STORE_HEADERS } from "@/src/config/constants";
-import { client as sql } from "@/src/db/index.ts";
-import { logger } from "@/src/lib/logger";
+import { NO_STORE_HEADERS } from "@/src/config/constants.ts";
+import { client as sql } from "@/src/db";
+import { logger } from "@/src/lib/logger.ts";
 
 async function checkDatabaseConnection(): Promise<boolean> {
   try {

@@ -1,4 +1,4 @@
-import type { UserStatus } from "@/src/config/constants";
+import type { UserStatus } from "@/src/config/constants.ts";
 import type { User } from "@/src/db/schema";
 
 export type UserListSortBy = "createdAt" | "updatedAt" | "username" | "email";

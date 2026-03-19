@@ -9,9 +9,9 @@
  * - `createPublicId`: Creates a unique public ID consisting of PUBLIC_ID_LENGTH (27) PUBLIC_ID_ALPHABET (a-z) letters.
  */
 
-import { appConfig } from "@/src/config/";
-import { PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH } from "@/src/config/constants";
-import { AgoraError } from "@/src/lib/errors";
+import { appConfig } from "@/src/config";
+import { PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH } from "@/src/config/constants.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
 import { clsx, type ClassValue } from "clsx";
 import { customAlphabet } from "nanoid";
 import { cookies } from "next/headers";

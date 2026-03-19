@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { appConfig } from "../config/index.ts";
-import * as schema from "./schema/index.ts";
+import { appConfig } from "../config";
+import * as schema from "./schema";
 
 // 1. Define the Global type
 // This prevents TypeScript from complaining that 'conn' doesn't exist on globalThis

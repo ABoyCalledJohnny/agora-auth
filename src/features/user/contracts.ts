@@ -1,7 +1,7 @@
-import type { UserStatus } from "@/src/config/constants";
+import type { UserStatus } from "@/src/config/constants.ts";
 import type { FullUser, NewUser, User, UserProfile, UserSettings } from "@/src/db/schema";
-import type { CrudRepository } from "@/src/repositories/contracts";
-import type { ListUsersPageInput, ListUsersPageResult } from "./types";
+import type { CrudRepository } from "@/src/repositories/contracts.ts";
+import type { ListUsersPageInput, ListUsersPageResult } from "./types.ts";
 
 export interface UserRepository extends CrudRepository<
   User,

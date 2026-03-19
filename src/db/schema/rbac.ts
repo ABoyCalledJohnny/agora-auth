@@ -1,7 +1,7 @@
 import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { index, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
-import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers";
-import { users } from "./users";
+import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers.ts";
+import { users } from "./users.ts";
 
 export const roles = pgTable("roles", {
   id: idColumn(),

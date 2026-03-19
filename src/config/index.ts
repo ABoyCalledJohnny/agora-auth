@@ -5,7 +5,7 @@ import {
   DEFAULT_CLIENT_NAME,
   DEFAULT_VERIFY_EMAIL_PATH,
   DEFAULT_RESET_PASSWORD_PATH,
-} from "./constants";
+} from "./constants.ts";
 
 // ---------------------------------------------------------------------------
 // 1. Environment schema — validates process.env at import time.

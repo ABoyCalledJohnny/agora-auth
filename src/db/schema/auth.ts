@@ -2,7 +2,7 @@ import { relations, type InferInsertModel, type InferSelectModel } from "drizzle
 import { index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers.ts";
 import { users } from "./users.ts";
-import { VERIFICATION_TOKEN_TYPE } from "@/src/config/constants";
+import { VERIFICATION_TOKEN_TYPE } from "@/src/config/constants.ts";
 
 export const verificationTokenTypeEnum = pgEnum("verification_token_type", VERIFICATION_TOKEN_TYPE);
 

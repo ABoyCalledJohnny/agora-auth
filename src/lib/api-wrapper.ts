@@ -1,9 +1,9 @@
 import { authenticate, authorize, type Session } from "@/src/lib/auth.ts";
-import { AgoraError, defaultErrorMessages } from "@/src/lib/errors";
+import { AgoraError, defaultErrorMessages } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
-import { sanitizeInput } from "@/src/lib/utils";
-import type { HandlerConfig } from "@/src/lib/wrapper-types";
-import type { ApiErrorResponse } from "@/src/types";
+import { sanitizeInput } from "@/src/lib/utils.ts";
+import type { HandlerConfig } from "@/src/lib/wrapper-types.ts";
+import type { ApiErrorResponse } from "@/src/types.ts";
 import { type NextRequest, NextResponse } from "next/server";
 import type { z } from "zod";
 

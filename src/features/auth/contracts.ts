@@ -1,4 +1,4 @@
-import type { VerificationTokenType } from "@/src/config/constants";
+import type { VerificationTokenType } from "@/src/config/constants.ts";
 import type {
   ApiClient,
   NewApiClient,
@@ -7,10 +7,10 @@ import type {
   Session,
   VerificationToken,
 } from "@/src/db/schema";
-import { apiClients, users } from "@/src/db/schema/index.ts";
-import type { NewRole, Role } from "@/src/db/schema/rbac";
-import { passwordRules } from "@/src/lib/validation";
-import type { BaseRepository, CrudRepository } from "@/src/repositories/contracts";
+import { apiClients, users } from "@/src/db/schema";
+import type { NewRole, Role } from "@/src/db/schema/rbac.ts";
+import { passwordRules } from "@/src/lib/validation.ts";
+import type { BaseRepository, CrudRepository } from "@/src/repositories/contracts.ts";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 

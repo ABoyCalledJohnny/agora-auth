@@ -1,4 +1,4 @@
-import type { ErrorCode } from "@/src/lib/errors";
+import type { ErrorCode } from "@/src/lib/errors.ts";
 
 export type ApiErrorCode = ErrorCode;
 
