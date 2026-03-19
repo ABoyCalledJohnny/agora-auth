@@ -9,25 +9,36 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   // Create
   // ---------------------------------------------------------------------------
   async create(data: NewApiClient): Promise<ApiClient> {
-    const [result] = await db
-      .insert(apiClients)
-      .values(data)
-      .onConflictDoUpdate({
-        target: apiClients.name,
-        set: {
-          clientId: data.clientId,
-          apiKeyHash: data.apiKeyHash,
-          baseUrl: data.baseUrl,
-          verifyEmailPath: data.verifyEmailPath,
-          resetPasswordPath: data.resetPasswordPath,
-          isActive: data.isActive,
-        },
-      })
-      .returning();
+    try {
+      const [result] = await db
+        .insert(apiClients)
+        .values(data)
+        .onConflictDoUpdate({
+          target: apiClients.name,
+          set: {
+            clientId: data.clientId,
+            apiKeyHash: data.apiKeyHash,
+            baseUrl: data.baseUrl,
+            verifyEmailPath: data.verifyEmailPath,
+            resetPasswordPath: data.resetPasswordPath,
+            isActive: data.isActive,
+          },
+        })
+        .returning();
 
-    if (!result) throw new AgoraError("INTERNAL", "Failed to create or fetch client.");
+      if (!result) throw new AgoraError("INTERNAL", "Failed to create or fetch client.");
 
-    return result;
+      return result;
+    } catch (e: unknown) {
+      if (e instanceof AgoraError) throw e;
+
+      const pgError = e as Record<string, unknown>;
+      if (pgError && pgError.code === "23505") {
+        throw new AgoraError("CLIENT_CONFLICT");
+      }
+
+      throw new AgoraError("INTERNAL", "A database error occurred while creating the API client.");
+    }
   },
 
   // ---------------------------------------------------------------------------
@@ -56,18 +67,34 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   // Update
   // ---------------------------------------------------------------------------
   async update(id: string, data: Partial<Omit<NewApiClient, "id" | "createdAt" | "updatedAt">>): Promise<ApiClient> {
-    const [updatedClient] = await db.update(apiClients).set(data).where(eq(apiClients.id, id)).returning();
+    try {
+      const [updatedClient] = await db.update(apiClients).set(data).where(eq(apiClients.id, id)).returning();
 
-    if (!updatedClient) throw new AgoraError("NOT_FOUND", "Client not found.");
-    return updatedClient;
+      if (!updatedClient) throw new AgoraError("NOT_FOUND", "Client not found.");
+      return updatedClient;
+    } catch (e: unknown) {
+      if (e instanceof AgoraError) throw e;
+
+      const pgError = e as Record<string, unknown>;
+      if (pgError && pgError.code === "23505") {
+        throw new AgoraError("CLIENT_CONFLICT");
+      }
+
+      throw new AgoraError("INTERNAL", "A database error occurred while updating the API client.");
+    }
   },
 
   // ---------------------------------------------------------------------------
   // Delete
   // ---------------------------------------------------------------------------
   async delete(id: string): Promise<ApiClient> {
-    const [deletedClient] = await db.delete(apiClients).where(eq(apiClients.id, id)).returning();
-    if (!deletedClient) throw new AgoraError("NOT_FOUND", "Client not found.");
-    return deletedClient;
+    try {
+      const [deletedClient] = await db.delete(apiClients).where(eq(apiClients.id, id)).returning();
+      if (!deletedClient) throw new AgoraError("NOT_FOUND", "Client not found.");
+      return deletedClient;
+    } catch (e) {
+      if (e instanceof AgoraError) throw e;
+      throw new AgoraError("INTERNAL", "A database error occurred while deleting the API client.");
+    }
   },
 };

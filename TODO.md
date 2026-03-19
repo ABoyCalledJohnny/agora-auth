@@ -188,7 +188,7 @@
         - [ ] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
         - [ ] **`NotificationService`:** Email abstraction using `nodemailer`.
             - [ ] Create HTML templates (welcome/verification, password reset).
-        - [ ] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
+        - [x] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
     - **API Routes and Server Actions:**
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
         - [ ] `POST /api/auth/register` - Register new user.

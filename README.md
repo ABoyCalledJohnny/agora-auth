@@ -2,7 +2,7 @@
 
 > [!WARNING]
 > **Active Development**
-> This project is currently in the **initial setup phase**. Core architecture is in progress and many features are incomplete.
+> The **initial infrastructure setup** (database, ORM, Docker pipelines, API/Action wrappers) is complete. The project is currently in the **active feature development phase**, focusing on Authentication services.
 
 A robust, secure, and modern authentication and user management system built with Next.js, Drizzle ORM, and PostgreSQL.
 
@@ -62,8 +62,8 @@ It aims to provide a solid foundation for user registration, login, profile mana
 
 ## Getting Started (WIP)
 
-> [!CAUTION]
-> **Project Status:** The project is in the very early stages of initialisation. Core architecture and features are still under active implementation, so behaviour may change frequently and many flows are incomplete.
+> [!WARNING]
+> **Project Status:** While the core infrastructure (database, Next.js setups, type-safety wrappers) is fully set up, features are under active implementation. Many user/admin flows are currently incomplete.
 
 Minimum local setup currently used in this repository:
 
@@ -133,8 +133,8 @@ The project follows a feature-driven, modular structure built on top of Next.js 
 
 ## Development Workflow
 
-> [!WARNING]
-> Since the project is in the initialisation phase, the full development workflow is not yet available.
+> [!NOTE]
+> The foundational development workflow has been established. You can run database migrations, formatting, type checking, and the Next.js development server with its associated local container network seamlessly via Bun scripts.
 
 Current Next.js and Bun scripts in `package.json` already support operations such as:
 

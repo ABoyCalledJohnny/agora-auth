@@ -2,7 +2,7 @@
 
 > [!WARNING]
 > **Aktive Entwicklung**
-> Dieses Projekt befindet sich derzeit in der **anfänglichen Einrichtungsphase**. Die Kernarchitektur ist in Arbeit und viele Funktionen sind noch unvollständig.
+> Die **anfängliche Infrastruktur-Einrichtung** (Datenbank, ORM, Docker, API/Action-Wrapper) ist abgeschlossen. Das Projekt befindet sich derzeit in der **aktiven Feature-Entwicklungsphase** mit Schwerpunkt auf Authentifizierungsdiensten.
 
 Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-Lösung, die mit Next.js, Drizzle ORM und PostgreSQL entwickelt wurde.
 
@@ -62,8 +62,8 @@ Das Ziel ist es, eine solide Grundlage für Benutzerregistrierung, Login, Profil
 
 ## Erste Schritte (In Arbeit)
 
-> [!CAUTION]
-> **Projektstatus:** Das Projekt befindet sich in einem sehr frühen Stadium der Initialisierung. Kernarchitektur und Funktionen werden weiterhin aktiv implementiert, daher kann sich das Verhalten häufig ändern und viele Abläufe sind noch unvollständig.
+> [!WARNING]
+> **Projektstatus:** Die Kerninfrastruktur (Datenbanken, Next.js Setup, Typensicherheits-Wrapper) wurde vollständig eingerichtet, aber Features wie Authentifizierung- und Admin-Abläufe befinden sich noch in aktiver Implementierung. Viele Workflows sind derzeit unvollständig.
 
 Aktuell verwendetes Mindest-Setup für die lokale Entwicklung in diesem Repository:
 
@@ -133,8 +133,8 @@ Das Projekt folgt einer feature-getriebenen, modularen Struktur, die auf dem Nex
 
 ## Entwicklungs-Workflow
 
-> [!WARNING]
-> Da sich das Projekt in der Initialisierungsphase befindet, ist der vollständige Entwicklungs-Workflow noch nicht verfügbar.
+> [!NOTE]
+> Die grundlegende Entwicklungsumgebung wurde etabliert. Mit zentralen Bun-Skripten lassen sich Datenbank-Migrationen, Typprüfungen, Formatierungen sowie der Next.js-Entwicklungsserver im Verbund mit dem lokalen Docker-Netzwerk nahtlos ausführen.
 
 Die aktuellen Next.js- und Bun-Skripte in der `package.json` unterstützen bereits unter anderem folgende Operationen:
 

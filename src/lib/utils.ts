@@ -101,3 +101,53 @@ export function cn(...inputs: ClassValue[]) {
  * Matches the publicIdSchema defined in src/lib/validation.ts.
  */
 export const createPublicId = customAlphabet(PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH);
+
+/**
+ * Strips explicit `undefined` values from an object.
+ * Essential for passing partial payloads into Drizzle ORM schemas while
+ * satisfying the strict `exactOptionalPropertyTypes` TypeScript configuration.
+ */
+export function stripUndefined<T extends Record<string, unknown>>(
+  obj: T,
+): { [K in keyof T]: Exclude<T[K], undefined> } {
+  return Object.fromEntries(Object.entries(obj).filter(([, value]) => value !== undefined)) as {
+    [K in keyof T]: Exclude<T[K], undefined>;
+  };
+}
+
+/**
+ * Validates if a provided target URL or origin securely matches an allowed base URL.
+ * Useful for preventing Open Redirect attacks on frontend login forms
+ * and backend API client validations.
+ *
+ * @param allowedBaseUrl The trusted base URL (e.g., "https://example.com/app")
+ * @param urlToVerify The requested redirect URL or origin (e.g., "/login" or "https://evil.com")
+ * @returns True if the target URL safely falls under the allowed base URL.
+ */
+export function isSafeRedirect(allowedBaseUrl: string, urlToVerify: string): boolean {
+  try {
+    const allowed = new URL(allowedBaseUrl);
+
+    // Passing allowed.origin acts as a fallback for relative paths.
+    // If urlToVerify is relative (e.g., "/login"), it prepends allowed.origin.
+    // If urlToVerify is absolute (e.g., "https://evil.com"), it ignores the fallback entirely.
+    const target = new URL(urlToVerify, allowed.origin);
+
+    // 1. Strict Origin Check (Protocol, Domain, Port)
+    // This protects against string-based bypasses like https://example.com.evil.com/
+    if (target.origin !== allowed.origin) {
+      return false;
+    }
+
+    // 2. Strict Path Prefix Check
+    // We append a trailing slash to both paths to prevent prefix bypass attacks.
+    // E.g., protecting "/app" from being bypassed by "/app-evil".
+    const allowedPath = allowed.pathname.endsWith("/") ? allowed.pathname : allowed.pathname + "/";
+    const targetPath = target.pathname.endsWith("/") ? target.pathname : target.pathname + "/";
+
+    return targetPath.startsWith(allowedPath);
+  } catch {
+    // Rejects malformed URLs securely
+    return false;
+  }
+}
