@@ -7,12 +7,6 @@ import type { ApiErrorResponse } from "@/src/types";
 import { type NextRequest, NextResponse } from "next/server";
 import type { z } from "zod";
 
-// TODO catch all for not implemented routes
-// TODO param validation
-// TODO rate limiting (e.g. strict limits for public routes vs authenticated routes)
-// TODO query parameter parsing (e.g. pagination, sorting filters for GET requests)
-// TODO metrics & request tracing (e.g. calculating handler execution time to log slow requests)
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -61,7 +55,7 @@ function formatApiError(error: unknown): NextResponse {
 
 /** With schema — handler receives `{ request, data, session, params }`. */
 export function withApiHandler<TSchema extends z.ZodType>(
-  config: HandlerConfig<TSchema> & { schema: TSchema },
+  config: HandlerConfig<TSchema> & { bodySchema: TSchema },
   handler: (context: {
     request: NextRequest;
     data: z.infer<TSchema>;
@@ -72,7 +66,7 @@ export function withApiHandler<TSchema extends z.ZodType>(
 
 /** Without schema — handler receives `{ request, session, params }`. */
 export function withApiHandler(
-  config: Omit<HandlerConfig, "schema">,
+  config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: { request: NextRequest; session: Session | null; params: RouteParams }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
 
@@ -86,7 +80,8 @@ export function withApiHandler(
     try {
       // 1. Authentication
       let session: Session | null = null;
-      if (config.auth) {
+      // Check for roles also so that a forgotten auth `true` argument doesn't cause this step to be skipped.
+      if (config.auth || config.roles?.length) {
         session = await authenticate();
       }
 
@@ -97,7 +92,7 @@ export function withApiHandler(
 
       // 3. Validation & sanitisation (JSON body)
       let data: unknown;
-      if (config.schema) {
+      if (config.bodySchema) {
         let body: unknown;
         try {
           body = await request.json();
@@ -105,7 +100,7 @@ export function withApiHandler(
           throw new AgoraError("VALIDATION_ERROR", "Invalid or missing JSON body.");
         }
         const sanitised = sanitizeInput(body);
-        const result = config.schema.safeParse(sanitised);
+        const result = config.bodySchema.safeParse(sanitised);
         if (!result.success) {
           throw new AgoraError("VALIDATION_ERROR", "Validation failed.", {
             details: result.error.issues,
@@ -115,7 +110,7 @@ export function withApiHandler(
       }
 
       // 4. Execute handler
-      const context = config.schema
+      const context = config.bodySchema
         ? { request, data, session, params: routeContext.params }
         : { request, session, params: routeContext.params };
 
@@ -142,7 +137,7 @@ export function withApiHandler(
 //
 // // POST (with body schema + auth):
 // export const POST = withApiHandler(
-//   { schema: createPostSchema, auth: true },
+//   { bodySchema: createPostSchema, auth: true },
 //   async ({ data, session }) => {
 //     const post = await postService.create(data, session!.userId);
 //     return NextResponse.json(post, { status: 201 });
@@ -151,7 +146,7 @@ export function withApiHandler(
 //
 // // Public POST (webhook, no auth):
 // export const POST = withApiHandler(
-//   { schema: webhookSchema },
+//   { bodySchema: webhookSchema },
 //   async ({ data }) => {
 //     await webhookService.handle(data);
 //     return NextResponse.json({ received: true });

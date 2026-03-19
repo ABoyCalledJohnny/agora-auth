@@ -606,6 +606,7 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
     - `Tabs` (or `TabGroup`/`TabPanel`): For navigating sections without page reloads (e.g., in Settings).
     - `Toast` (via `sonner`): For asynchronous notifications (e.g., "Settings saved", "Check your email"). No need to build from scratch; just map the `Toaster` provider.
     - `Alert`: For inline page-level alerts (e.g., static error messages at the top of a form).
+    - `Pill` / `Badge`: Minimal inline status indicator (useful for showing roles or active/suspended statuses in tables).
 
 **Route Structure**
 

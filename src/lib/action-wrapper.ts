@@ -52,13 +52,13 @@ function parseFormData(input: unknown): unknown {
 
 /** With schema — handler receives `{ data, session }`. */
 export function withActionHandler<TSchema extends z.ZodType, TResult>(
-  config: HandlerConfig<TSchema> & { schema: TSchema },
+  config: HandlerConfig<TSchema> & { bodySchema: TSchema },
   handler: (context: { data: z.infer<TSchema>; session: Session | null }) => Promise<TResult>,
 ): (rawInput: z.input<TSchema> | FormData) => Promise<ActionResult<TResult>>;
 
 /** Without schema — handler receives `{ session }`. */
 export function withActionHandler<TResult>(
-  config: Omit<HandlerConfig, "schema">,
+  config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: { session: Session | null }) => Promise<TResult>,
 ): () => Promise<ActionResult<TResult>>;
 
@@ -83,10 +83,10 @@ export function withActionHandler(
 
       // 3. Validation & sanitisation
       let data: unknown;
-      if (config.schema) {
+      if (config.bodySchema) {
         const input = parseFormData(rawInput);
         const sanitised = sanitizeInput(input);
-        const result = config.schema.safeParse(sanitised);
+        const result = config.bodySchema.safeParse(sanitised);
         if (!result.success) {
           throw new AgoraError("VALIDATION_ERROR", "Validation failed.", {
             details: result.error.flatten(),
@@ -96,7 +96,7 @@ export function withActionHandler(
       }
 
       // 4. Execute handler
-      const context = config.schema ? { data, session } : { session };
+      const context = config.bodySchema ? { data, session } : { session };
       const result = await handler(context);
 
       // 5. Return success
@@ -114,7 +114,7 @@ export function withActionHandler(
 // // With schema + auth:
 // "use server";
 // export const createPost = withActionHandler(
-//   { schema: createPostSchema, auth: true, roles: ["author"] },
+//   { bodySchema: createPostSchema, auth: true, roles: ["author"] },
 //   async ({ data, session }) => {
 //     return postService.create(data, session!.userId);
 //   },
@@ -132,7 +132,7 @@ export function withActionHandler(
 // // Public action with schema (e.g. newsletter signup):
 // "use server";
 // export const subscribe = withActionHandler(
-//   { schema: subscribeSchema },
+//   { bodySchema: subscribeSchema },
 //   async ({ data }) => {
 //     await newsletterService.subscribe(data.email);
 //   },

@@ -169,7 +169,7 @@
         - [ ] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
             - [ ] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`.
-            - [ ] General: `Button`, `Tabs`, `Alert`.
+            - [ ] General: `Button`, `Tabs`, `Alert`, `Pill`.
             - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
 
@@ -215,19 +215,19 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`. 
+        - [ ] Create Zod validation schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`.
         - [ ] Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
     - **API Routes and Server Actions:**
-	    - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
-	    - [ ] 🔒 `GET /api/user/profile` - Authenticated user's full profile.
-	    - [ ] 🔒 `PATCH /api/user/profile` - Update display name, bio, etc.
-	    - [ ] 🔒 `PATCH /api/user/email` - Initiate email change (triggers verification).
-	    - [ ] 🔒 `PATCH /api/user/username` - Change username.
-	    - [ ] 🔒 `PATCH /api/user/password` - Change password (requires current password).
-	    - [ ] 🔒 `DELETE /api/user` - Self-serve account deletion (requires current password).
-	    - [ ] 🔒 `GET /api/users/:username` - Public profile (authenticated users only, strictly public fields, respects profile visibility settings).
+        - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
+        - [ ] 🔒 `GET /api/user/profile` - Authenticated user's full profile.
+        - [ ] 🔒 `PATCH /api/user/profile` - Update display name, bio, etc.
+        - [ ] 🔒 `PATCH /api/user/email` - Initiate email change (triggers verification).
+        - [ ] 🔒 `PATCH /api/user/username` - Change username.
+        - [ ] 🔒 `PATCH /api/user/password` - Change password (requires current password).
+        - [ ] 🔒 `DELETE /api/user` - Self-serve account deletion (requires current password).
+        - [ ] 🔒 `GET /api/users/:username` - Public profile (authenticated users only, strictly public fields, respects profile visibility settings).
     - **Frontend:**
         - [ ] **`UserProfile`:** Public profile page at `/profile/[username]`.
         - [ ] **`SettingsPage`:** Settings shell with `Tabs` component (Profile tab, Account tab).
