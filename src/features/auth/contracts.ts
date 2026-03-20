@@ -76,6 +76,7 @@ export const createClientSchema = ClientSchema.pick({
   verifyEmailPath: true,
   resetPasswordPath: true,
   isActive: true,
+  skipEmailVerification: true,
 }).extend({
   plainApiKey: z
     .string()

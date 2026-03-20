@@ -288,6 +288,10 @@ _Out of scope for this project._
     - [ ] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
     - [ ] Integrate domain into Dogado mail hosting provider and add config data to `env.local`.
 - **Production Server**
+    - [ ] Bind the PostgreSQL container port to the VPS localhost in `compose.production.yaml`.
+    - [ ] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -L 5433:127.0.0.1:5432 user@vps-ip`).
+    - [ ] Add the database superuser credentials to `.env.local` to override development environment variables.
+    - [ ] Run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
     - [ ] Clean old Docker infrastructure.
     - [ ] Enable continuous deployment.
 - **Client Integration and Seeding**

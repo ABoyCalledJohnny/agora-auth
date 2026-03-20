@@ -1,0 +1,1 @@
+ALTER TABLE "api_clients" ADD COLUMN "skip_email_verification" boolean DEFAULT false NOT NULL;

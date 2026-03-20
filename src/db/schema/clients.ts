@@ -12,6 +12,7 @@ export const apiClients = pgTable("api_clients", {
   verifyEmailPath: text().notNull(),
   resetPasswordPath: text().notNull(),
   isActive: boolean().notNull().default(true),
+  skipEmailVerification: boolean().notNull().default(false),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
 });

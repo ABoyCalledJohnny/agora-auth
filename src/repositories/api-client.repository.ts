@@ -24,6 +24,7 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
             verifyEmailPath: data.verifyEmailPath,
             resetPasswordPath: data.resetPasswordPath,
             isActive: data.isActive,
+            skipEmailVerification: data.skipEmailVerification,
           },
         })
         .returning();
