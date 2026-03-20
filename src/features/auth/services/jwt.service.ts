@@ -1,17 +1,12 @@
-import { exportJWK, importPKCS8, importSPKI, type JWK, type JWTPayload, jwtVerify, SignJWT } from "jose";
+import type { AccessTokenPayload } from "../types.ts";
+
+import { exportJWK, importPKCS8, importSPKI, type JWK, jwtVerify, SignJWT } from "jose";
 
 import { appConfig } from "@/src/config/index.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 
 const privateKey = await importPKCS8(appConfig.auth.jwtPrivateKey, "RS256");
 const publicKey = await importSPKI(appConfig.auth.jwtPublicKey, "RS256");
-
-export interface AccessTokenPayload extends JWTPayload {
-  sub: string; // User ID
-  sid: string; // Session ID
-  username: string;
-  roles: string[];
-}
 
 export const JwtService = {
   /**

@@ -1,21 +1,21 @@
 import type { Session } from "@/src/db/schema/index.ts";
 
+export type CreateSessionInput = {
+  userId: string;
+  ipAddress: string;
+  userAgent: string;
+};
+
+export type CreateSessionResult = {
+  plainToken: string;
+  session: Session;
+};
+
 import { appConfig } from "@/src/config/index.ts";
 import { createToken, hashToken } from "@/src/lib/crypto.ts";
 import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleSessionRepository } from "@/src/repositories/session.repository.ts";
-
-export interface CreateSessionInput {
-  userId: string;
-  ipAddress: string;
-  userAgent: string;
-}
-
-export interface CreateSessionResult {
-  plainToken: string;
-  session: Session;
-}
 
 /**
  * Service responsible for issuing, rotating, and managing long-lived

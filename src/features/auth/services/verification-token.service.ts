@@ -1,22 +1,22 @@
 import type { VerificationTokenType } from "@/src/config/constants.ts";
 import type { VerificationToken } from "@/src/db/schema/index.ts";
 
+export type CreateVerificationTokenInput = {
+  userId: string;
+  type: VerificationTokenType;
+  metadata?: Record<string, unknown>;
+};
+
+export type CreateVerificationTokenResult = {
+  plainToken: string;
+  verificationToken: VerificationToken;
+};
+
 import { appConfig } from "@/src/config/index.ts";
 import { createToken, hashToken } from "@/src/lib/crypto.ts";
 import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleVerificationTokenRepository } from "@/src/repositories/verification-token.repository.ts";
-
-export interface CreateVerificationTokenInput {
-  userId: string;
-  type: VerificationTokenType;
-  metadata?: Record<string, unknown>;
-}
-
-export interface CreateVerificationTokenResult {
-  plainToken: string;
-  verificationToken: VerificationToken;
-}
 
 /**
  * Service responsible for issuing, consuming, and managing lifecycle

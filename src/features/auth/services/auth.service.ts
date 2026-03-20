@@ -1,4 +1,5 @@
 import type { LoginRequest, NewPasswordRequest, RegisterRequest, ResetPasswordRequest } from "../contracts.ts";
+import type { AuthTokens, LoginResponse } from "../types.ts";
 import type { ApiClient, User } from "@/src/db/schema/index.ts";
 
 import { RESERVED_USERNAMES } from "@/src/config/constants.ts";
@@ -12,16 +13,6 @@ import { DrizzleUserRepository } from "@/src/repositories/user.repository.ts";
 import { JwtService } from "./jwt.service.ts";
 import { SessionService } from "./session.service.ts";
 import { VerificationTokenService } from "./verification-token.service.ts";
-
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: string;
-}
-
-export interface LoginResponse extends AuthTokens {
-  user: User;
-}
 
 /**
  * AuthService

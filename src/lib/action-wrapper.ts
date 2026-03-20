@@ -2,7 +2,7 @@ import type { HandlerConfig } from "@/src/lib/wrapper-types.ts";
 import type { ApiErrorResponse, ApiResponse } from "@/src/types.ts";
 import type { z } from "zod";
 
-import { authenticate, authorize, type Session } from "@/src/lib/auth.ts";
+import { type AppSession, authenticate, authorize } from "@/src/lib/auth.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 import { sanitizeInput } from "@/src/lib/utils.ts";
@@ -54,13 +54,13 @@ function parseFormData(input: unknown): unknown {
 /** With schema — handler receives `{ data, session }`. */
 export function withActionHandler<TSchema extends z.ZodType, TResult>(
   config: HandlerConfig<TSchema> & { bodySchema: TSchema },
-  handler: (context: { data: z.infer<TSchema>; session: Session | null }) => Promise<TResult>,
+  handler: (context: { data: z.infer<TSchema>; session: AppSession | null }) => Promise<TResult>,
 ): (rawInput: z.input<TSchema> | FormData) => Promise<ActionResult<TResult>>;
 
 /** Without schema — handler receives `{ session }`. */
 export function withActionHandler<TResult>(
   config: Omit<HandlerConfig, "bodySchema">,
-  handler: (context: { session: Session | null }) => Promise<TResult>,
+  handler: (context: { session: AppSession | null }) => Promise<TResult>,
 ): () => Promise<ActionResult<TResult>>;
 
 // Implementation
@@ -72,7 +72,7 @@ export function withActionHandler(
   return async (rawInput?: unknown) => {
     try {
       // 1. Authentication
-      let session: Session | null = null;
+      let session: AppSession | null = null;
       if (config.auth) {
         session = await authenticate();
       }

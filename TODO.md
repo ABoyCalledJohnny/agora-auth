@@ -139,7 +139,7 @@
 - **Development:**
     - **Shared Validation and Domain Rules:**
         - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains.
-        - [x] **Global types:** Create `src/types.ts` to define system-wide interfaces like `ApiErrorResponse`, `ApiSuccessResponse`, and standard action states for uniform client-server communication.
+        - [x] **Global types:** Create `src/types.ts` to define system-wide interfaces like `ApiErrorResponse`, `ApiSuccessResponse`, and standard action states for uniform client-server communication as well es `PaginatedList`s.
     - **Database Layer:**
         - **Drizzle schemas:** Translate the ERD into Drizzle schema and relation files.
             - **Validation:** Import shared constants and types from `constants.ts` and `validation.ts` where applicable.

@@ -4,7 +4,7 @@ import type { z } from "zod";
 
 import { type NextRequest, NextResponse } from "next/server";
 
-import { authenticate, authorize, type Session } from "@/src/lib/auth.ts";
+import { type AppSession, authenticate, authorize } from "@/src/lib/auth.ts";
 import { AgoraError, defaultErrorMessages } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 import { sanitizeInput } from "@/src/lib/utils.ts";
@@ -61,7 +61,7 @@ export function withApiHandler<TSchema extends z.ZodType>(
   handler: (context: {
     request: NextRequest;
     data: z.infer<TSchema>;
-    session: Session | null;
+    session: AppSession | null;
     params: RouteParams;
   }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
@@ -69,7 +69,11 @@ export function withApiHandler<TSchema extends z.ZodType>(
 /** Without schema — handler receives `{ request, session, params }`. */
 export function withApiHandler(
   config: Omit<HandlerConfig, "bodySchema">,
-  handler: (context: { request: NextRequest; session: Session | null; params: RouteParams }) => Promise<NextResponse>,
+  handler: (context: {
+    request: NextRequest;
+    session: AppSession | null;
+    params: RouteParams;
+  }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
 
 // Implementation
@@ -81,7 +85,7 @@ export function withApiHandler(
   return async (request: NextRequest, routeContext: { params: RouteParams }) => {
     try {
       // 1. Authentication
-      let session: Session | null = null;
+      let session: AppSession | null = null;
       // Check for roles also so that a forgotten auth `true` argument doesn't cause this step to be skipped.
       if (config.auth || config.roles?.length) {
         session = await authenticate();

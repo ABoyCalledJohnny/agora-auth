@@ -1,5 +1,3 @@
-import type { Session as DbSession } from "@/src/db/schema/auth.ts";
-
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 
@@ -7,13 +5,14 @@ import { logger } from "@/src/lib/logger.ts";
 // Types
 // ---------------------------------------------------------------------------
 
-// This is the rich object your wrapper and handlers will actually use!
-export type Session = DbSession & {
+// This becomes the standard user context available to all your Next.js pages/components!
+export type AppSession = {
   user: {
-    id: string;
+    id: string; // mapped from sub
     username: string;
-    roles: string[]; // <-- Attached seamlessly
+    roles: string[];
   };
+  sessionId: string; // mapped from sid
 };
 
 // ---------------------------------------------------------------------------
@@ -30,7 +29,16 @@ export type Session = DbSession & {
  *
  * Returns `null` if no tokens are present or the refresh fails.
  */
-export async function getSession(): Promise<Session | null> {
+export async function getSession(): Promise<AppSession | null> {
+  // TODO: IMPLEMENTATION STEPS
+  // 1. Instatiate `cookies()` and format the secret names safely out of `appConfig`.
+  // 2. Grab the Access JWT from the cookies.
+  // 3. Call `JwtService.verify(token)`. If valid, map the AccessTokenPayload to `AppSession` and return it. (No DB call needed!).
+  // 4. Catch `TOKEN_EXPIRED` inside the try/catch. If so, attempt to grab the Refresh Token.
+  // 5. Call `AuthService.refresh(refreshToken)` to securely rotate the DB session and emit new tokens.
+  // 6. Write the new tokens strictly back to the incoming/outgoing Next headers via `setSessionCookies()`.
+  // 7. Map the newly generated parameters into `AppSession` and cleanly return it.
+
   throw new Error("getSession() is not implemented — connect your auth library here.");
 }
 
@@ -43,7 +51,7 @@ export async function getSession(): Promise<Session | null> {
  * Triggers a silent token refresh if the Access JWT is expired.
  * Throws `UNAUTHORIZED` if no valid session can be established.
  */
-export async function authenticate(): Promise<Session> {
+export async function authenticate(): Promise<AppSession> {
   const session = await getSession();
   if (!session) {
     throw new AgoraError("UNAUTHORIZED");
@@ -59,12 +67,12 @@ export async function authenticate(): Promise<Session> {
  * Checks that the decoded JWT payload holds at least one of the required roles.
  * Throws `FORBIDDEN` if the check fails.
  */
-export function authorize(session: Session, requiredRoles: string[]): void {
+export function authorize(session: AppSession, requiredRoles: string[]): void {
   if (requiredRoles.length === 0) return;
 
   const hasRole = requiredRoles.some((role) => session.user.roles.includes(role));
   if (!hasRole) {
-    logger.warn(`Authorisation denied for user ${session.userId}`, {
+    logger.warn(`Authorisation denied for user ${session.user.id}`, {
       required: requiredRoles,
       actual: session.user.roles,
     });
@@ -95,7 +103,7 @@ export function authorize(session: Session, requiredRoles: string[]): void {
  * }
  * ```
  */
-export async function assertAuth(options?: { roles?: string[] }): Promise<Session> {
+export async function assertAuth(options?: { roles?: string[] }): Promise<AppSession> {
   const session = await authenticate();
   if (options?.roles) {
     authorize(session, options.roles);
