@@ -5,7 +5,7 @@ import { hashApiKey, verifyApiKey } from "@/src/lib/crypto.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 import { createPublicId, isSafeRedirect, stripUndefined } from "@/src/lib/utils.ts";
-import { DrizzleApiClientRepository } from "@/src/repositories/ApiClientRepository.ts";
+import { DrizzleApiClientRepository } from "@/src/repositories/api-client.repository.ts";
 
 /**
  * Service responsible for validating external API clients and resolving

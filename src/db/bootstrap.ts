@@ -6,8 +6,8 @@ import { appConfig } from "../config/index.ts";
 import { hashApiKey, hashPassword } from "../lib/crypto.ts";
 import { AgoraError } from "../lib/errors.ts";
 import { createPublicId } from "../lib/utils.ts";
-import { DrizzleApiClientRepository } from "../repositories/ApiClientRepository.ts";
-import { DrizzleRoleRepository } from "../repositories/RoleRepository.ts";
+import { DrizzleApiClientRepository } from "../repositories/api-client.repository.ts";
+import { DrizzleRoleRepository } from "../repositories/role.repository.ts";
 import { db } from "./index.ts";
 import { userCredentials, userProfiles, users, userSettings, usersRoles } from "./schema/index.ts";
 
