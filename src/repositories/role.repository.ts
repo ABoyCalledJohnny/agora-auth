@@ -71,6 +71,13 @@ export const DrizzleRoleRepository: RoleRepository = {
     }
   },
 
+  /**
+   * Removes a joined relationship strictly stripping rights from a User.
+   *
+   * @param userId The user's root ID.
+   * @param roleId The internal Role ID mappings.
+   *
+   */
   async removeRoleFromUser(userId: string, roleId: string): Promise<void> {
     try {
       await db.delete(usersRoles).where(and(eq(usersRoles.userId, userId), eq(usersRoles.roleId, roleId)));

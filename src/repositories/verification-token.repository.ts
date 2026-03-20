@@ -11,6 +11,15 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
   // ---------------------------------------------------------------------------
   // Create
   // ---------------------------------------------------------------------------
+  /**
+   * Securely persists a completely hashed, short-lived verification token.
+   * Leverages native Drizzle timestamping mapping for accurate rotation context.
+   *
+   * @param data The required payload generating a strict Token signature.
+   * @returns The fully mapped VerificationToken entity.
+   * @throws {AgoraError} INTERNAL on insertion failure constraints.
+   *
+   */
   async create(data: NewVerificationToken): Promise<VerificationToken> {
     try {
       const [token] = await db.insert(verificationTokens).values(data).returning();
