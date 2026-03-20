@@ -183,7 +183,7 @@
         - [x] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
     - **Services:**
         - [ ] **`AuthService`:** Registration and login orchestration.
-        - [ ] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
+        - [x] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
         - [x] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
         - [x] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
         - [ ] **`NotificationService`:** Email abstraction using `nodemailer`.

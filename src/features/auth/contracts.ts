@@ -109,9 +109,8 @@ export const tokenStringSchema = z
   // Base64url character set standard
   .regex(/^[A-Za-z0-9_-]+$/, "Token format invalid");
 
-export const loginSchema = UserSchema.pick({
-  email: true,
-}).extend({
+export const loginSchema = z.object({
+  identifier: z.string().min(1, "Email or username is required"),
   password: z.string(),
 });
 
