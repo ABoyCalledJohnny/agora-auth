@@ -184,7 +184,7 @@
     - **Services:**
         - [ ] **`AuthService`:** Registration and login orchestration.
         - [ ] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
-        - [ ] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
+        - [x] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
         - [ ] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
         - [ ] **`NotificationService`:** Email abstraction using `nodemailer`.
             - [ ] Create HTML templates (welcome/verification, password reset).
@@ -262,6 +262,7 @@ _Out of scope for this project._
 
 - [ ] **Project Readme:** Finalise `README.md` from initial draft.
 - [ ] **API Documentation:** Finalise `api.md` (and `api_de.md`) documenting all public endpoints, request/response schemas, authentication requirements, and example usage - share with classmate consuming the API.
+- [ ] **Code quality:** Add JSDoc/DocBlocks and helpful inline comments to complex functions and components.
 - [ ] **Presentation:** Prepare project presentation.
 
 ---
