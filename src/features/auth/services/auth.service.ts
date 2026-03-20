@@ -2,16 +2,21 @@ import type { LoginRequest, NewPasswordRequest, RegisterRequest, ResetPasswordRe
 import type { ApiClient, User } from "@/src/db/schema/index.ts";
 
 import { RESERVED_USERNAMES } from "@/src/config/constants.ts";
-import { hashPassword } from "@/src/lib/crypto.ts";
+import { appConfig } from "@/src/config/index.ts";
+import { hashPassword, verifyPassword } from "@/src/lib/crypto.ts";
 import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
-import { createPublicId } from "@/src/lib/utils.ts";
+import { createPublicId, parseDuration } from "@/src/lib/utils.ts";
+import { DrizzleRoleRepository } from "@/src/repositories/role.repository.ts";
 import { DrizzleUserRepository } from "@/src/repositories/user.repository.ts";
 
+import { JwtService } from "./jwt.service.ts";
+import { SessionService } from "./session.service.ts";
 import { VerificationTokenService } from "./verification-token.service.ts";
 
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
+  expiresAt: string;
 }
 
 export interface LoginResponse extends AuthTokens {
@@ -71,16 +76,57 @@ export const AuthService = {
    */
   async login(input: LoginRequest, ipAddress: string, userAgent: string): Promise<LoginResponse> {
     try {
-      // TODO: IMPLEMENTATION STEPS
-      // 1. Look up the user by email OR username (input.identifier) using UserRepository.
-      //    If not found, throw INVALID_CREDENTIALS to prevent user enumeration.
-      // 2. Verify the password hash via `verifyPassword()` from crypto.ts. Throw INVALID_CREDENTIALS if it fails.
-      // 3. Check account state (e.g., throw ACCOUNT_PENDING if email verification is mandatory and they haven't verified).
-      // 4. Call `SessionService.create({ userId, ipAddress, userAgent })` to generate a Refresh Token.
-      // 5. Call `JwtService.sign(payload)` to generate a short-lived Access Token.
-      // 6. Return both tokens along with the safe user object.
+      // 1. Look up the user by email OR username (input.identifier).
+      const user = await DrizzleUserRepository.findByIdentifier(input.identifier);
 
-      throw new Error("Not implemented");
+      let isCorrectPassword = false;
+
+      if (user) {
+        // User exists, check real password
+        const hashedPassword = await DrizzleUserRepository.getPasswordHash(user.id);
+        if (hashedPassword) {
+          isCorrectPassword = await verifyPassword(input.password, hashedPassword);
+        }
+      } else {
+        // 🔒 TIMING ATTACK MITIGATION
+        // User doesn't exist. Hash a dummy password anyway so the execution time is identical
+        // This prevents attackers from knowing which emails exist simply by measuring response times.
+        await hashPassword(input.password);
+      }
+
+      if (!user || !isCorrectPassword) throw new AgoraError("INVALID_CREDENTIALS");
+
+      // 3. Check account state
+      if (user.status === "pending") throw new AgoraError("ACCOUNT_PENDING");
+      if (user.status === "suspended") throw new AgoraError("ACCOUNT_SUSPENDED");
+
+      // 4. Generate Session / Refresh Token
+      const refreshTokenWrapper = await SessionService.create({
+        userId: user.id,
+        ipAddress,
+        userAgent,
+      });
+
+      const userRoles = await DrizzleRoleRepository.getUserRoles(user.id);
+
+      // 5. Generate short-lived Access Token
+      const accessToken = await JwtService.sign({
+        sub: user.id,
+        sid: refreshTokenWrapper.session.id,
+        username: user.username,
+        roles: userRoles,
+      });
+
+      // Calculate exact expiration ISO string to align with the JWT `exp` claim.
+      const expiresAt = new Date(Date.now() + parseDuration(appConfig.auth.accessTokenExpiry)).toISOString();
+
+      // 6. Return both tokens along with the safe user object
+      return {
+        accessToken,
+        refreshToken: refreshTokenWrapper.plainToken,
+        expiresAt,
+        user,
+      };
     } catch (e) {
       handleServiceError(e, "Error during user login.");
     }
@@ -91,14 +137,33 @@ export const AuthService = {
    */
   async refresh(plainSessionToken: string): Promise<AuthTokens> {
     try {
-      // TODO: IMPLEMENTATION STEPS
       // 1. Call `SessionService.rotate(plainSessionToken)` to invalidate the old refresh token and get a new one.
       //    (This inherently checks for Token Reuse and triggers full revocation if stolen).
-      // 2. Lookup the user from the rotated session's `userId` to ensure they are still active (not suspended/deleted).
-      // 3. Call `JwtService.sign(payload)` to generate a fresh Access Token reflecting their current roles.
-      // 4. Return new Access Token and new Refresh Token.
+      const refreshTokenWrapper = await SessionService.rotate(plainSessionToken);
 
-      throw new Error("Not implemented");
+      // 2. Lookup the user from the rotated session's `userId` to ensure they are still active (not suspended/deleted).
+      const user = await DrizzleUserRepository.findById(refreshTokenWrapper.session.userId);
+      if (!user) throw new AgoraError("UNAUTHORIZED");
+      if (user.status === "pending") throw new AgoraError("ACCOUNT_PENDING");
+      if (user.status === "suspended") throw new AgoraError("ACCOUNT_SUSPENDED");
+
+      // 3. Call `JwtService.sign(payload)` to generate a fresh Access Token reflecting their current roles.
+      const userRoles = await DrizzleRoleRepository.getUserRoles(user.id);
+      const accessToken = await JwtService.sign({
+        sub: user.id,
+        sid: refreshTokenWrapper.session.id,
+        username: user.username,
+        roles: userRoles,
+      });
+
+      const expiresAt = new Date(Date.now() + parseDuration(appConfig.auth.accessTokenExpiry)).toISOString();
+
+      // 4. Return new Access Token and new Refresh Token.
+      return {
+        accessToken,
+        refreshToken: refreshTokenWrapper.plainToken,
+        expiresAt,
+      };
     } catch (e) {
       handleServiceError(e, "Error refreshing session tokens.");
     }
@@ -109,11 +174,8 @@ export const AuthService = {
    */
   async logout(plainSessionToken: string): Promise<void> {
     try {
-      // TODO: IMPLEMENTATION STEPS
-      // 1. Call `SessionService.revokeByToken(plainSessionToken)` to formally terminate it in the database.
-      // 2. (Optional) Any other cleanup tasks if necessary.
-
-      throw new Error("Not implemented");
+      // 1. Terminate the session in the database via the token.
+      await SessionService.revokeByToken(plainSessionToken);
     } catch (e) {
       handleServiceError(e, "Error logging out user.");
     }
@@ -125,11 +187,18 @@ export const AuthService = {
 
   async verifyEmail(plainToken: string): Promise<void> {
     try {
-      // TODO: IMPLEMENTATION STEPS
-      // 1. Call `VerificationTokenService.consume(plainToken, "email_verification")`.
-      // 2. Update the user record (`emailVerified: new Date()`) using UserRepository.
+      // 1. Consume the token to ensure it's valid and unused
+      const consumedToken = await VerificationTokenService.consume(plainToken, "email_verification");
 
-      throw new Error("Not implemented");
+      // 2. Fetch the user to determine if we should transition their status
+      const user = await DrizzleUserRepository.findById(consumedToken.userId);
+      if (!user) throw new AgoraError("NOT_FOUND", "User associated with this token no longer exists.");
+
+      // 3. Mark the email as verified, and activate the user if they were pending
+      await DrizzleUserRepository.update(consumedToken.userId, {
+        emailVerifiedAt: new Date(),
+        ...(user.status === "pending" && { status: "active" }),
+      });
     } catch (e) {
       handleServiceError(e, "Error verifying email.");
     }
@@ -137,12 +206,19 @@ export const AuthService = {
 
   async requestPasswordReset(input: ResetPasswordRequest): Promise<void> {
     try {
-      // TODO: IMPLEMENTATION STEPS
       // 1. Look up the user by email (input.email).
-      // 2. If user exists, call `VerificationTokenService.create({ userId, type: "password_reset" })`.
-      // 3. Dispatch the password reset email using the MailService.
-      //    (Security Best Practice: Do not throw an error if the user doesn't exist, just return silently to prevent email enumeration).
+      const user = await DrizzleUserRepository.findByEmail(input.email);
 
+      // Security Best Practice: To prevent user enumeration attacks, we do not throw an error
+      // if the email doesn't exist in our system. We silently succeed.
+      if (user) {
+        // 2. Create token.
+        // const verificationToken = await VerificationTokenService.create({userId: user.id, type: 'password_reset'});
+        // TODO Implement/finalise after NotificationService creation.
+        // 3. Dispatch the password reset email using the NotificationService.
+      }
+
+      // Remove this throw once NotificationService is implemented
       throw new Error("Not implemented");
     } catch (e) {
       handleServiceError(e, "Error requesting password reset.");
@@ -151,13 +227,18 @@ export const AuthService = {
 
   async resetPassword(plainToken: string, input: NewPasswordRequest): Promise<void> {
     try {
-      // TODO: IMPLEMENTATION STEPS
-      // 1. Call `VerificationTokenService.consume(plainToken, "password_reset")` to get the target userId.
-      // 2. Hash the `input.password` via `hashPassword()`.
-      // 3. Update the user's credentials in `user_credentials` table.
-      // 4. (Recommended) Call `SessionService.revokeAllForUser(userId)` to invalidate all active sessions in case of account compromise.
+      // 1. Consume the token to get the target userId and guarantee it was valid/unused.
+      const consumedToken = await VerificationTokenService.consume(plainToken, "password_reset");
 
-      throw new Error("Not implemented");
+      // 2. Hash the new password securely via Argon2.
+      const hashedPassword = await hashPassword(input.password);
+
+      // 3. Update the user's credentials in the `user_credentials` table via the `UserRepository`.
+      await DrizzleUserRepository.setPasswordHash(consumedToken.userId, hashedPassword);
+
+      // 4. Invalidate all active sessions across all devices for security.
+      // E.g., if their email was compromised, kicking out attackers is mandatory.
+      await SessionService.revokeAllForUser(consumedToken.userId);
     } catch (e) {
       handleServiceError(e, "Error resetting password.");
     }
