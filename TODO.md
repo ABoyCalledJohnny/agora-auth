@@ -185,7 +185,7 @@
         - [ ] **`AuthService`:** Registration and login orchestration.
         - [ ] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
         - [x] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
-        - [ ] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
+        - [x] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
         - [ ] **`NotificationService`:** Email abstraction using `nodemailer`.
             - [ ] Create HTML templates (welcome/verification, password reset).
         - [x] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.

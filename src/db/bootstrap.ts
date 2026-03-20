@@ -3,7 +3,7 @@
 import { DEFAULT_PREFERENCES, DEFAULT_PRIVACY_SETTINGS, SYSTEM_ROLE_NAMES } from "@/src/config/constants.ts";
 
 import { appConfig } from "../config/index.ts";
-import { hashApiKey, hashPassword } from "../lib/crypto.ts";
+import { hashPassword, hashToken } from "../lib/crypto.ts";
 import { AgoraError } from "../lib/errors.ts";
 import { createPublicId } from "../lib/utils.ts";
 import { DrizzleApiClientRepository } from "../repositories/api-client.repository.ts";
@@ -87,7 +87,7 @@ async function seedDefaultClient() {
   await DrizzleApiClientRepository.create({
     name: appConfig.clients.defaultClientName,
     clientId: appConfig.clients.defaultClientId,
-    apiKeyHash: hashApiKey(appConfig.bootstrap.defaultClientSecret),
+    apiKeyHash: hashToken(appConfig.bootstrap.defaultClientSecret),
     baseUrl: appConfig.app.url,
     verifyEmailPath: appConfig.clients.defaultVerifyEmailPath,
     resetPasswordPath: appConfig.clients.defaultResetPasswordPath,

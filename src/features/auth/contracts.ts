@@ -101,6 +101,14 @@ export const registerSchema = UserSchema.pick({
 
 export type RegisterRequest = z.infer<typeof registerSchema>;
 
+/** Schema to validate high-entropy 32-byte base64url encoded tokens via API / JSON inputs */
+export const tokenStringSchema = z
+  .string()
+  // 32 byte base64url is exactly 43 characters long
+  .length(43, "Token format invalid")
+  // Base64url character set standard
+  .regex(/^[A-Za-z0-9_-]+$/, "Token format invalid");
+
 export const loginSchema = UserSchema.pick({
   email: true,
 }).extend({

@@ -1,7 +1,7 @@
 import type { CreateClientRequest, UpdateClientRequest } from "../contracts.ts";
 import type { ApiClient } from "@/src/db/schema/index.ts";
 
-import { hashApiKey, verifyApiKey } from "@/src/lib/crypto.ts";
+import { hashToken, verifyToken } from "@/src/lib/crypto.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 import { createPublicId, isSafeRedirect, stripUndefined } from "@/src/lib/utils.ts";
@@ -23,7 +23,7 @@ export const ApiClientService = {
    */
   async authenticate(clientId: string, plainApiKey: string): Promise<ApiClient> {
     const client = await DrizzleApiClientRepository.findByClientId(clientId);
-    const isValidKey = client ? verifyApiKey(plainApiKey, client.apiKeyHash) : false;
+    const isValidKey = client ? verifyToken(plainApiKey, client.apiKeyHash) : false;
 
     if (!client?.isActive || !isValidKey) throw new AgoraError("INVALID_CREDENTIALS");
 
@@ -71,9 +71,16 @@ export const ApiClientService = {
     return isSafeRedirect(client.baseUrl, urlToVerify);
   },
 
+  /**
+   * Creates a new API client, generating a unique public client ID
+   * and hashing the provided plain text API key for secure storage.
+   *
+   * @param clientData The validated creation request data.
+   * @returns The newly created ApiClient entity.
+   */
   async create(clientData: CreateClientRequest): Promise<ApiClient> {
     try {
-      const apiKeyHash = hashApiKey(clientData.plainApiKey); // example crypto function
+      const apiKeyHash = hashToken(clientData.plainApiKey);
 
       const clientId = createPublicId();
 
@@ -92,6 +99,14 @@ export const ApiClientService = {
     }
   },
 
+  /**
+   * Updates an existing API client.
+   * Automatically strips undefined values to ensure database integrity.
+   *
+   * @param id The internal database ID of the client.
+   * @param clientData The validated partial update request data.
+   * @returns The updated ApiClient entity.
+   */
   async update(id: string, clientData: UpdateClientRequest): Promise<ApiClient> {
     try {
       // Strip undefined values to satisfy exactOptionalPropertyTypes in TS
@@ -106,6 +121,12 @@ export const ApiClientService = {
     }
   },
 
+  /**
+   * Deletes an API client by its internal database ID.
+   *
+   * @param id The internal database ID of the client.
+   * @returns The deleted ApiClient entity.
+   */
   async delete(id: string): Promise<ApiClient> {
     try {
       return await DrizzleApiClientRepository.delete(id);

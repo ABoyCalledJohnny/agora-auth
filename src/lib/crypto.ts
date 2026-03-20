@@ -3,11 +3,11 @@
  *
  * - `hashPassword`: Secure password hashing using Bun's native optimized Argon2id implementation.
  * - `verifyPassword`: Verifies a plain text password against an Argon2id hash.
- * - `hashApiKey`: Fast, deterministic SHA-256 hashing for high-entropy secrets like API keys.
- * - `verifyApiKey`: Verifies a plaintext API key against its SHA-256 hash using a constant-time comparison.
+ * - `hashToken`: Fast, deterministic SHA-256 hashing for high-entropy secrets like API keys and verification tokens.
+ * - `verifyToken`: Verifies a plaintext token against its SHA-256 hash using a constant-time comparison.
  */
 
-import { timingSafeEqual } from "node:crypto";
+import { randomBytes, timingSafeEqual } from "node:crypto";
 
 /**
  * Secure password hashing using Bun's native optimized Argon2id implementation.
@@ -25,22 +25,26 @@ export async function hashPassword(password: string): Promise<string> {
  * Verify a plain text password against an Argon2id hash.
  *
  * @param password The plain text password to verify
- * @param hash The Argon2id hash stored in the database
+ * @param hash The Argon2id hash stored in the database, 32 bytes -> 43 characters
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return await Bun.password.verify(password, hash);
 }
 
+export function createToken(bytes: number = 32): string {
+  return randomBytes(bytes).toString("base64url");
+}
+
 /**
- * Fast, deterministic hashing for high-entropy secrets like API keys.
+ * Fast, deterministic hashing for high-entropy secrets like API keys or verification tokens.
  * Uses SHA-256. Do NOT use this for user passwords.
  */
-export function hashApiKey(key: string): string {
+export function hashToken(key: string): string {
   return new Bun.CryptoHasher("sha256").update(key).digest("hex");
 }
 
 /**
- * Verify a plaintext API key against its SHA-256 hash securely.
+ * Verify a plaintext high-entropy string against its SHA-256 hash securely.
  *
  * Why not use `===`?
  * Standard string comparison (`===`) stops at the first mismatched character.
@@ -48,8 +52,8 @@ export function hashApiKey(key: string): string {
  * guess the hash character by character (a "timing attack").
  * This function uses a constant-time comparison to prevent that.
  */
-export function verifyApiKey(plainKey: string, hashedKey: string): boolean {
-  const plainHash = hashApiKey(plainKey);
+export function verifyToken(plainKey: string, hashedKey: string): boolean {
+  const plainHash = hashToken(plainKey);
 
   // Convert hex strings to byte arrays (Buffers).
   // timingSafeEqual requires binary data formats, not standard JS strings.
