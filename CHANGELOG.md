@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.2.0-rc.0...v0.2.0) (2026-03-20)
+
+### Chores
+
+- include repository JSDoc improvements ([ad7796e](https://github.com/ABoyCalledJohnny/agora-auth/commit/ad7796e2a16a212e7fcd39fd8b0fc494fad2f7a2))
+
 ## [0.2.0-rc.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.1.0...v0.2.0-rc.0) (2026-03-19)
 
 ### Features
