@@ -3,8 +3,7 @@ import type { VerificationToken } from "@/src/db/schema/index.ts";
 
 import { appConfig } from "@/src/config/index.ts";
 import { createToken, hashToken } from "@/src/lib/crypto.ts";
-import { AgoraError } from "@/src/lib/errors.ts";
-import { logger } from "@/src/lib/logger.ts";
+import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleVerificationTokenRepository } from "@/src/repositories/verification-token.repository.ts";
 
@@ -57,9 +56,7 @@ export const VerificationTokenService = {
         verificationToken,
       };
     } catch (e) {
-      if (e instanceof AgoraError) throw e;
-      logger.error("Error creating verification token.", e);
-      throw new AgoraError("INTERNAL");
+      handleServiceError(e, "Error creating verification token.");
     }
   },
 
@@ -90,9 +87,7 @@ export const VerificationTokenService = {
 
       return token;
     } catch (e) {
-      if (e instanceof AgoraError) throw e;
-      logger.error("Error consuming verification token.", e);
-      throw new AgoraError("INTERNAL");
+      handleServiceError(e, "Error consuming verification token.");
     }
   },
 
@@ -107,9 +102,7 @@ export const VerificationTokenService = {
     try {
       return await DrizzleVerificationTokenRepository.deleteByUserIdAndType(userId, type);
     } catch (e) {
-      if (e instanceof AgoraError) throw e;
-      logger.error("Error deleting verification tokens by user and type.", e);
-      throw new AgoraError("INTERNAL");
+      handleServiceError(e, "Error deleting verification tokens by user and type.");
     }
   },
 
@@ -123,9 +116,7 @@ export const VerificationTokenService = {
     try {
       return (await DrizzleVerificationTokenRepository.deleteExpired()).length;
     } catch (e) {
-      if (e instanceof AgoraError) throw e;
-      logger.error("Error flushing expired verification tokens.", e);
-      throw new AgoraError("INTERNAL");
+      handleServiceError(e, "Error flushing expired verification tokens.");
     }
   },
 };

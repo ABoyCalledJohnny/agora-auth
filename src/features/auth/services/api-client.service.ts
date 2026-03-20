@@ -2,8 +2,7 @@ import type { CreateClientRequest, UpdateClientRequest } from "../contracts.ts";
 import type { ApiClient } from "@/src/db/schema/index.ts";
 
 import { hashToken, verifyToken } from "@/src/lib/crypto.ts";
-import { AgoraError } from "@/src/lib/errors.ts";
-import { logger } from "@/src/lib/logger.ts";
+import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
 import { createPublicId, isSafeRedirect, stripUndefined } from "@/src/lib/utils.ts";
 import { DrizzleApiClientRepository } from "@/src/repositories/api-client.repository.ts";
 
@@ -93,9 +92,7 @@ export const ApiClientService = {
         apiKeyHash,
       });
     } catch (e) {
-      if (e instanceof AgoraError) throw e;
-      logger.error("Error creating API client. Potential database or connection issue.", e);
-      throw new AgoraError("INTERNAL");
+      handleServiceError(e, "Error creating API client. Potential database or connection issue.");
     }
   },
 
@@ -115,9 +112,7 @@ export const ApiClientService = {
 
       return await DrizzleApiClientRepository.update(id, cleanedData);
     } catch (e) {
-      if (e instanceof AgoraError) throw e;
-      logger.error(`Error updating API client with ID ${id}.`, e);
-      throw new AgoraError("INTERNAL");
+      handleServiceError(e, `Error updating API client with ID ${id}.`);
     }
   },
 
@@ -131,9 +126,7 @@ export const ApiClientService = {
     try {
       return await DrizzleApiClientRepository.delete(id);
     } catch (e) {
-      if (e instanceof AgoraError) throw e;
-      logger.error(`Error deleting API client with ID ${id}.`, e);
-      throw new AgoraError("INTERNAL");
+      handleServiceError(e, `Error deleting API client with ID ${id}.`);
     }
   },
 };
