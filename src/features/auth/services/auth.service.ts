@@ -1,7 +1,13 @@
 import type { LoginRequest, NewPasswordRequest, RegisterRequest, ResetPasswordRequest } from "../contracts.ts";
-import type { User } from "@/src/db/schema/index.ts";
+import type { ApiClient, User } from "@/src/db/schema/index.ts";
 
-import { handleServiceError } from "@/src/lib/errors.ts";
+import { RESERVED_USERNAMES } from "@/src/config/constants.ts";
+import { hashPassword } from "@/src/lib/crypto.ts";
+import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
+import { createPublicId } from "@/src/lib/utils.ts";
+import { DrizzleUserRepository } from "@/src/repositories/user.repository.ts";
+
+import { VerificationTokenService } from "./verification-token.service.ts";
 
 export interface AuthTokens {
   accessToken: string;
@@ -9,7 +15,7 @@ export interface AuthTokens {
 }
 
 export interface LoginResponse extends AuthTokens {
-  user: Omit<User, "passwordHash">; // Safe user object without credentials
+  user: User;
 }
 
 /**
@@ -23,17 +29,38 @@ export const AuthService = {
   /**
    * 1. Registration Flow
    */
-  async register(input: RegisterRequest): Promise<Omit<User, "passwordHash">> {
+  async register(input: RegisterRequest, client: ApiClient): Promise<User> {
     try {
-      // TODO: IMPLEMENTATION STEPS
-      // 1. Check if the email or username is already taken (UserRepository). If so, throw EMAIL_EXISTS / USERNAME_EXISTS.
-      // 2. Hash the user's plaintext password using `hashPassword()` from crypto.ts.
-      // 3. Save the new user and their credentials to the database.
-      // 4. If email verification is required: Create a verification token via `VerificationTokenService.create()`.
-      // 5. Dispatch the welcome/verification email using the MailService.
-      // 6. Return the safely mapped user object (omit password).
+      //  1. Check for duplicates.
+      if (await DrizzleUserRepository.findByEmail(input.email)) throw new AgoraError("EMAIL_EXISTS");
+      if (
+        (await DrizzleUserRepository.findByUsername(input.username)) ||
+        (RESERVED_USERNAMES as readonly string[]).includes(input.username)
+      )
+        throw new AgoraError("USERNAME_EXISTS");
 
-      throw new Error("Not implemented");
+      // 2. Hash the user's plaintext password.
+      const hashedPassword = await hashPassword(input.password);
+
+      // 3. Save the new user and their credentials to the database.
+      const newUser = await DrizzleUserRepository.create({
+        publicId: createPublicId(),
+        username: input.username,
+        email: input.email,
+      });
+      await DrizzleUserRepository.setPasswordHash(newUser.id, hashedPassword);
+
+      // TODO Implement/finalise after NotificationService creation.
+
+      // 4. If email verification is required: Create a verification token via `VerificationTokenService.create()`.
+      if (!client.skipEmailVerification) {
+        // const verificationToken = await VerificationTokenService.create({userId: newUser.id, type: 'email_verification'});
+      }
+
+      // 5. Dispatch the welcome/verification email using the NotificationService.
+
+      // 6. Return the safely mapped user object (omit password).
+      return newUser;
     } catch (e) {
       handleServiceError(e, "Error during user registration.");
     }

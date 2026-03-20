@@ -13,6 +13,7 @@ export interface UserRepository extends CrudRepository<
   // -------------------------------------------------------------------------
   findByUsername(username: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
+  findByIdentifier(email: string): Promise<User | null>;
   findByRoleId(roleId: string): Promise<User[]>;
   findByStatus(status: UserStatus): Promise<User[]>;
   listPage(input: ListUsersPageInput): Promise<ListUsersPageResult>;
