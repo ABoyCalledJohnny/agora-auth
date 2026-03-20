@@ -1,7 +1,7 @@
-import type { UserStatus } from "@/src/config/constants";
-import type { FullUser, NewUser, User, UserProfile, UserSettings } from "@/src/db/schema";
-import type { CrudRepository } from "@/src/repositories/contracts";
-import type { ListUsersPageInput, ListUsersPageResult } from "./types";
+import type { ListUsersPageInput, ListUsersPageResult } from "./types.ts";
+import type { UserStatus } from "@/src/config/constants.ts";
+import type { FullUser, NewUser, User, UserProfile, UserSettings } from "@/src/db/schema/index.ts";
+import type { CrudRepository } from "@/src/repositories/contracts.ts";
 
 export interface UserRepository extends CrudRepository<
   User,
@@ -13,6 +13,7 @@ export interface UserRepository extends CrudRepository<
   // -------------------------------------------------------------------------
   findByUsername(username: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
+  findByIdentifier(email: string): Promise<User | null>;
   findByRoleId(roleId: string): Promise<User[]>;
   findByStatus(status: UserStatus): Promise<User[]>;
   listPage(input: ListUsersPageInput): Promise<ListUsersPageResult>;

@@ -1,25 +1,38 @@
-import type { UserStatus } from "@/src/config/constants";
-import { db } from "@/src/db";
+import type { UserStatus } from "@/src/config/constants.ts";
+import type { UserRepository } from "@/src/features/user/contracts.ts";
+
+import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+
+import { db } from "@/src/db/index.ts";
 import {
   type FullUser,
   type NewUser,
   type User,
-  type UserProfile,
-  type UserSettings,
-  userProfiles,
-  userSettings,
-  users,
-  usersRoles,
   userCredentials,
-} from "@/src/db/schema";
-import type { UserRepository } from "@/src/features/user/contracts";
-import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
-import { AgoraError } from "../lib/errors";
+  type UserProfile,
+  userProfiles,
+  users,
+  type UserSettings,
+  userSettings,
+  usersRoles,
+} from "@/src/db/schema/index.ts";
+
+import { AgoraError } from "../lib/errors.ts";
 
 export const DrizzleUserRepository: UserRepository = {
   // -------------------------------------------------------------------------
   // Create
   // -------------------------------------------------------------------------
+  /**
+   * Creates a new user in the database. Initiates a strictly atomic database transaction
+   * guaranteeing synchronized generation of linked `userProfiles` and `userSettings`.
+   *
+   * @param data The validated payload for generating a user.
+   * @returns The fully persisted root User entity.
+   * @throws {AgoraError} EMAIL_EXISTS if email constraint violated.
+   * @throws {AgoraError} USERNAME_EXISTS if username constraint violated.
+   *
+   */
   async create(data: NewUser): Promise<User> {
     try {
       const newUser = await db.transaction(async (tx) => {
@@ -59,18 +72,50 @@ export const DrizzleUserRepository: UserRepository = {
   // -------------------------------------------------------------------------
   // Read
   // -------------------------------------------------------------------------
+  /**
+   * Looks up a user completely internally via their database auto-increment ID.
+   *
+   * @param id The internal database ID.
+   * @returns The resolved User object, or null if missing.
+   *
+   */
   async findById(id: string): Promise<User | null> {
     const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return user ?? null;
   },
 
+  /**
+   * Fetches a user specifically by their registered, unique username.
+   * Supports authentication architectures where users login via handles.
+   *
+   * @param username The exactly spelled domain username.
+   * @returns The resolved User, or null if missing.
+   *
+   */
   async findByUsername(username: string): Promise<User | null> {
     const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
     return user ?? null;
   },
 
+  /**
+   * Fetches a user specifically by their registered email address exactly.
+   * Standard query path for generic authentication flows.
+   *
+   * @param email The valid email address to query.
+   * @returns The resolved User, or null if missing.
+   *
+   */
   async findByEmail(email: string): Promise<User | null> {
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return user ?? null;
+  },
+
+  async findByIdentifier(identifier: string): Promise<User | null> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(or(eq(users.email, identifier), eq(users.username, identifier)))
+      .limit(1);
     return user ?? null;
   },
 
@@ -203,6 +248,16 @@ export const DrizzleUserRepository: UserRepository = {
   // -------------------------------------------------------------------------
   // Update
   // -------------------------------------------------------------------------
+  /**
+   * Applies partial updates directly to the root User entity table.
+   *
+   * @param id The internal ID of the target user.
+   * @param data Disjoint subset of user properties.
+   * @returns The successfully mutated User object.
+   * @throws {AgoraError} NOT_FOUND if the target did not exist.
+   * @throws {AgoraError} EMAIL_EXISTS if unique constraint violated on email updates.
+   *
+   */
   async update(id: string, data: Partial<Omit<NewUser, "id" | "createdAt" | "updatedAt">>): Promise<User> {
     try {
       const [updatedUser] = await db.update(users).set(data).where(eq(users.id, id)).returning();
@@ -223,6 +278,14 @@ export const DrizzleUserRepository: UserRepository = {
   },
 
   // Sub-Entities (Profile & Settings)
+  /**
+   * Applies partial updates specifically to the chained UserProfile entity.
+   *
+   * @param userId The internal root user ID.
+   * @param data Disjoint subset of user profile properties.
+   * @returns The successfully mutated UserProfile object.
+   *
+   */
   async updateProfile(
     userId: string,
     data: Partial<Omit<UserProfile, "id" | "userId" | "createdAt" | "updatedAt">>,
@@ -242,6 +305,14 @@ export const DrizzleUserRepository: UserRepository = {
     }
   },
 
+  /**
+   * Applies partial updates specifically to the chained UserSettings entity.
+   *
+   * @param userId The internal root user ID.
+   * @param data Disjoint subset of user settings properties.
+   * @returns The successfully mutated UserSettings object.
+   *
+   */
   async updateSettings(
     userId: string,
     data: Partial<Omit<UserSettings, "id" | "userId" | "createdAt" | "updatedAt">>,
@@ -264,6 +335,14 @@ export const DrizzleUserRepository: UserRepository = {
   // -------------------------------------------------------------------------
   // Security
   // -------------------------------------------------------------------------
+  /**
+   * Strict lookup isolating solely the encrypted `passwordHash`.
+   * Architectural separation of credentials prevents leaky data returns.
+   *
+   * @param userId The target user ID.
+   * @returns The complete raw hash string, or null if missing.
+   *
+   */
   async getPasswordHash(userId: string): Promise<string | null> {
     const result = await db
       .select({ passwordHash: userCredentials.passwordHash })
@@ -274,6 +353,14 @@ export const DrizzleUserRepository: UserRepository = {
     return result[0]?.passwordHash || null;
   },
 
+  /**
+   * Persists or forcefully overrides the secure hash for a specific user ID.
+   * Automatically upserts using PostgreSQL `onConflictDoUpdate`.
+   *
+   * @param userId The target user ID.
+   * @param passwordHash The newly computed Argon2 hash.
+   *
+   */
   async setPasswordHash(userId: string, passwordHash: string): Promise<void> {
     await db.insert(userCredentials).values({ userId, passwordHash }).onConflictDoUpdate({
       target: userCredentials.userId,
@@ -284,6 +371,14 @@ export const DrizzleUserRepository: UserRepository = {
   // -------------------------------------------------------------------------
   // Delete
   // -------------------------------------------------------------------------
+  /**
+   * Totally eradicates a User from the database completely. Cascades
+   * effectively remove corresponding roles and properties depending on constraints.
+   *
+   * @param id The internal lookup ID.
+   * @returns The fundamentally deleted User context structure.
+   *
+   */
   async delete(id: string): Promise<User> {
     const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning();
     if (!deletedUser) throw new AgoraError("NOT_FOUND", "User not found.");
