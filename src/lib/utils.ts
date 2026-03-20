@@ -7,6 +7,8 @@
  * - `clearSessionCookies`: Clears both session cookies.
  * - `cn`: A utility to merge Tailwind classes cleanly using clsx and tailwind-merge.
  * - `createPublicId`: Creates a unique public ID consisting of PUBLIC_ID_LENGTH (27) PUBLIC_ID_ALPHABET (a-z) letters.
+ * - `stripUndefined`: Strips explicit `undefined` values from an object to satisfy Drizzle types.
+ * - `isSafeRedirect`: Validates if a provided target URL or origin securely matches an allowed base URL.
  */
 
 import { type ClassValue, clsx } from "clsx";

@@ -1,3 +1,12 @@
+/**
+ * Cryptography Utility Functions:
+ *
+ * - `hashPassword`: Secure password hashing using Bun's native optimized Argon2id implementation.
+ * - `verifyPassword`: Verifies a plain text password against an Argon2id hash.
+ * - `hashApiKey`: Fast, deterministic SHA-256 hashing for high-entropy secrets like API keys.
+ * - `verifyApiKey`: Verifies a plaintext API key against its SHA-256 hash using a constant-time comparison.
+ */
+
 import { timingSafeEqual } from "node:crypto";
 
 /**

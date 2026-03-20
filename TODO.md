@@ -262,7 +262,7 @@ _Out of scope for this project._
 
 - [ ] **Project Readme:** Finalise `README.md` from initial draft.
 - [ ] **API Documentation:** Finalise `api.md` (and `api_de.md`) documenting all public endpoints, request/response schemas, authentication requirements, and example usage - share with classmate consuming the API.
-- [ ] **Code quality:** Add JSDoc/DocBlocks and helpful inline comments to complex functions and components.
+- [ ] **Code quality:** Add JSDoc/DocBlocks and helpful inline comments to complex functions and components (where missing).
 - [ ] **Presentation:** Prepare project presentation.
 
 ---
