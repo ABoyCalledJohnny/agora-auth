@@ -3,6 +3,8 @@ import type { HandlerConfig } from "@/src/lib/wrapper-types.ts";
 import type { ApiErrorResponse, ApiResponse } from "@/src/types.ts";
 import type { z } from "zod";
 
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+
 import { ApiClientService } from "@/src/features/auth/services/api-client.service.ts";
 import { type AppSession, authenticate, authorize } from "@/src/lib/auth.ts";
 import { AgoraError, defaultErrorMessages } from "@/src/lib/errors.ts";
@@ -125,6 +127,10 @@ export function withActionHandler(
       return { success: true as const, data: result };
     } catch (error) {
       // 6. Error Handling
+
+      if (isRedirectError(error)) {
+        throw error;
+      }
       return formatActionError(error);
     }
   };

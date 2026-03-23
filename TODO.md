@@ -193,14 +193,14 @@
     - **API Routes and Server Actions:**
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
         - [x] `POST /api/auth/register` - Register new user.
-        - [ ] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
+        - [x] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
         - [ ] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
         - [ ] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.
         - [ ] `POST /api/auth/verify-email` - Confirm email via token.
         - [ ] `POST /api/auth/verify-email/resend` - Re-issue verification email.
         - [ ] `POST /api/auth/reset-password` - Initiate password reset (send email).
         - [ ] `POST /api/auth/reset-password/confirm` - Set new password via reset token.
-        - [ ] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
+        - [x] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
     - **Auth Infrastructure:**
         - [x] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
         - [ ] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
