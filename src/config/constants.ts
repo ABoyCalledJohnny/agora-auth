@@ -40,7 +40,7 @@ export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 30;
 
 // Block reserved words for usernames to avoid impersonation and route conflicts.
-export const RESERVED_USERNAMES = [
+export const RESERVED_USERNAMES = new Set([
   "admin",
   "api",
   "support",
@@ -70,7 +70,7 @@ export const RESERVED_USERNAMES = [
   "rechnung",
   "pay",
   "zahlungen",
-] as const;
+]);
 
 // ============================================================================
 // 4. ENUMS & SYSTEM TYPES
@@ -117,3 +117,31 @@ export const DEFAULT_PREFERENCES = {
     },
   },
 } as const;
+
+// ============================================================================
+// 6. SECURITY & LOGGING
+// ============================================================================
+/** Object keys that should be automatically redacted in server logs to prevent sensitive data leaks. */
+export const SENSITIVE_LOG_KEYS = new Set([
+  // Passwords
+  "password",
+  "oldpassword",
+  "newpassword",
+  "passwordhash",
+
+  // Tokens & Secrets
+  "token",
+  "tokenhash",
+  "accesstoken",
+  "refreshtoken",
+  "sessiontoken",
+  "sessiontokenhash",
+  "secret",
+
+  // API Keys
+  "apikey",
+  "apikeyhash",
+
+  // HTTP Headers
+  "authorization",
+]);
