@@ -127,3 +127,9 @@ export const newPasswordSchema = z.object({
 });
 
 export type NewPasswordRequest = z.infer<typeof newPasswordSchema>;
+
+export const logoutSchema = z.object({
+  refreshToken: z.string().min(1, "Refresh token is required"),
+});
+
+export type LogoutRequest = z.infer<typeof logoutSchema>;

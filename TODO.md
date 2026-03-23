@@ -194,7 +194,7 @@
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
         - [x] `POST /api/auth/register` - Register new user.
         - [x] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
-        - [ ] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
+        - [x] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
         - [ ] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.
         - [ ] `POST /api/auth/verify-email` - Confirm email via token.
         - [ ] `POST /api/auth/verify-email/resend` - Re-issue verification email.
