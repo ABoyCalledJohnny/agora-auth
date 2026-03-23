@@ -53,11 +53,11 @@ export const DrizzleUserRepository: UserRepository = {
       });
 
       return newUser;
-    } catch (e: unknown) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error: unknown) {
+      if (error instanceof AgoraError) throw error;
 
       // PostgreSQL unique constraint violation code is '23505'
-      const pgError = e as Record<string, unknown>;
+      const pgError = error as Record<string, unknown>;
       if (pgError && pgError.code === "23505") {
         const errorDetails = String(pgError.constraint || pgError.detail || pgError.message).toLowerCase();
         if (errorDetails.includes("email")) throw new AgoraError("EMAIL_EXISTS");
@@ -264,9 +264,9 @@ export const DrizzleUserRepository: UserRepository = {
 
       if (!updatedUser) throw new AgoraError("NOT_FOUND", "User not found.");
       return updatedUser;
-    } catch (e: unknown) {
-      if (e instanceof AgoraError) throw e;
-      const pgError = e as Record<string, unknown>;
+    } catch (error: unknown) {
+      if (error instanceof AgoraError) throw error;
+      const pgError = error as Record<string, unknown>;
       if (pgError && pgError.code === "23505") {
         const errorDetails = String(pgError.constraint || pgError.detail || pgError.message).toLowerCase();
         if (errorDetails.includes("email")) throw new AgoraError("EMAIL_EXISTS");
@@ -299,8 +299,8 @@ export const DrizzleUserRepository: UserRepository = {
 
       if (!updatedUserProfile) throw new AgoraError("NOT_FOUND", "User profile not found.");
       return updatedUserProfile;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while updating the user profile.");
     }
   },
@@ -326,8 +326,8 @@ export const DrizzleUserRepository: UserRepository = {
 
       if (!updatedUserSettings) throw new AgoraError("NOT_FOUND", "User settings not found.");
       return updatedUserSettings;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while updating the user settings.");
     }
   },

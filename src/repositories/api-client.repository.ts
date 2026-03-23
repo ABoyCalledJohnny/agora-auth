@@ -42,10 +42,10 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
       if (!result) throw new AgoraError("INTERNAL", "Failed to create or fetch client.");
 
       return result;
-    } catch (e: unknown) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error: unknown) {
+      if (error instanceof AgoraError) throw error;
 
-      const pgError = e as Record<string, unknown>;
+      const pgError = error as Record<string, unknown>;
       if (pgError && pgError.code === "23505") {
         throw new AgoraError("CLIENT_CONFLICT");
       }
@@ -112,10 +112,10 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
 
       if (!updatedClient) throw new AgoraError("NOT_FOUND", "Client not found.");
       return updatedClient;
-    } catch (e: unknown) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error: unknown) {
+      if (error instanceof AgoraError) throw error;
 
-      const pgError = e as Record<string, unknown>;
+      const pgError = error as Record<string, unknown>;
       if (pgError && pgError.code === "23505") {
         throw new AgoraError("CLIENT_CONFLICT");
       }
@@ -137,8 +137,8 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
       const [deletedClient] = await db.delete(apiClients).where(eq(apiClients.id, id)).returning();
       if (!deletedClient) throw new AgoraError("NOT_FOUND", "Client not found.");
       return deletedClient;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while deleting the API client.");
     }
   },

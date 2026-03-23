@@ -1,5 +1,24 @@
+import { JwtService } from "@/src/features/auth/services/jwt.service.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
+
+import { AuthService } from "../features/auth/services/auth.service.ts";
+import { clearSessionCookies, getSessionCookies, setSessionCookies } from "./utils.ts";
+
+/**
+ * Global Authentication Context
+ *
+ * This file contains the primary Server-Side mechanisms for retrieving,
+ * verifying, and asserting the user's secure session state. It serves as the
+ * single source of truth for "who the user is" inside Next.js Server Components,
+ * Server Actions, and API Route Handlers.
+ *
+ * Functions available:
+ * - `getSession()`: Soft check. Resolves user from cookies, or returns null if no valid session exists. Handled gracefully.
+ * - `authenticate()`: Hard check. Guarantees a valid user or throws an `UNAUTHORIZED` AgoraError immediately.
+ * - `authorize()`: Validates Role-Based Access Control against a required list.
+ * - `assertAuth()`: Convenience helper for protecting Next.js Page components.
+ */
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,16 +49,68 @@ export type AppSession = {
  * Returns `null` if no tokens are present or the refresh fails.
  */
 export async function getSession(): Promise<AppSession | null> {
-  // TODO: IMPLEMENTATION STEPS
-  // 1. Instatiate `cookies()` and format the secret names safely out of `appConfig`.
-  // 2. Grab the Access JWT from the cookies.
-  // 3. Call `JwtService.verify(token)`. If valid, map the AccessTokenPayload to `AppSession` and return it. (No DB call needed!).
-  // 4. Catch `TOKEN_EXPIRED` inside the try/catch. If so, attempt to grab the Refresh Token.
-  // 5. Call `AuthService.refresh(refreshToken)` to securely rotate the DB session and emit new tokens.
-  // 6. Write the new tokens strictly back to the incoming/outgoing Next headers via `setSessionCookies()`.
-  // 7. Map the newly generated parameters into `AppSession` and cleanly return it.
+  // 1. Grab both cookies
+  const { accessCookie, refreshCookie } = await getSessionCookies();
 
-  throw new Error("getSession() is not implemented — connect your auth library here.");
+  // 2. Gatekeeper Check: If neither exists, user is a guest.
+  if (!accessCookie && !refreshCookie) {
+    return null;
+  }
+
+  // 3. Access Cookie Strategy
+  if (accessCookie) {
+    try {
+      // Verify signature & expiration. If valid, we are done!
+      const payload = await JwtService.verify(accessCookie.value);
+      return {
+        sessionId: payload.sid,
+        user: {
+          id: payload.sub,
+          username: payload.username,
+          roles: payload.roles,
+        },
+      };
+    } catch (error) {
+      // If error is NOT an expiration error (e.g. tampering, invalid signature), reject immediately
+      if (!(error instanceof AgoraError && error.code === "TOKEN_EXPIRED")) {
+        return null;
+      }
+      // If it IS expired, swallow the error and fall through to the Refresh Flow.
+    }
+  }
+
+  // 4. Refresh Strategy (Reached if access token is missing or expired)
+  if (!refreshCookie) {
+    return null; // Cannot refresh without a refresh token.
+  }
+
+  try {
+    // 5. Call `AuthService.refresh(refreshToken)` to securely rotate the DB session
+    const authTokens = await AuthService.refresh(refreshCookie.value);
+
+    // 6. Write the new tokens strictly back to the headers
+    setSessionCookies(authTokens.accessToken, authTokens.refreshToken);
+
+    // 7. Map the newly generated parameters into `AppSession` and cleanly return it.
+    const decodedNewToken = await JwtService.verify(authTokens.accessToken);
+    return {
+      sessionId: decodedNewToken.sid,
+      user: {
+        id: decodedNewToken.sub,
+        username: decodedNewToken.username,
+        roles: decodedNewToken.roles,
+      },
+    };
+  } catch (error) {
+    // The database rejected the refresh token!
+    if (error instanceof AgoraError) {
+      // If they are suspended/pending/revoked, actively delete the cookies
+      if (["ACCOUNT_SUSPENDED", "ACCOUNT_PENDING", "UNAUTHORIZED"].includes(error.code)) {
+        clearSessionCookies();
+      }
+    }
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------

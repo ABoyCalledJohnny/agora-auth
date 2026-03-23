@@ -91,8 +91,8 @@ export const ApiClientService = {
         clientId,
         apiKeyHash,
       });
-    } catch (e) {
-      handleServiceError(e, "Error creating API client. Potential database or connection issue.");
+    } catch (error) {
+      handleServiceError(error, "Error creating API client. Potential database or connection issue.");
     }
   },
 
@@ -111,8 +111,8 @@ export const ApiClientService = {
       const cleanedData = stripUndefined(clientData);
 
       return await DrizzleApiClientRepository.update(id, cleanedData);
-    } catch (e) {
-      handleServiceError(e, `Error updating API client with ID ${id}.`);
+    } catch (error) {
+      handleServiceError(error, `Error updating API client with ID ${id}.`);
     }
   },
 
@@ -125,8 +125,8 @@ export const ApiClientService = {
   async delete(id: string): Promise<ApiClient> {
     try {
       return await DrizzleApiClientRepository.delete(id);
-    } catch (e) {
-      handleServiceError(e, `Error deleting API client with ID ${id}.`);
+    } catch (error) {
+      handleServiceError(error, `Error deleting API client with ID ${id}.`);
     }
   },
 };

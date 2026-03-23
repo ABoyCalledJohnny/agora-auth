@@ -26,8 +26,8 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
 
       if (!token) throw new AgoraError("INTERNAL", "Failed to create verification token.");
       return token;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while creating the verification token.");
     }
   },
@@ -74,8 +74,8 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
         .returning();
 
       return consumedToken ?? null;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while consuming the verification token.");
     }
   },
@@ -98,8 +98,8 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
 
       if (!deletedToken) throw new AgoraError("NOT_FOUND", "Verification token not found.");
       return deletedToken;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while deleting the verification token.");
     }
   },
@@ -112,8 +112,8 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
         .returning({ id: verificationTokens.id }); // Only return the ID to keep the payload light
 
       return deletedTokens.length;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while deleting verification tokens by user ID.");
     }
   },
@@ -126,8 +126,8 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
         .returning();
 
       return expiredTokens;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while deleting expired verification tokens.");
     }
   },

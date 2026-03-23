@@ -7,6 +7,20 @@ import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 import { sanitizeInput } from "@/src/lib/utils.ts";
 
+/**
+ * Action Wrapper
+ *
+ * A higher-order function that wraps Next.js Server Actions to provide a unified
+ * pipeline for authentication, authorisation, validation, and error handling.
+ *
+ * Typical Flow:
+ * 1. Authentication: If `auth: true` or `roles` are provided, it calls `authenticate()` to verify the session.
+ * 2. Authorisation: If `roles` are provided, it calls `authorize()` to verify the user has the required roles.
+ * 3. Validation: If `schema` is provided, it normalizes (handles FormData or plain objects), sanitizes, and validates the input.
+ * 4. Execution: Runs your specific server action handler with the strongly-typed `data` and `session`.
+ * 5. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ActionResult` union, preventing untyped exceptions from crashing the frontend.
+ */
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -66,7 +80,7 @@ export function withActionHandler<TResult>(
 // Implementation
 export function withActionHandler(
   config: HandlerConfig,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- required for overload compatibility
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required to satisfy varied generic overload signatures
   handler: (context: any) => Promise<unknown>,
 ) {
   return async (rawInput?: unknown) => {
@@ -96,13 +110,13 @@ export function withActionHandler(
         data = result.data;
       }
 
-      // 4. Execute handler
+      // 4. Execute handler & return success
       const context = config.bodySchema ? { data, session } : { session };
       const result = await handler(context);
 
-      // 5. Return success
       return { success: true as const, data: result };
     } catch (error) {
+      // 5. Error Handling
       return formatActionError(error);
     }
   };

@@ -29,10 +29,7 @@ export const AuthService = {
     try {
       //  1. Check for duplicates.
       if (await DrizzleUserRepository.findByEmail(input.email)) throw new AgoraError("EMAIL_EXISTS");
-      if (
-        (await DrizzleUserRepository.findByUsername(input.username)) ||
-        (RESERVED_USERNAMES as readonly string[]).includes(input.username)
-      )
+      if ((await DrizzleUserRepository.findByUsername(input.username)) || RESERVED_USERNAMES.has(input.username))
         throw new AgoraError("USERNAME_EXISTS");
 
       // 2. Hash the user's plaintext password.
@@ -57,8 +54,8 @@ export const AuthService = {
 
       // 6. Return the safely mapped user object (omit password).
       return newUser;
-    } catch (e) {
-      handleServiceError(e, "Error during user registration.");
+    } catch (error) {
+      handleServiceError(error, "Error during user registration.");
     }
   },
 
@@ -118,8 +115,8 @@ export const AuthService = {
         expiresAt,
         user,
       };
-    } catch (e) {
-      handleServiceError(e, "Error during user login.");
+    } catch (error) {
+      handleServiceError(error, "Error during user login.");
     }
   },
 
@@ -155,8 +152,8 @@ export const AuthService = {
         refreshToken: refreshTokenWrapper.plainToken,
         expiresAt,
       };
-    } catch (e) {
-      handleServiceError(e, "Error refreshing session tokens.");
+    } catch (error) {
+      handleServiceError(error, "Error refreshing session tokens.");
     }
   },
 
@@ -167,8 +164,8 @@ export const AuthService = {
     try {
       // 1. Terminate the session in the database via the token.
       await SessionService.revokeByToken(plainSessionToken);
-    } catch (e) {
-      handleServiceError(e, "Error logging out user.");
+    } catch (error) {
+      handleServiceError(error, "Error logging out user.");
     }
   },
 
@@ -190,8 +187,8 @@ export const AuthService = {
         emailVerifiedAt: new Date(),
         ...(user.status === "pending" && { status: "active" }),
       });
-    } catch (e) {
-      handleServiceError(e, "Error verifying email.");
+    } catch (error) {
+      handleServiceError(error, "Error verifying email.");
     }
   },
 
@@ -211,8 +208,8 @@ export const AuthService = {
 
       // Remove this throw once NotificationService is implemented
       throw new Error("Not implemented");
-    } catch (e) {
-      handleServiceError(e, "Error requesting password reset.");
+    } catch (error) {
+      handleServiceError(error, "Error requesting password reset.");
     }
   },
 
@@ -230,8 +227,8 @@ export const AuthService = {
       // 4. Invalidate all active sessions across all devices for security.
       // E.g., if their email was compromised, kicking out attackers is mandatory.
       await SessionService.revokeAllForUser(consumedToken.userId);
-    } catch (e) {
-      handleServiceError(e, "Error resetting password.");
+    } catch (error) {
+      handleServiceError(error, "Error resetting password.");
     }
   },
 };

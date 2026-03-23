@@ -21,8 +21,8 @@ export const DrizzleRoleRepository: RoleRepository = {
       if (!existingRole) throw new AgoraError("INTERNAL", "Failed to create or fetch role.");
 
       return existingRole;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while creating the role.");
     }
   },
@@ -65,8 +65,8 @@ export const DrizzleRoleRepository: RoleRepository = {
   async assignRoleToUser(userId: string, roleId: string): Promise<void> {
     try {
       await db.insert(usersRoles).values({ userId, roleId }).onConflictDoNothing();
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while assigning the role.");
     }
   },
@@ -81,8 +81,8 @@ export const DrizzleRoleRepository: RoleRepository = {
   async removeRoleFromUser(userId: string, roleId: string): Promise<void> {
     try {
       await db.delete(usersRoles).where(and(eq(usersRoles.userId, userId), eq(usersRoles.roleId, roleId)));
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while removing the role.");
     }
   },
@@ -93,10 +93,10 @@ export const DrizzleRoleRepository: RoleRepository = {
 
       if (!updatedRole) throw new AgoraError("NOT_FOUND", "Role not found.");
       return updatedRole;
-    } catch (e: unknown) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error: unknown) {
+      if (error instanceof AgoraError) throw error;
 
-      const pgError = e as Record<string, unknown>;
+      const pgError = error as Record<string, unknown>;
       if (pgError && pgError.code === "23505") {
         throw new AgoraError("ROLE_EXISTS");
       }
@@ -113,8 +113,8 @@ export const DrizzleRoleRepository: RoleRepository = {
       const [deletedRole] = await db.delete(roles).where(eq(roles.id, id)).returning();
       if (!deletedRole) throw new AgoraError("NOT_FOUND", "Role not found.");
       return deletedRole;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while deleting the role.");
     }
   },

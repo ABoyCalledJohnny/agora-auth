@@ -48,8 +48,8 @@ export const SessionService = {
         plainToken,
         session,
       };
-    } catch (e) {
-      handleServiceError(e, "Error creating user session.");
+    } catch (error) {
+      handleServiceError(error, "Error creating user session.");
     }
   },
 
@@ -71,8 +71,8 @@ export const SessionService = {
       }
 
       return session;
-    } catch (e) {
-      handleServiceError(e, "Error authenticating session.");
+    } catch (error) {
+      handleServiceError(error, "Error authenticating session.");
     }
   },
 
@@ -114,8 +114,8 @@ export const SessionService = {
         plainToken: newPlainToken,
         session,
       };
-    } catch (e) {
-      handleServiceError(e, "Error rotating session token.");
+    } catch (error) {
+      handleServiceError(error, "Error rotating session token.");
     }
   },
 
@@ -128,8 +128,8 @@ export const SessionService = {
   async revoke(id: string): Promise<Session> {
     try {
       return await DrizzleSessionRepository.revoke(id);
-    } catch (e) {
-      handleServiceError(e, `Error revoking session with ID ${id}.`);
+    } catch (error) {
+      handleServiceError(error, `Error revoking session with ID ${id}.`);
     }
   },
 
@@ -150,8 +150,8 @@ export const SessionService = {
       }
 
       return await DrizzleSessionRepository.revoke(session.id);
-    } catch (e) {
-      handleServiceError(e, "Error revoking session by token.");
+    } catch (error) {
+      handleServiceError(error, "Error revoking session by token.");
     }
   },
 
@@ -165,8 +165,8 @@ export const SessionService = {
   async revokeAllForUser(userId: string): Promise<Session[]> {
     try {
       return await DrizzleSessionRepository.revokeAllForUser(userId);
-    } catch (e) {
-      handleServiceError(e, `Error revoking all sessions for user ${userId}.`);
+    } catch (error) {
+      handleServiceError(error, `Error revoking all sessions for user ${userId}.`);
     }
   },
 
@@ -180,8 +180,8 @@ export const SessionService = {
   async delete(id: string): Promise<Session> {
     try {
       return await DrizzleSessionRepository.delete(id);
-    } catch (e) {
-      handleServiceError(e, `Error deleting session with ID ${id}.`);
+    } catch (error) {
+      handleServiceError(error, `Error deleting session with ID ${id}.`);
     }
   },
 
@@ -194,8 +194,8 @@ export const SessionService = {
   async deleteExpired(): Promise<number> {
     try {
       return (await DrizzleSessionRepository.deleteExpired()).length;
-    } catch (e) {
-      handleServiceError(e, "Error flushing expired sessions from database.");
+    } catch (error) {
+      handleServiceError(error, "Error flushing expired sessions from database.");
     }
   },
 };

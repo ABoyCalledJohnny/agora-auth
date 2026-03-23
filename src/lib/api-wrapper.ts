@@ -9,6 +9,20 @@ import { AgoraError, defaultErrorMessages } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 import { sanitizeInput } from "@/src/lib/utils.ts";
 
+/**
+ * API Wrapper
+ *
+ * A higher-order function that wraps Next.js API Route Handlers to provide a unified
+ * pipeline for authentication, authorisation, validation, and error handling.
+ *
+ * Typical Flow:
+ * 1. Authentication: If `auth: true` or `roles` are provided, it calls `authenticate()` to verify the access token/session.
+ * 2. Authorisation: If `roles` are provided, it calls `authorize()` to check if the user has the required roles.
+ * 3. Validation: If `bodySchema` is provided, it parses the payload as JSON, sanitizes it, and validates against the Zod schema.
+ * 4. Execution: Runs your specific route handler with the strongly-typed `data`, `session`, and route `params`.
+ * 5. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ApiErrorResponse` with correct HTTP status codes.
+ */
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -79,7 +93,7 @@ export function withApiHandler(
 // Implementation
 export function withApiHandler(
   config: HandlerConfig,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- required for overload compatibility
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required to satisfy varied generic overload signatures
   handler: (context: any) => Promise<NextResponse>,
 ) {
   return async (request: NextRequest, routeContext: { params: RouteParams }) => {
@@ -122,6 +136,7 @@ export function withApiHandler(
 
       return await handler(context);
     } catch (error) {
+      // 5. Error Handling
       return formatApiError(error);
     }
   };

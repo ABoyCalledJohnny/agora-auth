@@ -11,6 +11,8 @@
  * - `isSafeRedirect`: Validates if a provided target URL or origin securely matches an allowed base URL.
  */
 
+import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+
 import { type ClassValue, clsx } from "clsx";
 import { customAlphabet } from "nanoid";
 import { cookies } from "next/headers";
@@ -58,6 +60,24 @@ export function parseDuration(str: string): number {
   // `keyof typeof multipliers` extracts the exact literal union "m" | "h" | "d"
   // `keyof` itself only works on Types, not JavaScript values, so `typeof` bridges the gap.
   return Number(value) * multipliers[unit as keyof typeof multipliers];
+}
+
+export async function getSessionCookies(): Promise<{
+  accessCookie: RequestCookie | null;
+  refreshCookie: RequestCookie | null;
+}> {
+  const cookieStore = await cookies();
+  const isProd = appConfig.app.env === "production";
+  const cookiePrefix = isProd ? "__Secure-" : "";
+
+  const accessCookieName = `${cookiePrefix}${appConfig.auth.accessCookieName}`;
+  const refreshCookieName = `${cookiePrefix}${appConfig.auth.refreshCookieName}`;
+
+  // 2. Grab the Access JWT from the cookies.
+  const accessCookie = cookieStore.get(accessCookieName) ?? null;
+  const refreshCookie = cookieStore.get(refreshCookieName) ?? null;
+
+  return { accessCookie, refreshCookie };
 }
 
 /**

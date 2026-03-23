@@ -55,8 +55,8 @@ export const VerificationTokenService = {
         plainToken,
         verificationToken,
       };
-    } catch (e) {
-      handleServiceError(e, "Error creating verification token.");
+    } catch (error) {
+      handleServiceError(error, "Error creating verification token.");
     }
   },
 
@@ -86,8 +86,8 @@ export const VerificationTokenService = {
       if (token.expiresAt < new Date()) throw new AgoraError("TOKEN_EXPIRED");
 
       return token;
-    } catch (e) {
-      handleServiceError(e, "Error consuming verification token.");
+    } catch (error) {
+      handleServiceError(error, "Error consuming verification token.");
     }
   },
 
@@ -101,8 +101,8 @@ export const VerificationTokenService = {
   async deleteByUserAndType(userId: string, type: VerificationTokenType): Promise<number> {
     try {
       return await DrizzleVerificationTokenRepository.deleteByUserIdAndType(userId, type);
-    } catch (e) {
-      handleServiceError(e, "Error deleting verification tokens by user and type.");
+    } catch (error) {
+      handleServiceError(error, "Error deleting verification tokens by user and type.");
     }
   },
 
@@ -115,8 +115,8 @@ export const VerificationTokenService = {
   async deleteExpired(): Promise<number> {
     try {
       return (await DrizzleVerificationTokenRepository.deleteExpired()).length;
-    } catch (e) {
-      handleServiceError(e, "Error flushing expired verification tokens.");
+    } catch (error) {
+      handleServiceError(error, "Error flushing expired verification tokens.");
     }
   },
 };
