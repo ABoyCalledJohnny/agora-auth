@@ -220,6 +220,8 @@
         - [ ] Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
+        - [ ] **`RoleService`:** Handle user role retrieval and assignments, encapsulating authorization queries.
+        - [ ] **`AuthService` Refactor:** Update `AuthService` to use `UserService` and `RoleService` instead of directly calling `DrizzleUserRepository` and `DrizzleRoleRepository`.
     - **API Routes and Server Actions:**
         - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
         - [ ] 🔒 `GET /api/user/profile` - Authenticated user's full profile.
