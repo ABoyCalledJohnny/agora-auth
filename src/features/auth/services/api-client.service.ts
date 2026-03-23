@@ -1,6 +1,7 @@
 import type { CreateClientRequest, UpdateClientRequest } from "../contracts.ts";
 import type { ApiClient } from "@/src/db/schema/index.ts";
 
+import { appConfig } from "@/src/config/index.ts";
 import { hashToken, verifyToken } from "@/src/lib/crypto.ts";
 import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
 import { createPublicId, isSafeRedirect, stripUndefined } from "@/src/lib/utils.ts";
@@ -11,6 +12,20 @@ import { DrizzleApiClientRepository } from "@/src/repositories/api-client.reposi
  * their respective paths for emails and redirects.
  */
 export const ApiClientService = {
+  /**
+   * Retrieves the default first-party web application client.
+   *
+   * @returns The default ApiClient entity.
+   * @throws {AgoraError} INTERNAL if the default client is missing.
+   */
+  async getDefaultClient(): Promise<ApiClient> {
+    const client = await DrizzleApiClientRepository.findByClientId(appConfig.clients.defaultClientId);
+    if (!client) {
+      throw new AgoraError("INTERNAL", "Default API client not found in database.");
+    }
+    return client;
+  },
+
   /**
    * Authenticates an external API client using their client ID and plain text API key.
    * Disallows inactive clients.

@@ -1,5 +1,8 @@
 # Agora Auth API Draft (Auth Only)
 
+> **⚠️ IMPORTANT UPDATE:**
+> All successful API responses are now wrapped in a standardized envelope: `{ "success": true, "message": "...", "data": { ... } }`. Please ensure your client parsers account for the nested `data` object!
+
 This draft intentionally covers only core auth management:
 
 - register
@@ -167,13 +170,19 @@ Example success body:
 
 ```json
 {
-	"id": "uuid",
-	"publicId": "string",
-	"username": "string",
-	"email": "string",
-	"status": "pending",
-	"emailVerifiedAt": null,
-	"createdAt": "2026-03-15T12:00:00.000Z"
+	"success": true,
+	"message": "User registered successfully",
+	"data": {
+		"id": "uuid",
+		"publicId": "string",
+		"username": "string",
+		"email": "string",
+		"status": "pending",
+		"emailVerifiedAt": null,
+		"createdAt": "2026-03-15T12:00:00.000Z",
+		"updatedAt": "2026-03-15T12:00:00.000Z",
+		"lastSignInAt": null
+	}
 }
 ```
 
@@ -219,18 +228,23 @@ Example success body:
 
 ```json
 {
-	"user": {
-		"id": "uuid",
-		"publicId": "string",
-		"username": "new_user",
-		"email": "new.user@example.com",
-		"status": "active",
-		"emailVerifiedAt": "2026-03-15T12:00:00.000Z",
-		"createdAt": "2026-03-15T10:00:00.000Z"
-	},
-	"accessToken": "jwt_or_session_token",
-	"refreshToken": "opaque_refresh_token",
-	"expiresAt": "2026-03-15T13:00:00.000Z"
+	"success": true,
+	"data": {
+		"user": {
+			"id": "uuid",
+			"publicId": "string",
+			"username": "new_user",
+			"email": "new.user@example.com",
+			"status": "active",
+			"emailVerifiedAt": "2026-03-15T12:00:00.000Z",
+			"createdAt": "2026-03-15T10:00:00.000Z",
+			"updatedAt": "2026-03-15T10:00:00.000Z",
+			"lastSignInAt": "2026-03-15T10:00:00.000Z"
+		},
+		"accessToken": "jwt_or_session_token",
+		"refreshToken": "opaque_refresh_token",
+		"expiresAt": "2026-03-15T13:00:00.000Z"
+	}
 }
 ```
 
@@ -286,9 +300,12 @@ Example success body:
 
 ```json
 {
-	"accessToken": "new_access_token",
-	"refreshToken": "new_refresh_token",
-	"expiresAt": "2026-03-15T14:00:00.000Z"
+	"success": true,
+	"data": {
+		"accessToken": "new_access_token",
+		"refreshToken": "new_refresh_token",
+		"expiresAt": "2026-03-15T14:00:00.000Z"
+	}
 }
 ```
 
@@ -332,7 +349,9 @@ Example success body:
 
 ```json
 {
-	"message": "If the account exists, a verification email has been sent"
+	"success": true,
+	"message": "If the account exists, a verification email has been sent",
+	"data": null
 }
 ```
 
@@ -373,7 +392,9 @@ Example success body:
 
 ```json
 {
-	"message": "Email verified successfully"
+	"success": true,
+	"message": "Email verified successfully",
+	"data": null
 }
 ```
 
@@ -422,7 +443,9 @@ Example success body:
 
 ```json
 {
-	"message": "If the account exists, a reset email has been sent"
+	"success": true,
+	"message": "If the account exists, a reset email has been sent",
+	"data": null
 }
 ```
 
@@ -465,7 +488,9 @@ Example success body:
 
 ```json
 {
-	"message": "Password updated successfully"
+	"success": true,
+	"message": "Password updated successfully",
+	"data": null
 }
 ```
 
@@ -506,16 +531,19 @@ Example success body:
 
 ```json
 {
-	"keys": [
-		{
-			"kty": "RSA",
-			"kid": "2026-03-15-key-1",
-			"use": "sig",
-			"alg": "RS256",
-			"n": "...",
-			"e": "AQAB"
-		}
-	]
+	"success": true,
+	"data": {
+		"keys": [
+			{
+				"kty": "RSA",
+				"kid": "2026-03-15-key-1",
+				"use": "sig",
+				"alg": "RS256",
+				"n": "...",
+				"e": "AQAB"
+			}
+		]
+	}
 }
 ```
 

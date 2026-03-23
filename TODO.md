@@ -192,7 +192,7 @@
         - [x] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
     - **API Routes and Server Actions:**
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
-        - [ ] `POST /api/auth/register` - Register new user.
+        - [x] `POST /api/auth/register` - Register new user.
         - [ ] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
         - [ ] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
         - [ ] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.

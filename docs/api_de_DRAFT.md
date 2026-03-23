@@ -1,5 +1,8 @@
 # Agora Auth API Entwurf (Nur Auth)
 
+> **⚠️ WICHTIGES UPDATE:**
+> Alle erfolgreichen API-Antworten sind jetzt in einen Standard-Umschlag gewrapped: `{ "success": true, "message": "...", "data": { ... } }`. Bitte passe deine Client-Parser entsprechend an und beachte das verschachtelte `data`-Objekt!
+
 Dieser Entwurf deckt absichtlich nur die Kernbereiche der Authentifizierung ab:
 
 - register
@@ -159,13 +162,19 @@ Beispiel Success-Body:
 
 ```json
 {
-	"id": "uuid",
-	"publicId": "string",
-	"username": "string",
-	"email": "string",
-	"status": "pending",
-	"emailVerifiedAt": null,
-	"createdAt": "2026-03-15T12:00:00.000Z"
+	"success": true,
+	"message": "User registered successfully",
+	"data": {
+		"id": "uuid",
+		"publicId": "string",
+		"username": "string",
+		"email": "string",
+		"status": "pending",
+		"emailVerifiedAt": null,
+		"createdAt": "2026-03-15T12:00:00.000Z",
+		"updatedAt": "2026-03-15T12:00:00.000Z",
+		"lastSignInAt": null
+	}
 }
 ```
 
@@ -211,18 +220,23 @@ Beispiel Success-Body:
 
 ```json
 {
-	"user": {
-		"id": "uuid",
-		"publicId": "string",
-		"username": "new_user",
-		"email": "new.user@example.com",
-		"status": "active",
-		"emailVerifiedAt": "2026-03-15T12:00:00.000Z",
-		"createdAt": "2026-03-15T10:00:00.000Z"
-	},
-	"accessToken": "jwt_or_session_token",
-	"refreshToken": "opaque_refresh_token",
-	"expiresAt": "2026-03-15T13:00:00.000Z"
+	"success": true,
+	"data": {
+		"user": {
+			"id": "uuid",
+			"publicId": "string",
+			"username": "new_user",
+			"email": "new.user@example.com",
+			"status": "active",
+			"emailVerifiedAt": "2026-03-15T12:00:00.000Z",
+			"createdAt": "2026-03-15T10:00:00.000Z",
+			"updatedAt": "2026-03-15T10:00:00.000Z",
+			"lastSignInAt": "2026-03-15T10:00:00.000Z"
+		},
+		"accessToken": "jwt_or_session_token",
+		"refreshToken": "opaque_refresh_token",
+		"expiresAt": "2026-03-15T13:00:00.000Z"
+	}
 }
 ```
 
@@ -278,9 +292,12 @@ Beispiel Success-Body:
 
 ```json
 {
-	"accessToken": "new_access_token",
-	"refreshToken": "new_refresh_token",
-	"expiresAt": "2026-03-15T14:00:00.000Z"
+	"success": true,
+	"data": {
+		"accessToken": "new_access_token",
+		"refreshToken": "new_refresh_token",
+		"expiresAt": "2026-03-15T14:00:00.000Z"
+	}
 }
 ```
 
@@ -324,7 +341,9 @@ Beispiel Success-Body:
 
 ```json
 {
-	"message": "If the account exists, a verification email has been sent"
+	"success": true,
+	"message": "If the account exists, a verification email has been sent",
+	"data": null
 }
 ```
 
@@ -365,7 +384,9 @@ Beispiel Success-Body:
 
 ```json
 {
-	"message": "Email verified successfully"
+	"success": true,
+	"message": "Email verified successfully",
+	"data": null
 }
 ```
 
@@ -414,7 +435,9 @@ Beispiel Success-Body:
 
 ```json
 {
-	"message": "If the account exists, a reset email has been sent"
+	"success": true,
+	"message": "If the account exists, a reset email has been sent",
+	"data": null
 }
 ```
 
@@ -457,7 +480,9 @@ Beispiel Success-Body:
 
 ```json
 {
-	"message": "Password updated successfully"
+	"success": true,
+	"message": "Password updated successfully",
+	"data": null
 }
 ```
 
@@ -498,16 +523,19 @@ Beispiel Success-Body:
 
 ```json
 {
-	"keys": [
-		{
-			"kty": "RSA",
-			"kid": "2026-03-15-key-1",
-			"use": "sig",
-			"alg": "RS256",
-			"n": "...",
-			"e": "AQAB"
-		}
-	]
+	"success": true,
+	"data": {
+		"keys": [
+			{
+				"kty": "RSA",
+				"kid": "2026-03-15-key-1",
+				"use": "sig",
+				"alg": "RS256",
+				"n": "...",
+				"e": "AQAB"
+			}
+		]
+	}
 }
 ```
 
