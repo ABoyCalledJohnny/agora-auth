@@ -202,7 +202,7 @@
         - [ ] `POST /api/auth/reset-password/confirm` - Set new password via reset token.
         - [ ] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
     - **Auth Infrastructure:**
-        - [ ] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
+        - [x] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
         - [ ] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
     - **Frontend:**
         - [ ] **`SessionProvider`:** Create in `src/providers/` - React Context with `useSession()` hook. Hydrate from `layout.tsx` via server-side `getSession()`. Add to root layout.
