@@ -198,7 +198,7 @@
         - [x] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.
         - [x] `POST /api/auth/verify-email` - Confirm email via token.
         - [x] `POST /api/auth/verify-email/resend` - Re-issue verification email.
-        - [ ] `POST /api/auth/reset-password` - Initiate password reset (send email).
+        - [ ] `POST /api/auth/reset-password` - Initiate password reset (resend email).
         - [ ] `POST /api/auth/reset-password/confirm` - Set new password via reset token.
         - [x] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
     - **Auth Infrastructure:**

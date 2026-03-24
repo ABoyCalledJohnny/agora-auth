@@ -114,17 +114,18 @@ export const loginSchema = z.object({
 
 export type LoginRequest = z.infer<typeof loginSchema>;
 
-export const resetPasswordSchema = UserSchema.pick({
+export const resetPasswordRequestSchema = UserSchema.pick({
   email: true,
 });
 
-export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
+export type ResetPasswordRequest = z.infer<typeof resetPasswordRequestSchema>;
 
-export const newPasswordSchema = z.object({
+export const resetPasswordConfirmSchema = z.object({
+  token: tokenStringSchema,
   password: passwordRules((key) => key),
 });
 
-export type NewPasswordRequest = z.infer<typeof newPasswordSchema>;
+export type ResetPasswordConfirmRequest = z.infer<typeof resetPasswordConfirmSchema>;
 
 export const logoutSchema = z.object({
   refreshToken: tokenStringSchema,

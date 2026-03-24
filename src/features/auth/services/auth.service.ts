@@ -1,4 +1,4 @@
-import type { LoginRequest, NewPasswordRequest, RegisterRequest, ResetPasswordRequest } from "../contracts.ts";
+import type { LoginRequest, RegisterRequest, ResetPasswordConfirmRequest, ResetPasswordRequest } from "../contracts.ts";
 import type { AuthTokens, LoginResponse } from "../types.ts";
 import type { ApiClient, User } from "@/src/db/schema/index.ts";
 
@@ -193,6 +193,8 @@ export const AuthService = {
         // await NotificationService.sendVerificationEmail(user.email, plainToken, client);
         void plainToken; // Remove this once NotificationService is implemented
       }
+      // Remove this throw once NotificationService is implemented
+      throw new AgoraError("NOT_IMPLEMENTED");
     } catch (error) {
       handleServiceError(error, "Error requesting verification email.");
     }
@@ -217,7 +219,7 @@ export const AuthService = {
     }
   },
 
-  async requestPasswordReset(input: ResetPasswordRequest): Promise<void> {
+  async requestPasswordReset(input: ResetPasswordRequest, client: ApiClient): Promise<void> {
     try {
       // 1. Look up the user by email (input.email).
       const user = await DrizzleUserRepository.findByEmail(input.email);
@@ -226,22 +228,24 @@ export const AuthService = {
       // if the email doesn't exist in our system. We silently succeed.
       if (user) {
         // 2. Create token.
-        // const verificationToken = await VerificationTokenService.create({userId: user.id, type: 'password_reset'});
-        // TODO Implement/finalise after NotificationService creation.
-        // 3. Dispatch the password reset email using the NotificationService.
-      }
+        const verificationToken = await VerificationTokenService.create({ userId: user.id, type: "password_reset" });
 
+        // 3. Dispatch the password reset email using the NotificationService.
+        // await NotificationService.sendPasswordResetEmail(user.email, plainToken, client);
+        void verificationToken; // Remove this once NotificationService is implemented
+        void client;
+      }
       // Remove this throw once NotificationService is implemented
-      throw new Error("Not implemented");
+      throw new AgoraError("NOT_IMPLEMENTED");
     } catch (error) {
       handleServiceError(error, "Error requesting password reset.");
     }
   },
 
-  async resetPassword(plainToken: string, input: NewPasswordRequest): Promise<void> {
+  async resetPassword(input: ResetPasswordConfirmRequest): Promise<void> {
     try {
       // 1. Consume the token to get the target userId and guarantee it was valid/unused.
-      const consumedToken = await VerificationTokenService.consume(plainToken, "password_reset");
+      const consumedToken = await VerificationTokenService.consume(input.token, "password_reset");
 
       // 2. Hash the new password securely via Argon2.
       const hashedPassword = await hashPassword(input.password);
