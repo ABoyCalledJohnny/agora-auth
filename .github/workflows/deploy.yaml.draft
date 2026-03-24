@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  BUN_VERSION: '1.3.10'
+  BUN_VERSION: '1.3.11'
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -220,3 +220,20 @@ jobs:
 
 # - name: Compute image tag
 #   run: echo "IMAGE_TAG=v$(node -p "require('./package.json').version")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+# =============================================================================
+# REFERENCE: Removed Production Commands (for manual VPS usage)
+# =============================================================================
+# Run these directly on your VPS when needed (assuming you are in the project root):
+# 
+# Drizzle Studio (Production):
+#   npx drizzle-kit studio
+#
+# Drizzle Migrate (Production):
+#   npx drizzle-kit migrate
+#
+# Drizzle Push (Production):
+#   npx drizzle-kit push
+#
+# Docker Postgres Shell (Production):
+#   sudo docker compose -f compose.yaml -f compose.production.yaml exec postgres sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'

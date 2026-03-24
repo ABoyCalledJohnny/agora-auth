@@ -178,7 +178,7 @@ https://dbdiagram.io/d/Auth-Wright-695f8d2ed6e030a024753b90
 
 **User Settings (JSON columns):**
 
-- Privacy: `profileVisibility` (`'public' | 'members_only' | 'private'`), `showOnlineStatus`, `allowIndexing`
+- Privacy: `profileVisibility` (`'members_only' | 'private'`), `showOnlineStatus`, `allowIndexing`
 - Preferences:
     - `theme: 'system' | 'light' | 'dark'`
     - `language`
@@ -337,9 +337,12 @@ All values in this table are **never committed** to version control. They are st
 | `STAGING_JWT_PRIVATE_KEY`        | `JWT_PRIVATE_KEY`        | staging | RS256 private key for signing access JWTs               |
 | `STAGING_JWT_PUBLIC_KEY`         | `JWT_PUBLIC_KEY`         | staging | RS256 public key (served via JWKS endpoint)             |
 | `PROD_INITIAL_ADMIN_EMAIL`       | `INITIAL_ADMIN_EMAIL`    |  prod   | Email for the initial admin account                     |
+| `PROD_INITIAL_ADMIN_USERNAME`    | `INITIAL_ADMIN_USERNAME` |  prod   | Username for the initial admin account                  |
 | `PROD_INITIAL_ADMIN_PASSWORD`    | `INITIAL_ADMIN_PASSWORD` |  prod   | Password for the initial admin account                  |
-| `PROD_DEFAULT_CLIENT_SECRET`     | `DEFAULT_CLIENT_SECRET`  |  prod   | Raw API Key for the default system client               |
+|                                  |                          |  prod   | Default System Client ID                                |
+|                                  |                          |  prod   | Raw API Key for the default system client               |
 | `STAGING_INITIAL_ADMIN_EMAIL`    | `INITIAL_ADMIN_EMAIL`    | staging | Email for the initial admin account (staging)           |
+| `STAGING_INITIAL_ADMIN_USERNAME` | `INITIAL_ADMIN_USERNAME` | staging | Username for the initial admin account (staging)        |
 | `STAGING_INITIAL_ADMIN_PASSWORD` | `INITIAL_ADMIN_PASSWORD` | staging | Password for the initial admin account (staging)        |
 | `STAGING_DEFAULT_CLIENT_SECRET`  | `DEFAULT_CLIENT_SECRET`  | staging | Raw API Key for the default system client (staging)     |
 | **Email (SMTP)**                 |                          |         |                                                         |
@@ -414,8 +417,8 @@ JWT_PUBLIC_KEY=""
 > [!NOTE]
 > **Details**
 >
-> - `AUTH_SECRET` is already set as a dummy in `.env.development` - no need to duplicate here.
-> - `POSTGRES_*` are already set as dummy values in `.env.development`.
+> - `AUTH_SECRET`, `DEFAULT_CLIENT_SECRET`, and `INITIAL_ADMIN_*` fields must be placed in `.env.local`.
+> - `POSTGRES_*` are still set as dummy values in `.env.development`.
 > - `APP_DB_USER` and `APP_DB_PASSWORD` must also be present in `.env.local` for local `next build` runs. Build mode loads `.env.production` + `.env.local` (not `.env.development`), and `config/index.ts` validates these fields at import time.
 > - JWT keys are structurally complex PEM files (unlike `AUTH_SECRET` which is just a random string). A dummy won't work - real dev-only keys are needed. Alternatively, you could auto-generate in dev mode at startup.
 > - For tests, SMTP and JWT are typically mocked; `.env.test` does not need real secrets for these.
@@ -446,18 +449,19 @@ Complete matrix of every variable across all committed `.env` files. Replace `{p
 | `APP_DB_USER`                     |               |   `{project}_dev_app_user`   |   `{project}_test_app_user`   |          🔒 CI/CD          |      🔒 CI/CD      |
 | `APP_DB_PASSWORD`                 |               | `{project}_dev_app_password` | `{project}_test_app_password` |          🔒 CI/CD          |      🔒 CI/CD      |
 | **Auth & Bootstrapping**          |               |                              |                               |                            |                    |
-| `AUTH_SECRET`                     |               |      `dev_dummy_secret`      |      `test_dummy_secret`      |          🔒 CI/CD          |      🔒 CI/CD      |
-| `JWT_PRIVATE_KEY`                 |               |       🔒 `.env.local`        |      mock / `.env.local`      |          🔒 CI/CD          |      🔒 CI/CD      |
-| `JWT_PUBLIC_KEY`                  |               |       🔒 `.env.local`        |      mock / `.env.local`      |          🔒 CI/CD          |      🔒 CI/CD      |
-| `INITIAL_ADMIN_EMAIL`             |               |      `admin@localhost`       |       `admin@localhost`       |          🔒 CI/CD          |      🔒 CI/CD      |
-| `INITIAL_ADMIN_PASSWORD`          |               |     `dev_dummy_password`     |     `test_dummy_password`     |          🔒 CI/CD          |      🔒 CI/CD      |
-| `DEFAULT_CLIENT_SECRET`           |               |  `dev_dummy_client_secret`   |  `test_dummy_client_secret`   |          🔒 CI/CD          |      🔒 CI/CD      |
+| `AUTH_SECRET`                     |               |       🔒 `.env.local`        |      `test_dummy_secret`      |          🔒 CI/CD          |      🔒 CI/CD      |
+| `JWT_PRIVATE_KEY`                 |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
+| `JWT_PUBLIC_KEY`                  |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
+| `INITIAL_ADMIN_EMAIL`             |               |       🔒 `.env.local`        |     `admin@localhost.com`     |          🔒 CI/CD          |      🔒 CI/CD      |
+| `INITIAL_ADMIN_USERNAME`          |               |       🔒 `.env.local`        |            `admin`            |          🔒 CI/CD          |      🔒 CI/CD      |
+| `INITIAL_ADMIN_PASSWORD`          |               |       🔒 `.env.local`        |     `test_dummy_password`     |          🔒 CI/CD          |      🔒 CI/CD      |
+| `DEFAULT_CLIENT_SECRET`           |               |       🔒 `.env.local`        |  `test_dummy_client_secret`   |          🔒 CI/CD          |      🔒 CI/CD      |
 | **Email (SMTP)**                  |               |                              |                               |                            |                    |
 | `SMTP_HOST`                       |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
 | `SMTP_PORT`                       |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
 | `SMTP_USER`                       |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
 | `SMTP_PASSWORD`                   |               |       🔒 `.env.local`        |             mock              |          🔒 CI/CD          |      🔒 CI/CD      |
-| `MAIL_FROM`                       |               |     `noreply@localhost`      |   `noreply@test.localhost"`   | `noreply@staging.{domain}` | `noreply@{domain}` |
+| `MAIL_FROM`                       |               |   `noreply@localhost.com`    | `noreply@test.localhost.com"` | `noreply@staging.{domain}` | `noreply@{domain}` |
 | **Feature Flags**                 |               |                              |                               |                            |                    |
 | `NEXT_PUBLIC_ENABLE_REGISTRATION` |    `true`     |              -               |               -               |             -              |      `false`       |
 | **Files & Uploads**               |               |                              |                               |                            |                    |
@@ -499,7 +503,7 @@ Hardcoded, non-secret defaults that live in code. The `config/index.ts` module i
 | **Auth · Security** | `allowSessionIpChange`    | `true`                                                                              | If `false`, session is revoked on IP change    |
 |                     | `allowSessionAgentChange` | `true`                                                                              | If `false`, session is revoked on UA change    |
 | **Clients**         | `defaultClientId`         | `"agora_web_default"`                                                               | Internal app client for Server Actions         |
-| **Email**           | `mailFrom`                | `env.MAIL_FROM \|\| "noreply@localhost"`                                            | Sender address                                 |
+| **Email**           | `mailFrom`                | `env.MAIL_FROM \|\| "noreply@localhost.com"`                                        | Sender address                                 |
 | **Rate Limiting**   | `rateLimitMax`            | `Number(env.RATE_LIMIT_MAX) \|\| 100`                                               | Per IP per window                              |
 |                     | `rateLimitWindow`         | `Number(env.RATE_LIMIT_WINDOW) \|\| 60`                                             | Seconds                                        |
 | **Files**           | `uploadDir`               | `env.UPLOAD_DIR \|\| "./uploads"`                                                   |                                                |
@@ -602,6 +606,7 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
     - `Tabs` (or `TabGroup`/`TabPanel`): For navigating sections without page reloads (e.g., in Settings).
     - `Toast` (via `sonner`): For asynchronous notifications (e.g., "Settings saved", "Check your email"). No need to build from scratch; just map the `Toaster` provider.
     - `Alert`: For inline page-level alerts (e.g., static error messages at the top of a form).
+    - `Pill` / `Badge`: Minimal inline status indicator (useful for showing roles or active/suspended statuses in tables).
 
 **Route Structure**
 
@@ -725,20 +730,19 @@ See `./messages/{language}.json`
 
 #### Schedule
 
-| Task                                      | Est. | Dates         | Notes                                                                                          |
-| :---------------------------------------- | :--- | :------------ | :--------------------------------------------------------------------------------------------- |
-| **1. Preparation and Planning**           | Pre  | before 16/03  | Completed before development starts.                                                           |
-| **2. Setup**                              | Pre  | before 16/03  | Mostly pre-development. 2.3 (Project Identity) spills into Day 1.                              |
-| **3.1 Infrastructure & Core Setup**       | ~4   | 16/03 - 20/03 | Validation, DB, repos, wrappers.                                                               |
-| **3.2 Auth - Backend**<br>**5. API Docs** | ~4.5 | 20/03 - 27/03 | 6 services, 9 dual-channel endpoints, `auth.ts`, `proxy.ts`. <br>Final `api.md`                |
-| **6. Deploy**<br>**External connection**  | ~1.5 | 27/03 - 31/03 | Docker, Pipeline, DNS, client and seeding<br>External client hookup.                           |
-| **3.1 Frontend Shell**                    | ~1.5 | 31/03 - 02/04 | Root layout, landing page, header/footer, nav, error pages, UI primitives.                     |
-| **3.2 User Mgmt - Backend**               | ~2   | 02/04 - 07/04 | UserService, 7 endpoints. Patterns from Auth. Easter break (03-06/04) in between.              |
-| **3.2 Auth - Frontend**                   | ~1.5 | 07/04 - 09/04 | Minimal forms, SessionProvider, nav update, hooks.                                             |
-| **3.2 Admin Dashboard**                   | ~1   | 09/04 - 10/04 | 3 endpoints, AdminUserTable (primitives from 3.1).                                             |
-| **6. CI/CD + 5. Docs + Presentation**     | ~1   | 10/04 - 13/04 | Pipeline, env vars, README, presentation prep.                                                 |
-| **4. Site Health & Standards**            | -    | -             | Out of scope for this project.                                                                 |
-| _Buffer_                                  | ~2.5 | 13/04 - 15/04 | Overflow, polish, bug fixes. **User profile + settings frontend if time allows.** Pres: 16/04. |
+| Task                                               | Est. | Dates         | Notes                                                                                         |
+| :------------------------------------------------- | :--- | :------------ | :-------------------------------------------------------------------------------------------- |
+| **1. Preparation and Planning** ✅                 | Pre  | before 16/03  | Completed before development starts.                                                          |
+| **2. Setup** ✅                                    | Pre  | before 16/03  | Mostly pre-development. 2.3 (Project Identity) spills into Day 1.                             |
+| **3.1 Infrastructure & Core Setup** ✅             | ~3.5 | 16/03 - 20/03 | Validation, DB, repos, `api-wrapper.ts`.                                                      |
+| **3.2 Auth - Backend**<br>**5. API Docs** ✅       | ~3   | 20/03 - 25/03 | 5 services, API endpoints, `auth.ts`. <br>Final `api.md`                                      |
+| **6. Deploy**<br>**External connection**           | ~1.5 | 25/03 - 27/03 | Docker, Pipeline, DNS, client and seeding<br>External client hookup.                          |
+| **3.1 Frontend Shell**                             | ~1.5 | 27/03 - 31/03 | Root layout, landing page, header/footer, nav, error pages, UI primitives.                    |
+| **3.1 & 3.2: Misc**<br>**3.2 User Mgmt - Backend** | ~3   | 31/03 - 07/04 | `action-wrapper`, `proxy`, `Notification`, Minimal User. Easter break (03-06/04).             |
+| **3.2 Auth - Frontend**                            | ~1.5 | 07/04 - 09/04 | Minimal forms, SessionProvider, nav update, form, hooks.                                      |
+| **3.2 Admin Dashboard**                            | ~2   | 09/04 - 12/04 | 3 endpoints, AdminUserTable (primitives from 3.1, plus extra time for a rich UI).             |
+| **6. CI/CD + 5. Docs + Presentation**              | ~1   | 12/04 - 13/04 | Pipeline, env vars, README, presentation prep.                                                |
+| _Buffer_                                           | ~2.5 | 13/04 - 15/04 | Overflow, bug fixes. **Finish User Mgmt backend, then profile + settings UI if time allows.** |
 
 ---
 
@@ -816,12 +820,14 @@ See `./messages/{language}.json`
 
 **Admin**
 
+- **AdminService:** Create an `AdminService` to handle high-level global configurations, cross-cutting system actions, and administrative user management.
 - **Admin Dashboard:** Overview/landing page with key metrics (total users, recent registrations, active sessions).
 - **Admin User Table Enhancements:** Extend the MVP table with advanced filtering, sorting, search, and bulk actions.
 - **Admin User Detail View:** Detailed account view for a specific user (`GET /api/admin/users/:id`).
 - **Admin User Creation:** Manually create new users (e.g., staff accounts) (`POST /api/admin/users`).
 - **Admin User Editing:** Edit another user's details (`PATCH /api/admin/users/:id`).
 - **API Client Management:** UI form to register and manage additional API clients (beyond the default `agora_web_default` in config).
+- **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
 
 ## 5. Documentation
 

@@ -10,7 +10,7 @@
 # ---------------------------------------------------------------------------
 # Base & Runner
 # ---------------------------------------------------------------------------
-FROM oven/bun:1.3.10 AS runner
+FROM oven/bun:1.3.11 AS runner
 WORKDIR /app
 
 # 1. Install dependencies
@@ -27,4 +27,4 @@ COPY src/lib ./src/lib
 COPY src/db ./src/db
 
 # 3. Execute migrations and bootstrap scripts
-CMD ["sh", "-c", "bun run db:migrate && bun run db:bootstrap"]
+CMD ["sh", "-c", "bun run db:migrate:prod && bun run db:bootstrap:prod"]

@@ -2,7 +2,7 @@
 
 > [!WARNING]
 > **Active Development**
-> This project is currently in the **initial setup phase**. Core architecture is in progress and many features are incomplete.
+> The **core authentication logic** (API routes, server actions, Zod schemas, database models, and strict type-safe wrappers) is heavily implemented. The project is currently focusing on frontend UI completion and hooking up external notification services.
 
 A robust, secure, and modern authentication and user management system built with Next.js, Drizzle ORM, and PostgreSQL.
 
@@ -62,8 +62,8 @@ It aims to provide a solid foundation for user registration, login, profile mana
 
 ## Getting Started (WIP)
 
-> [!CAUTION]
-> **Project Status:** The project is in the very early stages of initialisation. Core architecture and features are still under active implementation, so behaviour may change frequently and many flows are incomplete.
+> [!WARNING]
+> **Project Status:** While the core authentication endpoints (Login, Register, Refresh, Verify, Reset) are functional, frontend UI integrations, admin flows, and email notifications are still under active implementation.
 
 Minimum local setup currently used in this repository:
 
@@ -156,6 +156,7 @@ The project follows a feature-driven, modular structure built on top of Next.js 
 ├── docs/                   # API documentation and drafts
 ├── drizzle/                # Database migrations output
 ├── messages/               # Internationalisation (i18n) translation files
+├── public/                 # Static assets (robots.txt, etc.)
 └── src/                    # Application source code
     ├── app/                # Next.js App Router layout, pages, and API routes
     ├── components/         # Shared UI components (layout, forms, tables)
@@ -163,18 +164,28 @@ The project follows a feature-driven, modular structure built on top of Next.js 
     ├── db/                 # Database connection, schemas, and seeding scripts
     ├── features/           # Feature-driven logic (auth, user, admin)
     │   └── [feature]/      # Each feature contains boundaries (contracts, docs, services, UI)
+    │       ├── actions/    # Next.js Server Actions
+    │       ├── components/ # Feature-specific UI components
+    │       ├── hooks/      # Feature-specific React hooks
+    │       ├── services/   # Business logic and external calls
+    │       ├── contracts.ts# Zod validation schemas and DTOs
+    │       ├── index.ts    # Public exports for the feature
+    │       └── types.ts    # TypeScript definitions
     ├── hooks/              # Shared React hooks
     ├── lib/                # Core utilities, validation, and wrappers
     ├── providers/          # Global React context providers
-    └── repositories/       # Database data access layer
+    ├── repositories/       # Database data access layer
+    ├── i18n.ts             # Internationalisation setup
+    ├── proxy.ts            # Proxy configuration
+    └── types.ts            # Global TypeScript definitions
 ```
 
 ---
 
 ## Development Workflow
 
-> [!WARNING]
-> Since the project is in the initialisation phase, the full development workflow is not yet available.
+> [!NOTE]
+> The foundational development workflow has been established. You can run database migrations, formatting, type checking, and the Next.js development server with its associated local container network seamlessly via Bun scripts.
 
 Current Next.js and Bun scripts in `package.json` already support operations such as:
 
@@ -190,8 +201,13 @@ Current Next.js and Bun scripts in `package.json` already support operations suc
 | `bun run build`       | Builds the application for production                       |
 | `bun run db:generate` | Generates Drizzle SQL migrations based on schema changes    |
 | `bun run db:migrate`  | Applies pending database migrations                         |
+| `bun run db:push`     | Pushes database schema changes directly                     |
+| `bun run db:studio`   | Opens Drizzle Studio to inspect the database                |
+| `bun run db:reset`    | Resets the database, pushes schema, and seeds data          |
 | `bun run typecheck`   | Runs TypeScript type checking across the project            |
 | `bun run verify`      | Runs lint, typecheck, and format checks                     |
+| `bun run docker:up`   | Starts the necessary Docker containers                      |
+| `bun run docker:stop` | Stops the Docker containers                                 |
 
 ---
 

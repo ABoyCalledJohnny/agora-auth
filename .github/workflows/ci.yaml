@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  BUN_VERSION: "1.3.10"
+  BUN_VERSION: "1.3.11"
   APP_DB_USER: "ci_app_user"
   APP_DB_PASSWORD: "ci_app_password"
   JWT_PRIVATE_KEY: "ci_dummy_private_key"
@@ -18,6 +18,13 @@ env:
   SMTP_PORT: "1025"
   SMTP_USER: "ci_dummy_smtp_user"
   SMTP_PASSWORD: "ci_dummy_smtp_password"
+  AUTH_SECRET: "ci_dummy_auth_secret_must_be_32_chars_long"
+  INITIAL_ADMIN_EMAIL: "admin@localhost.com"
+  INITIAL_ADMIN_PASSWORD: "ci_dummy_admin_password"
+  INITIAL_ADMIN_USERNAME: "ci_dummy_admin_username"
+  DEFAULT_CLIENT_ID: "ci_dummy_client_id"
+  DEFAULT_CLIENT_SECRET: "ci_dummy_client_secret"
+  POSTGRES_DB: "ci_dummy_db"
 
 jobs:
   verify-and-build:
@@ -43,7 +50,7 @@ jobs:
         run: bun run format:check
 
       - name: 🧹 Run Linting
-        run: bun run lint
+        run: bun run lint:check
 
       - name: 🏷️ Type Check
         run: bun run typecheck

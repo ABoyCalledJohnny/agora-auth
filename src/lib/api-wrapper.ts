@@ -1,27 +1,36 @@
-import { type NextRequest, NextResponse } from "next/server";
+import type { ApiClient } from "@/src/db/schema/index.ts";
+import type { HandlerConfig } from "@/src/lib/wrapper-types.ts";
+import type { ApiErrorResponse } from "@/src/types.ts";
 import type { z } from "zod";
-import { type Session, authenticate, authorize } from "@/src/lib/auth";
-import { AgoraError } from "@/src/lib/errors";
-import { logger } from "@/src/lib/logger.ts";
-import { sanitizeInput } from "@/src/lib/utils";
 
-//  TODO catch all for not implemented routes
+import { type NextRequest, NextResponse } from "next/server";
+
+import { ApiClientService } from "@/src/features/auth/services/api-client.service.ts";
+import { type AppSession, authenticate, authorize } from "@/src/lib/auth.ts";
+import { AgoraError, defaultErrorMessages } from "@/src/lib/errors.ts";
+import { logger } from "@/src/lib/logger.ts";
+import { sanitizeInput } from "@/src/lib/utils.ts";
+
+/**
+ * API Wrapper
+ *
+ * A higher-order function that wraps Next.js API Route Handlers to provide a unified
+ * pipeline for authentication, authorisation, validation, and error handling.
+ *
+ * Typical Flow:
+ * 1. Authentication: If `auth: true` or `roles` are provided, it calls `authenticate()` to verify the access token/session.
+ * 2. Authorisation: If `roles` are provided, it calls `authorize()` to check if the user has the required roles.
+ * 3. Client Resolution: Resolves the API client making the request (useful for tenant/client-specific logic).
+ * 4. Validation: If `bodySchema` is provided, it parses the payload as JSON, sanitizes it, and validates against the Zod schema.
+ * 5. Execution: Runs your specific route handler with the strongly-typed `data`, `session`, `client`, and route `params`.
+ * 6. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ApiErrorResponse` with correct HTTP status codes.
+ */
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 type RouteParams = Promise<Record<string, string>>;
-
-/** Configuration for `withApiHandler`. */
-type ApiConfig<TSchema extends z.ZodType = z.ZodType> = {
-  /** Zod schema to validate the JSON request body. Omit for bodyless routes (GET, DELETE). */
-  schema?: TSchema;
-  /** Require authentication. Defaults to `false`. */
-  auth?: boolean;
-  /** Roles the user must hold (only checked when `auth` is `true`). */
-  roles?: string[];
-};
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
 // TypeScript still types it as `Session | null` — use `session!` or a guard.
@@ -32,44 +41,72 @@ type ApiConfig<TSchema extends z.ZodType = z.ZodType> = {
 
 function formatApiError(error: unknown): NextResponse {
   if (error instanceof AgoraError) {
-    return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
+    const response: ApiErrorResponse = {
+      success: false,
+      error: error.message,
+      code: error.code,
+      details: error.details,
+    };
+
+    const headers = new Headers();
+    if (error.status === 401) {
+      const isTokenError =
+        error.code === "TOKEN_EXPIRED" || error.code === "TOKEN_INVALID" || error.code === "TOKEN_REVOKED";
+
+      const authParams = isTokenError ? ' error="invalid_token"' : "";
+      headers.set("WWW-Authenticate", `Bearer${authParams}`);
+    }
+
+    return NextResponse.json(response, { status: error.status, headers });
   }
   logger.error("Unhandled API error", error);
-  return NextResponse.json({ error: "An unexpected error occurred.", code: "INTERNAL" }, { status: 500 });
+  const response: ApiErrorResponse = {
+    success: false,
+    error: defaultErrorMessages.INTERNAL,
+    code: "INTERNAL",
+  };
+  return NextResponse.json(response, { status: 500 });
 }
 
 // ---------------------------------------------------------------------------
 // withApiHandler
 // ---------------------------------------------------------------------------
 
-/** With schema — handler receives `{ request, data, session, params }`. */
+/** With schema — handler receives `{ request, data, session, client, params }`. */
 export function withApiHandler<TSchema extends z.ZodType>(
-  config: ApiConfig<TSchema> & { schema: TSchema },
+  config: HandlerConfig<TSchema> & { bodySchema: TSchema },
   handler: (context: {
     request: NextRequest;
     data: z.infer<TSchema>;
-    session: Session | null;
+    session: AppSession | null;
+    client: ApiClient;
     params: RouteParams;
   }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
 
-/** Without schema — handler receives `{ request, session, params }`. */
+/** Without schema — handler receives `{ request, session, client, params }`. */
 export function withApiHandler(
-  config: Omit<ApiConfig, "schema">,
-  handler: (context: { request: NextRequest; session: Session | null; params: RouteParams }) => Promise<NextResponse>,
+  config: Omit<HandlerConfig, "bodySchema">,
+  handler: (context: {
+    request: NextRequest;
+    session: AppSession | null;
+    client: ApiClient;
+    params: RouteParams;
+  }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
 
 // Implementation
 export function withApiHandler(
-  config: ApiConfig,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- required for overload compatibility
+  config: HandlerConfig,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required to satisfy varied generic overload signatures
   handler: (context: any) => Promise<NextResponse>,
 ) {
   return async (request: NextRequest, routeContext: { params: RouteParams }) => {
     try {
       // 1. Authentication
-      let session: Session | null = null;
-      if (config.auth) {
+      let session: AppSession | null = null;
+      // Check for roles also so that a forgotten auth `true` argument doesn't cause this step to be skipped.
+      if (config.auth || config.roles?.length) {
         session = await authenticate();
       }
 
@@ -78,9 +115,24 @@ export function withApiHandler(
         authorize(session, config.roles);
       }
 
-      // 3. Validation & sanitisation (JSON body)
+      // 3. Client Resolution
+      let client: ApiClient;
+      const clientId = request.headers.get("x-client-id");
+      const apiKey = request.headers.get("x-api-key");
+
+      if (clientId && apiKey) {
+        try {
+          client = await ApiClientService.authenticate(clientId, apiKey);
+        } catch {
+          throw new AgoraError("UNAUTHORIZED", "Invalid API client credentials provided.");
+        }
+      } else {
+        client = await ApiClientService.getDefaultClient();
+      }
+
+      // 4. Validation & sanitisation (JSON body)
       let data: unknown;
-      if (config.schema) {
+      if (config.bodySchema) {
         let body: unknown;
         try {
           body = await request.json();
@@ -88,22 +140,23 @@ export function withApiHandler(
           throw new AgoraError("VALIDATION_ERROR", "Invalid or missing JSON body.");
         }
         const sanitised = sanitizeInput(body);
-        const result = config.schema.safeParse(sanitised);
+        const result = config.bodySchema.safeParse(sanitised);
         if (!result.success) {
           throw new AgoraError("VALIDATION_ERROR", "Validation failed.", {
-            details: result.error.flatten(),
+            details: result.error.issues,
           });
         }
         data = result.data;
       }
 
-      // 4. Execute handler
-      const context = config.schema
-        ? { request, data, session, params: routeContext.params }
-        : { request, session, params: routeContext.params };
+      // 5. Execute handler
+      const context = config.bodySchema
+        ? { request, data, session, client, params: routeContext.params }
+        : { request, session, client, params: routeContext.params };
 
       return await handler(context);
     } catch (error) {
+      // 6. Error Handling
       return formatApiError(error);
     }
   };
@@ -125,7 +178,7 @@ export function withApiHandler(
 //
 // // POST (with body schema + auth):
 // export const POST = withApiHandler(
-//   { schema: createPostSchema, auth: true },
+//   { bodySchema: createPostSchema, auth: true },
 //   async ({ data, session }) => {
 //     const post = await postService.create(data, session!.userId);
 //     return NextResponse.json(post, { status: 201 });
@@ -134,7 +187,7 @@ export function withApiHandler(
 //
 // // Public POST (webhook, no auth):
 // export const POST = withApiHandler(
-//   { schema: webhookSchema },
+//   { bodySchema: webhookSchema },
 //   async ({ data }) => {
 //     await webhookService.handle(data);
 //     return NextResponse.json({ received: true });

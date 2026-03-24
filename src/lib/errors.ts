@@ -2,6 +2,7 @@ export type ErrorCode =
   // Standard Application Errors
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
+  | "NOT_IMPLEMENTED"
   | "INTERNAL"
   // Auth & Access
   | "UNAUTHORIZED"
@@ -15,12 +16,15 @@ export type ErrorCode =
   | "ACCOUNT_PENDING"
   // Conflicts
   | "EMAIL_EXISTS"
-  | "USERNAME_EXISTS";
+  | "USERNAME_EXISTS"
+  | "CLIENT_CONFLICT"
+  | "ROLE_EXISTS";
 
 export const defaultErrorMessages: Record<ErrorCode, string> = {
   // Standard Application Errors
   VALIDATION_ERROR: "The provided data is invalid.",
   NOT_FOUND: "The requested resource could not be found.",
+  NOT_IMPLEMENTED: "This endpoint is not implemented yet.",
   INTERNAL: "An unexpected internal server error occurred.",
 
   // Auth & Access
@@ -38,12 +42,15 @@ export const defaultErrorMessages: Record<ErrorCode, string> = {
   // Conflicts
   EMAIL_EXISTS: "A user with this email address already exists.",
   USERNAME_EXISTS: "This username is not available.",
+  CLIENT_CONFLICT: "An API client with this name, clientId, or base URL already exists.",
+  ROLE_EXISTS: "A role with this name already exists.",
 };
 
 export const defaultHttpStatus = {
   // Standard Application Errors
   VALIDATION_ERROR: 400,
   NOT_FOUND: 404,
+  NOT_IMPLEMENTED: 501,
   INTERNAL: 500,
 
   // Auth & Access
@@ -61,6 +68,8 @@ export const defaultHttpStatus = {
   // Conflicts
   EMAIL_EXISTS: 409,
   USERNAME_EXISTS: 409,
+  CLIENT_CONFLICT: 409,
+  ROLE_EXISTS: 409,
 } as const satisfies Record<ErrorCode, number>;
 
 export type AppHttpStatus = (typeof defaultHttpStatus)[ErrorCode];
@@ -95,4 +104,17 @@ export class AgoraError extends Error {
     this.status = options?.status ?? defaultHttpStatus[code] ?? 500;
     this.details = options?.details;
   }
+}
+
+import { logger } from "@/src/lib/logger.ts";
+
+/**
+ * Standardized error handler for service layers.
+ * Rethrows known application errors and logs unexpected (internal) errors
+ * before throwing a generic 500 INTERNAL error.
+ */
+export function handleServiceError(error: unknown, logMessage: string): never {
+  if (error instanceof AgoraError) throw error;
+  logger.error(logMessage, error);
+  throw new AgoraError("INTERNAL");
 }

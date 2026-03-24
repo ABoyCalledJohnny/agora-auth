@@ -67,7 +67,7 @@
     - [x] **Validation Strategy:** Define core domain rules (e.g., Password complexity, user roles, user settings and preferences) (e.g., for `src/lib/validation.ts`).
 - **Service Architecture and Logic:**
     - [x] **Business Logic:** Define dedicated services for core operations (e.g., user management, authentication, token lifecycle) to decouple logic from the transport layer.
-    - [x] **Transport/API:** Plan the REST API structure and Next.js Server Actions for client-server communication, ensuring consistent validation and error handling.
+    - [x] **Transport/API:** Plan the REST API structure and Next.js Server Actions for client-server communication, ensuring consistent validation and error handling (define standard `ApiSuccessResponse` and `ApiErrorResponse` shapes).
     - [x] **Logic Flow:** Map out critical data flows (e.g., authentication lifecycle, complex transactions).
 - **Core Configuration and Standards:**
     - [x] **Error Types and Messages:** Define necessary error types / codes, messages, and HTTP statuses.
@@ -100,7 +100,7 @@
 
 - [x] **Git Repository:** Initialise local Git repository, create remote on GitHub, and link them.
 - [x] **Repository Layout:** Create project directory layout (using Turbine as a basis).
-- [ ] **Infrastructure:** Copy, update/complete documentation, basic infrastructure and configuration files (from Turbine).
+- [x] **Infrastructure:** Copy, update/complete documentation, basic infrastructure and configuration files (from Turbine).
 - [x] **Application Scaffold:** Copy reusable application structure from Turbine (layout, components, utilities). Feature-specific adaptations happen during development (Section 3).
 - [x] **File Skeleton Creation:** Scaffold additional project directories and empty placeholder files (UI components, repositories, providers, database scripts) identified during the architecture phase to establish a visual roadmap in the codebase before writing logic.
 
@@ -138,23 +138,28 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Shared Validation and Domain Rules:**
-        - [ ] **Validation module:** Create `src/lib/validation.ts` with reusable domain rules (password requirements, username format) and complex JSON type schemas (`UserPreferences`, `PrivacySettings`) needed by the database schema.
+        - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains.
+        - [x] **Global types:** Create `src/types.ts` to define system-wide interfaces like `ApiErrorResponse`, `ApiSuccessResponse`, and standard action states for uniform client-server communication as well es `PaginatedList`s.
     - **Database Layer:**
-        - [ ] **Drizzle schemas:** Translate the ERD into Drizzle schema files (`users.ts`, `auth.ts`, `rbac.ts`, `clients.ts`). Import shared validators/types from `validation.ts` where applicable.
-        - [ ] **Types:** Export inferred TypeScript types from Drizzle schemas (e.g., `User`, `Session`, `Role`).
-        - [ ] **Migrations:** Generate and apply the initial migration (`bun run db:generate` and `bun run db:migrate`).
-        - [ ] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap`).
-        - [ ] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).
-        - [ ] **Database connection:** Verify `src/db/index.ts` pool configuration and ensure `src/config` provides the composed `DATABASE_URL`.
-        - **Repositories:** Create repositories and interfaces:
-            - [ ] **`UserRepository`:** Data access for user records in `src/repositories/`. Shared across Auth and User features.
-            - [ ] **`SessionRepository`:** Session CRUD (create, find, revoke, rotate) in `src/repositories/`.
-            - [ ] **`VerificationTokenRepository`:** Token storage and lookup in `src/repositories/`.
-            - [ ] **`RoleRepository`:** Role and user-role assignment queries in `src/repositories/`.
-            - [ ] **`ApiClientRepository`:** API client lookup and domain validation in `src/repositories/`.
+        - **Drizzle schemas:** Translate the ERD into Drizzle schema and relation files.
+            - **Validation:** Import shared constants and types from `constants.ts` and `validation.ts` where applicable.
+            - **Types:** Export inferred TypeScript types from Drizzle schemas (e.g., `User`, `Session`, `Role`).
+            - [x] Users Tables (`users.ts`)
+            - [x] Auth Tables (`auth.ts`)
+            - [x] Role Tables (`rbac.ts`)
+            - [x] Client Table (`client.ts`)
+        - [x] **Migrations:** Generate and apply the initial migration (`bun run db:generate` and `bun run db:migrate:dev`).
+        - **Repositories:** Create repositories as well as interfaces:
+            - [x] **`UserRepository`:** Data access for user records in `src/repositories/`. Shared across Auth and User features.
+            - [x] **`SessionRepository`:** Session CRUD (create, find, revoke, rotate) in `src/repositories/`.
+            - [x] **`VerificationTokenRepository`:** Token storage and lookup in `src/repositories/`.
+            - [x] **`RoleRepository`:** Role and user-role assignment queries in `src/repositories/`.
+            - [x] **`ApiClientRepository`:** API client lookup and domain validation in `src/repositories/`.
+        - [x] **Bootstrap script:** Implement `src/db/bootstrap.ts` to automatically create mandatory system data on startup (roles: `admin`, `user`; initial admin account; default API client). Ensure inserts use `ON CONFLICT DO NOTHING` for idempotency. Run script (`bun run db:bootstrap:dev`).
+        - [x] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).
     - **Core Library:**
-        - [ ] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) — Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
-        - [ ] **`withActionHandler`:** Implement Server Action wrapper (`src/lib/action-wrapper.ts`) — Zod input validation, structured error state, authentication/authorisation guards, cookie management, and redirect to `/login?next=…` on auth failure.
+        - [x] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) - Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
+        - [ ] **`withActionHandler`:** Implement Server Action wrapper (`src/lib/action-wrapper.ts`) - Zod input validation, structured error state, authentication/authorisation guards, cookie management, and redirect to `/login?next=…` on auth failure.
     - **Frontend Shell:**
         - [ ] **Root layout:** Set up `layout.tsx` with `NextIntlClientProvider` and `Toaster`. (`SessionProvider` is created and added later in the Auth feature.)
         - [ ] **Landing page:** Implement `/` route (`page.tsx`) — marketing/welcome page.
@@ -164,7 +169,7 @@
         - [ ] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
             - [ ] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`.
-            - [ ] General: `Button`, `Tabs`, `Alert`.
+            - [ ] General: `Button`, `Tabs`, `Alert`, `Pill`.
             - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
 
@@ -175,28 +180,29 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
+        - [x] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
     - **Services:**
-        - [ ] **`AuthService`:** Registration and login orchestration.
-        - [ ] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
-        - [ ] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
-        - [ ] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
+        - [x] **`AuthService`:** Registration and login orchestration.
+        - [x] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
+        - [x] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
+        - [x] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
         - [ ] **`NotificationService`:** Email abstraction using `nodemailer`.
             - [ ] Create HTML templates (welcome/verification, password reset).
-        - [ ] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
+            - [ ] Implement service in `AuthService`.
+        - [x] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
     - **API Routes and Server Actions:**
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
-        - [ ] `POST /api/auth/register` - Register new user.
-        - [ ] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
-        - [ ] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
-        - [ ] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.
-        - [ ] `POST /api/auth/verify-email` - Confirm email via token.
-        - [ ] `POST /api/auth/verify-email/resend` - Re-issue verification email.
-        - [ ] `POST /api/auth/reset-password` - Initiate password reset (send email).
+        - [x] `POST /api/auth/register` - Register new user.
+        - [x] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
+        - [x] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
+        - [x] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.
+        - [x] `POST /api/auth/verify-email` - Confirm email via token.
+        - [x] `POST /api/auth/verify-email/resend` - Re-issue verification email.
+        - [ ] `POST /api/auth/reset-password` - Initiate password reset (resend email).
         - [ ] `POST /api/auth/reset-password/confirm` - Set new password via reset token.
-        - [ ] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
+        - [x] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
     - **Auth Infrastructure:**
-        - [ ] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
+        - [x] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
         - [ ] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
     - **Frontend:**
         - [ ] **`SessionProvider`:** Create in `src/providers/` - React Context with `useSession()` hook. Hydrate from `layout.tsx` via server-side `getSession()`. Add to root layout.
@@ -210,18 +216,21 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`. Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
+        - [ ] Create Zod validation schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`.
+        - [ ] Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
+        - [ ] **`RoleService`:** Handle user role retrieval and assignments, encapsulating authorization queries.
+        - [ ] **`AuthService` Refactor:** Update `AuthService` to use `UserService` and `RoleService` instead of directly calling `DrizzleUserRepository` and `DrizzleRoleRepository`.
     - **API Routes and Server Actions:**
-    - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
-    - [ ] 🔒 `GET /api/user/profile` - Authenticated user's full profile.
-    - [ ] 🔒 `PATCH /api/user/profile` - Update display name, bio, etc.
-    - [ ] 🔒 `PATCH /api/user/email` - Initiate email change (triggers verification).
-    - [ ] 🔒 `PATCH /api/user/username` - Change username.
-    - [ ] 🔒 `PATCH /api/user/password` - Change password (requires current password).
-    - [ ] 🔒 `DELETE /api/user` - Self-serve account deletion (requires current password).
-    - [ ] 🔒 `GET /api/users/:username` - Public profile (authenticated users only, strictly public fields, respects profile visibility settings).
+        - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
+        - [ ] 🔒 `GET /api/user/profile` - Authenticated user's full profile.
+        - [ ] 🔒 `PATCH /api/user/profile` - Update display name, bio, etc.
+        - [ ] 🔒 `PATCH /api/user/email` - Initiate email change (triggers verification).
+        - [ ] 🔒 `PATCH /api/user/username` - Change username.
+        - [ ] 🔒 `PATCH /api/user/password` - Change password (requires current password).
+        - [ ] 🔒 `DELETE /api/user` - Self-serve account deletion (requires current password).
+        - [ ] 🔒 `GET /api/users/:username` - Public profile (authenticated users only, strictly public fields, respects profile visibility settings).
     - **Frontend:**
         - [ ] **`UserProfile`:** Public profile page at `/profile/[username]`.
         - [ ] **`SettingsPage`:** Settings shell with `Tabs` component (Profile tab, Account tab).
@@ -229,6 +238,7 @@
         - [ ] **`AccountTab`:** Display current values with Change buttons, inline edit forms (`EditEmailForm`, `EditUsernameForm`, `EditPasswordForm`), and `DeleteAccountSection`.
         - [ ] **User hooks:** `useGetProfile`, `useUpdateProfile`, `useUpdateEmail`, `useUpdateUsername`, `useUpdatePassword`, `useDeleteAccount`, `useGetPublicProfile` in `src/features/user/hooks/`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
+    - [ ] Enable email authentication for default client.
 
 ###### Feature: Admin Dashboard (Days 15-16)
 
@@ -256,6 +266,7 @@ _Out of scope for this project._
 
 - [ ] **Project Readme:** Finalise `README.md` from initial draft.
 - [ ] **API Documentation:** Finalise `api.md` (and `api_de.md`) documenting all public endpoints, request/response schemas, authentication requirements, and example usage - share with classmate consuming the API.
+- [ ] **Code quality:** Add JSDoc/DocBlocks and helpful inline comments to complex functions and components (where missing).
 - [ ] **Presentation:** Prepare project presentation.
 
 ---
@@ -281,6 +292,10 @@ _Out of scope for this project._
     - [ ] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
     - [ ] Integrate domain into Dogado mail hosting provider and add config data to `env.local`.
 - **Production Server**
+    - [ ] Bind the PostgreSQL container port to the VPS localhost in `compose.production.yaml`.
+    - [ ] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -L 5433:127.0.0.1:5432 user@vps-ip`).
+    - [ ] Add the database superuser credentials to `.env.local` to override development environment variables.
+    - [ ] Run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
     - [ ] Clean old Docker infrastructure.
     - [ ] Enable continuous deployment.
 - **Client Integration and Seeding**
