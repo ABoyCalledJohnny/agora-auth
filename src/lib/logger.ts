@@ -24,6 +24,23 @@ function redactData(data: unknown): unknown {
     return data.map(redactData);
   }
 
+  // Handle Error objects specially because message/stack are non-enumerable
+  if (data instanceof Error) {
+    const errorObj: Record<string, unknown> = {
+      name: data.name,
+      message: data.message,
+      stack: data.stack,
+    };
+
+    // Include custom properties (like code, details) which are usually enumerable
+    for (const [key, value] of Object.entries(data)) {
+      errorObj[key] = value;
+    }
+
+    // Redact the resulting plain object
+    return redactData(errorObj);
+  }
+
   const redactedObj: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(data)) {
     if (SENSITIVE_LOG_KEYS.has(key.toLowerCase())) {
