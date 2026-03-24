@@ -3,23 +3,18 @@
  *
  * - `sanitizeInput`: Recursively sanitises string values in request payloads.
  * - `parseDuration`: Parses a human-readable duration string into milliseconds.
- * - `setSessionCookies`: Sets the session cookie pair with secure defaults.
- * - `clearSessionCookies`: Clears both session cookies.
  * - `cn`: A utility to merge Tailwind classes cleanly using clsx and tailwind-merge.
  * - `createPublicId`: Creates a unique public ID consisting of PUBLIC_ID_LENGTH (27) PUBLIC_ID_ALPHABET (a-z) letters.
  * - `stripUndefined`: Strips explicit `undefined` values from an object to satisfy Drizzle types.
  * - `isSafeRedirect`: Validates if a provided target URL or origin securely matches an allowed base URL.
  */
 
-import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
-
 import { type ClassValue, clsx } from "clsx";
 import { customAlphabet } from "nanoid";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { twMerge } from "tailwind-merge";
 
 import { PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH } from "@/src/config/constants.ts";
-import { appConfig } from "@/src/config/index.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 
 /**
@@ -60,55 +55,6 @@ export function parseDuration(str: string): number {
   // `keyof typeof multipliers` extracts the exact literal union "m" | "h" | "d"
   // `keyof` itself only works on Types, not JavaScript values, so `typeof` bridges the gap.
   return Number(value) * multipliers[unit as keyof typeof multipliers];
-}
-
-export async function getSessionCookies(): Promise<{
-  accessCookie: RequestCookie | null;
-  refreshCookie: RequestCookie | null;
-}> {
-  const cookieStore = await cookies();
-  const isProd = appConfig.app.env === "production";
-  const cookiePrefix = isProd ? "__Secure-" : "";
-
-  const accessCookieName = `${cookiePrefix}${appConfig.auth.accessCookieName}`;
-  const refreshCookieName = `${cookiePrefix}${appConfig.auth.refreshCookieName}`;
-
-  // 2. Grab the Access JWT from the cookies.
-  const accessCookie = cookieStore.get(accessCookieName) ?? null;
-  const refreshCookie = cookieStore.get(refreshCookieName) ?? null;
-
-  return { accessCookie, refreshCookie };
-}
-
-/**
- * Sets the session cookie pair (access + refresh tokens) with secure defaults
- * from appConfig. Used by withApiHandler, withActionHandler, and proxy.ts.
- */
-export async function setSessionCookies(accessToken: string, refreshToken: string) {
-  const cookieStore = await cookies();
-  const shared = {
-    httpOnly: true,
-    secure: appConfig.app.env === "production",
-    sameSite: appConfig.auth.cookieSameSite,
-    path: "/",
-  } as const;
-
-  cookieStore.set(appConfig.auth.accessCookieName, accessToken, {
-    ...shared,
-    maxAge: parseDuration(appConfig.auth.accessTokenExpiry) / 1000,
-  });
-
-  cookieStore.set(appConfig.auth.refreshCookieName, refreshToken, {
-    ...shared,
-    maxAge: parseDuration(appConfig.auth.refreshTokenExpiry) / 1000,
-  });
-}
-
-/** Clears both session cookies. */
-export async function clearSessionCookies() {
-  const cookieStore = await cookies();
-  cookieStore.delete(appConfig.auth.accessCookieName);
-  cookieStore.delete(appConfig.auth.refreshCookieName);
 }
 
 /**

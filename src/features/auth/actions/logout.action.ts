@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { withActionHandler } from "@/src/lib/action-wrapper.ts";
-import { clearSessionCookies, getSessionCookies } from "@/src/lib/utils.ts";
+import { clearSessionCookies, getSessionCookies } from "@/src/lib/auth.ts";
 
 import { AuthService } from "../services/auth.service.ts";
 

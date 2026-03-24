@@ -5,7 +5,8 @@ import { z } from "zod";
 
 import { appConfig } from "@/src/config/index.ts";
 import { withActionHandler } from "@/src/lib/action-wrapper.ts";
-import { getRequestMetadata, isSafeRedirect, setSessionCookies } from "@/src/lib/utils.ts";
+import { setSessionCookies } from "@/src/lib/auth.ts";
+import { getRequestMetadata, isSafeRedirect } from "@/src/lib/utils.ts";
 
 import { loginSchema } from "../contracts.ts";
 import { AuthService } from "../services/auth.service.ts";
