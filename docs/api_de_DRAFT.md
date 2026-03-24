@@ -163,7 +163,7 @@ Beispiel Success-Body:
 ```json
 {
 	"success": true,
-	"message": "User registered successfully",
+	"message": "User registered successfully.",
 	"data": {
 		"id": "uuid",
 		"publicId": "string",
@@ -221,6 +221,7 @@ Beispiel Success-Body:
 ```json
 {
 	"success": true,
+	"message": "Login successful.",
 	"data": {
 		"user": {
 			"id": "uuid",
@@ -258,7 +259,17 @@ Request-Body:
 
 Mögliche Erfolgswerte:
 
-- `204 No Content`
+- `200 OK`
+
+Beispiel für erfolgreiche Antwort:
+
+```json
+{
+	"success": true,
+	"message": "Logout successful.",
+	"data": null
+}
+```
 
 Mögliche Fehler:
 
@@ -293,6 +304,7 @@ Beispiel Success-Body:
 ```json
 {
 	"success": true,
+	"message": "Token refreshed successfully.",
 	"data": {
 		"accessToken": "new_access_token",
 		"refreshToken": "new_refresh_token",
@@ -342,7 +354,7 @@ Beispiel Success-Body:
 ```json
 {
 	"success": true,
-	"message": "If the account exists, a verification email has been sent",
+	"message": "If the account exists, a verification email has been sent.",
 	"data": null
 }
 ```
@@ -385,7 +397,7 @@ Beispiel Success-Body:
 ```json
 {
 	"success": true,
-	"message": "Email verified successfully",
+	"message": "Email verified successfully.",
 	"data": null
 }
 ```
@@ -436,7 +448,7 @@ Beispiel Success-Body:
 ```json
 {
 	"success": true,
-	"message": "If the account exists, a reset email has been sent",
+	"message": "If the account exists, a reset email has been sent.",
 	"data": null
 }
 ```
@@ -481,7 +493,7 @@ Beispiel Success-Body:
 ```json
 {
 	"success": true,
-	"message": "Password updated successfully",
+	"message": "Password updated successfully.",
 	"data": null
 }
 ```
@@ -523,19 +535,16 @@ Beispiel Success-Body:
 
 ```json
 {
-	"success": true,
-	"data": {
-		"keys": [
-			{
-				"kty": "RSA",
-				"kid": "2026-03-15-key-1",
-				"use": "sig",
-				"alg": "RS256",
-				"n": "...",
-				"e": "AQAB"
-			}
-		]
-	}
+	"keys": [
+		{
+			"kty": "RSA",
+			"kid": "2026-03-15-key-1",
+			"use": "sig",
+			"alg": "RS256",
+			"n": "...",
+			"e": "AQAB"
+		}
+	]
 }
 ```
 
@@ -628,7 +637,7 @@ const logoutRes = await fetch("http://localhost:3000/api/auth/logout", {
 	method: "POST",
 });
 
-if (logoutRes.status === 204) {
+if (logoutRes.status === 200) {
 	console.log("Logged out successfully");
 }
 ```

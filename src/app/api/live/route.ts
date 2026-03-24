@@ -3,9 +3,13 @@ import { NO_STORE_HEADERS } from "@/src/config/constants.ts";
 export async function GET() {
   return Response.json(
     {
-      status: "ok",
-      app: "running",
-      date: new Date().toISOString(),
+      success: true,
+      message: "Liveness check passed.",
+      data: {
+        status: "ok",
+        app: "running",
+        date: new Date().toISOString(),
+      },
     },
     {
       status: 200,

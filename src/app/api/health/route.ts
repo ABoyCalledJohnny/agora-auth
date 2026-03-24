@@ -16,18 +16,22 @@ async function checkDatabaseConnection(): Promise<boolean> {
 export async function GET() {
   const isDatabaseConnected = await checkDatabaseConnection();
 
-  return Response.json(
-    {
+  const status = isDatabaseConnected ? 200 : 503;
+  const body = {
+    success: isDatabaseConnected,
+    message: isDatabaseConnected ? "Health check passed." : "Health check failed.",
+    data: {
       status: isDatabaseConnected ? "ok" : "error",
       app: "running",
       db: isDatabaseConnected ? "connected" : "disconnected",
       date: new Date().toISOString(),
     },
-    {
-      status: isDatabaseConnected ? 200 : 503,
-      headers: NO_STORE_HEADERS,
-    },
-  );
+  };
+
+  return Response.json(body, {
+    status,
+    headers: NO_STORE_HEADERS,
+  });
 }
 
 export async function HEAD() {

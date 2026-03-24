@@ -171,7 +171,7 @@ Example success body:
 ```json
 {
 	"success": true,
-	"message": "User registered successfully",
+	"message": "User registered successfully.",
 	"data": {
 		"id": "uuid",
 		"publicId": "string",
@@ -229,6 +229,7 @@ Example success body:
 ```json
 {
 	"success": true,
+	"message": "Login successful.",
 	"data": {
 		"user": {
 			"id": "uuid",
@@ -266,7 +267,17 @@ Request body:
 
 Possible success values:
 
-- `204 No Content`
+- `200 OK`
+
+Example success body:
+
+```json
+{
+	"success": true,
+	"message": "Logout successful.",
+	"data": null
+}
+```
 
 Possible errors:
 
@@ -301,6 +312,7 @@ Example success body:
 ```json
 {
 	"success": true,
+	"message": "Token refreshed successfully.",
 	"data": {
 		"accessToken": "new_access_token",
 		"refreshToken": "new_refresh_token",
@@ -350,7 +362,7 @@ Example success body:
 ```json
 {
 	"success": true,
-	"message": "If the account exists, a verification email has been sent",
+	"message": "If the account exists, a verification email has been sent.",
 	"data": null
 }
 ```
@@ -393,7 +405,7 @@ Example success body:
 ```json
 {
 	"success": true,
-	"message": "Email verified successfully",
+	"message": "Email verified successfully.",
 	"data": null
 }
 ```
@@ -444,7 +456,7 @@ Example success body:
 ```json
 {
 	"success": true,
-	"message": "If the account exists, a reset email has been sent",
+	"message": "If the account exists, a reset email has been sent.",
 	"data": null
 }
 ```
@@ -489,7 +501,7 @@ Example success body:
 ```json
 {
 	"success": true,
-	"message": "Password updated successfully",
+	"message": "Password updated successfully.",
 	"data": null
 }
 ```
@@ -531,19 +543,16 @@ Example success body:
 
 ```json
 {
-	"success": true,
-	"data": {
-		"keys": [
-			{
-				"kty": "RSA",
-				"kid": "2026-03-15-key-1",
-				"use": "sig",
-				"alg": "RS256",
-				"n": "...",
-				"e": "AQAB"
-			}
-		]
-	}
+	"keys": [
+		{
+			"kty": "RSA",
+			"kid": "2026-03-15-key-1",
+			"use": "sig",
+			"alg": "RS256",
+			"n": "...",
+			"e": "AQAB"
+		}
+	]
 }
 ```
 
@@ -629,14 +638,14 @@ const refreshData = await refreshRes.json();
 console.log(refreshData);
 ```
 
-### Logout (`204 No Content`)
+### Logout (`200 OK`)
 
 ```ts
 const logoutRes = await fetch("http://localhost:3000/api/auth/logout", {
 	method: "POST",
 });
 
-if (logoutRes.status === 204) {
+if (logoutRes.status === 200) {
 	console.log("Logged out successfully");
 }
 ```

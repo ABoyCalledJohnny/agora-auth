@@ -5,7 +5,7 @@ export type ApiErrorCode = ErrorCode;
 export type ApiSuccessResponse<TData = unknown> = {
   success: true;
   data: TData;
-  message?: string;
+  message: string;
 };
 
 export type ApiErrorResponse<TDetails = unknown> = {
