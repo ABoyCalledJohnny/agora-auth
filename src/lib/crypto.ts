@@ -9,6 +9,8 @@
 
 import { randomBytes, timingSafeEqual } from "node:crypto";
 
+import { TOKEN_BYTE_LENGTH } from "@/src/config/constants.ts";
+
 /**
  * Secure password hashing using Bun's native optimized Argon2id implementation.
  * Argon2id is the current industry recommended algorithm for password hashing.
@@ -31,7 +33,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return await Bun.password.verify(password, hash);
 }
 
-export function createToken(bytes: number = 32): string {
+export function createToken(bytes: number = TOKEN_BYTE_LENGTH): string {
   return randomBytes(bytes).toString("base64url");
 }
 

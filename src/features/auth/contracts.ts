@@ -13,6 +13,7 @@ import type { BaseRepository, CrudRepository } from "@/src/repositories/contract
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+import { TOKEN_STRING_LENGTH } from "@/src/config/constants.ts";
 import { apiClients, users } from "@/src/db/schema/index.ts";
 import { passwordRules } from "@/src/lib/validation.ts";
 
@@ -68,6 +69,14 @@ export interface VerificationTokenRepository extends BaseRepository<Verification
   deleteExpired(): Promise<VerificationToken[]>;
 }
 
+/** Schema to validate high-entropy 32-byte base64url encoded tokens via API / JSON inputs */
+export const tokenStringSchema = z
+  .string()
+  // 32 byte base64url is exactly 43 characters long
+  .length(TOKEN_STRING_LENGTH, "Token format invalid (must be 43-character base64url string)")
+  // Base64url character set standard
+  .regex(/^[A-Za-z0-9_-]+$/, "Token format invalid (must be 43-character base64url string)");
+
 const ClientSchema = createInsertSchema(apiClients);
 
 export const createClientSchema = ClientSchema.pick({
@@ -78,10 +87,7 @@ export const createClientSchema = ClientSchema.pick({
   isActive: true,
   skipEmailVerification: true,
 }).extend({
-  plainApiKey: z
-    .string()
-    .length(43)
-    .regex(/^[A-Za-z0-9_-]+$/, "Must be a valid base64url string"),
+  plainApiKey: tokenStringSchema,
 });
 
 export type CreateClientRequest = z.infer<typeof createClientSchema>;
@@ -100,14 +106,6 @@ export const registerSchema = UserSchema.pick({
 });
 
 export type RegisterRequest = z.infer<typeof registerSchema>;
-
-/** Schema to validate high-entropy 32-byte base64url encoded tokens via API / JSON inputs */
-export const tokenStringSchema = z
-  .string()
-  // 32 byte base64url is exactly 43 characters long
-  .length(43, "Token format invalid")
-  // Base64url character set standard
-  .regex(/^[A-Za-z0-9_-]+$/, "Token format invalid");
 
 export const loginSchema = z.object({
   identifier: z.string().min(1, "Email or username is required"),
@@ -129,7 +127,13 @@ export const newPasswordSchema = z.object({
 export type NewPasswordRequest = z.infer<typeof newPasswordSchema>;
 
 export const logoutSchema = z.object({
-  refreshToken: z.string().min(1, "Refresh token is required"),
+  refreshToken: tokenStringSchema,
 });
 
 export type LogoutRequest = z.infer<typeof logoutSchema>;
+
+export const refreshSchema = z.object({
+  refreshToken: tokenStringSchema,
+});
+
+export type RefreshRequest = z.infer<typeof refreshSchema>;

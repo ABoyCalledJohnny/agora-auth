@@ -1,3 +1,4 @@
+import type { User } from "@/src/db/schema/index.ts";
 import type { ApiSuccessResponse } from "@/src/types.ts";
 
 import { NextResponse } from "next/server";
@@ -21,7 +22,7 @@ export const POST = withApiHandler(
       client,
     );
 
-    const responseBody: ApiSuccessResponse = {
+    const responseBody: ApiSuccessResponse<User> = {
       success: true,
       message: "User registered successfully",
       data: newUser,

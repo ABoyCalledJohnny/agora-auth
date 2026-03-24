@@ -1,4 +1,5 @@
-import type { ApiSuccessResponse } from "@/src/types";
+import type { LoginResponse } from "@/src/features/auth/types.ts";
+import type { ApiSuccessResponse } from "@/src/types.ts";
 
 import { NextResponse } from "next/server";
 
@@ -14,7 +15,7 @@ export const POST = withApiHandler({ bodySchema: loginSchema }, async ({ data: {
   // Step 2: Verify credentials (find user by identifier, compare password hash via AuthService)
   const loginResponse = await AuthService.login({ identifier, password }, ipAddress, userAgent);
 
-  const responseBody: ApiSuccessResponse = {
+  const responseBody: ApiSuccessResponse<LoginResponse> = {
     success: true,
     message: "Login successful",
     data: {

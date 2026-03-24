@@ -31,3 +31,16 @@ export type PaginatedListResponse<T> = {
   page: number;
   limit: number;
 };
+
+export type HealthData = {
+  status: "ok" | "error";
+  app: "running";
+  db: "connected" | "disconnected";
+  date: string;
+};
+
+export type LiveData = {
+  status: "ok";
+  app: "running";
+  date: string;
+};

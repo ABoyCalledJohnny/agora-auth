@@ -34,6 +34,10 @@ export const NO_STORE_HEADERS = {
 export const PUBLIC_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 export const PUBLIC_ID_LENGTH = 27;
 
+// 32-bytes of high-entropy data encoded as base64url will always be exactly 43 characters long.
+export const TOKEN_BYTE_LENGTH = 32;
+export const TOKEN_STRING_LENGTH = 43;
+
 export const PASSWORD_MIN_LENGTH = 12;
 export const PASSWORD_MAX_LENGTH = 72;
 export const USERNAME_MIN_LENGTH = 3;
