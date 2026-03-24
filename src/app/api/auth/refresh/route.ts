@@ -3,6 +3,7 @@ import type { ApiSuccessResponse } from "@/src/types.ts";
 
 import { NextResponse } from "next/server";
 
+import enTranslations from "@/messages/en.json";
 import { refreshSchema } from "@/src/features/auth/contracts.ts";
 import { AuthService } from "@/src/features/auth/services/auth.service.ts";
 import { withApiHandler } from "@/src/lib/api-wrapper.ts";
@@ -16,7 +17,7 @@ export const POST = withApiHandler(
 
     const data: ApiSuccessResponse<AuthTokens> = {
       success: true,
-      message: "Token refreshed successfully.",
+      message: enTranslations.Auth.refreshSuccess,
       data: {
         accessToken: authTokens.accessToken,
         refreshToken: authTokens.refreshToken,

@@ -137,3 +137,15 @@ export const refreshSchema = z.object({
 });
 
 export type RefreshRequest = z.infer<typeof refreshSchema>;
+
+export const verifyEmailSchema = z.object({
+  token: tokenStringSchema,
+});
+
+export type VerifyEmailRequest = z.infer<typeof verifyEmailSchema>;
+
+export const resendVerifyEmailSchema = z.object({
+  email: z.email(),
+});
+
+export type ResendVerifyEmailRequest = z.infer<typeof resendVerifyEmailSchema>;

@@ -3,6 +3,7 @@ import type { ApiSuccessResponse } from "@/src/types.ts";
 
 import { NextResponse } from "next/server";
 
+import enTranslations from "@/messages/en.json";
 import { registerSchema } from "@/src/features/auth/contracts.ts";
 import { AuthService } from "@/src/features/auth/services/auth.service.ts";
 import { withApiHandler } from "@/src/lib/api-wrapper.ts";
@@ -24,7 +25,7 @@ export const POST = withApiHandler(
 
     const responseBody: ApiSuccessResponse<User> = {
       success: true,
-      message: "User registered successfully",
+      message: enTranslations.Auth.Register.success,
       data: newUser,
     };
 

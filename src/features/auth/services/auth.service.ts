@@ -174,6 +174,30 @@ export const AuthService = {
    * 5. Verification & Recovery Flows
    */
 
+  async requestVerificationEmail(email: string, client: ApiClient): Promise<void> {
+    try {
+      // 1. Look up the user by email
+      const user = await DrizzleUserRepository.findByEmail(email);
+
+      // Security Best Practice: Silently succeed if user is not found, or already verified
+      if (!user || user.status !== "pending") return;
+
+      if (!client.skipEmailVerification) {
+        // 2. Create verification token
+        const { plainToken } = await VerificationTokenService.create({
+          userId: user.id,
+          type: "email_verification",
+        });
+
+        // 3. Dispatch the email using NotificationService
+        // await NotificationService.sendVerificationEmail(user.email, plainToken, client);
+        void plainToken; // Remove this once NotificationService is implemented
+      }
+    } catch (error) {
+      handleServiceError(error, "Error requesting verification email.");
+    }
+  },
+
   async verifyEmail(plainToken: string): Promise<void> {
     try {
       // 1. Consume the token to ensure it's valid and unused

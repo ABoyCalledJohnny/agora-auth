@@ -2,6 +2,7 @@ import type { ApiSuccessResponse } from "@/src/types.ts";
 
 import { NextResponse } from "next/server";
 
+import enTranslations from "@/messages/en.json";
 import { logoutSchema } from "@/src/features/auth/contracts.ts";
 import { AuthService } from "@/src/features/auth/services/auth.service.ts";
 import { withApiHandler } from "@/src/lib/api-wrapper.ts";
@@ -12,7 +13,7 @@ export const POST = withApiHandler({ bodySchema: logoutSchema, auth: true }, asy
 
   const response: ApiSuccessResponse<null> = {
     success: true,
-    message: "Logout successful",
+    message: enTranslations.Auth.logoutSuccess,
     data: null,
   };
 

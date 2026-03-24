@@ -3,6 +3,7 @@ import type { ApiSuccessResponse } from "@/src/types.ts";
 
 import { NextResponse } from "next/server";
 
+import enTranslations from "@/messages/en.json";
 import { loginSchema } from "@/src/features/auth/contracts.ts";
 import { AuthService } from "@/src/features/auth/services/auth.service.ts";
 import { withApiHandler } from "@/src/lib/api-wrapper.ts";
@@ -17,7 +18,7 @@ export const POST = withApiHandler({ bodySchema: loginSchema }, async ({ data: {
 
   const responseBody: ApiSuccessResponse<LoginResponse> = {
     success: true,
-    message: "Login successful",
+    message: enTranslations.Auth.Login.success,
     data: {
       user: loginResponse.user,
       accessToken: loginResponse.accessToken,
