@@ -89,7 +89,12 @@ export const AuthService = {
       if (user.status === "pending") throw new AgoraError("ACCOUNT_PENDING");
       if (user.status === "suspended") throw new AgoraError("ACCOUNT_SUSPENDED");
 
-      // 4. Generate Session / Refresh Token
+      // 4. Update the user's last sign-in timestamp
+      await DrizzleUserRepository.update(user.id, {
+        lastSignInAt: new Date(),
+      });
+
+      // 5. Generate Session / Refresh Token
       const refreshTokenWrapper = await SessionService.create({
         userId: user.id,
         ipAddress,
@@ -98,7 +103,7 @@ export const AuthService = {
 
       const userRoles = await DrizzleRoleRepository.getUserRoles(user.id);
 
-      // 5. Generate short-lived Access Token
+      // 6. Generate short-lived Access Token
       const accessToken = await JwtService.sign({
         sub: user.id,
         sid: refreshTokenWrapper.session.id,

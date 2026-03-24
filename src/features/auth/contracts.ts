@@ -14,8 +14,8 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 import { TOKEN_STRING_LENGTH } from "@/src/config/constants.ts";
-import { apiClients, users } from "@/src/db/schema/index.ts";
-import { passwordRules } from "@/src/lib/validation.ts";
+import { apiClients } from "@/src/db/schema/index.ts";
+import { passwordRules, usernameRules } from "@/src/lib/validation.ts";
 
 export interface RoleRepository extends CrudRepository<
   Role,
@@ -96,12 +96,9 @@ export const updateClientSchema = createClientSchema.omit({ plainApiKey: true })
 
 export type UpdateClientRequest = z.infer<typeof updateClientSchema>;
 
-const UserSchema = createInsertSchema(users);
-
-export const registerSchema = UserSchema.pick({
-  username: true,
-  email: true,
-}).extend({
+export const registerSchema = z.object({
+  username: usernameRules((key) => key),
+  email: z.email(),
   password: passwordRules((key) => key),
 });
 
@@ -114,8 +111,8 @@ export const loginSchema = z.object({
 
 export type LoginRequest = z.infer<typeof loginSchema>;
 
-export const resetPasswordRequestSchema = UserSchema.pick({
-  email: true,
+export const resetPasswordRequestSchema = z.object({
+  email: z.email("Invalid email address"),
 });
 
 export type ResetPasswordRequest = z.infer<typeof resetPasswordRequestSchema>;

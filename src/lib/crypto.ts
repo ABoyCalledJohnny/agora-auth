@@ -7,20 +7,20 @@
  * - `verifyToken`: Verifies a plaintext token against its SHA-256 hash using a constant-time comparison.
  */
 
-import { randomBytes, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+
+import * as argon2 from "argon2";
 
 import { TOKEN_BYTE_LENGTH } from "@/src/config/constants.ts";
 
 /**
- * Secure password hashing using Bun's native optimized Argon2id implementation.
+ * Secure password hashing using Argon2id implementation.
  * Argon2id is the current industry recommended algorithm for password hashing.
- *
- * @see https://bun.sh/docs/api/hashing#bun-password
  */
 export async function hashPassword(password: string): Promise<string> {
-  // Bun.password.hash automatically generates a salt and returns
+  // argon2.hash automatically generates a salt and returns
   // the fully formatted $argon2id$... string.
-  return await Bun.password.hash(password);
+  return await argon2.hash(password);
 }
 
 /**
@@ -30,7 +30,7 @@ export async function hashPassword(password: string): Promise<string> {
  * @param hash The Argon2id hash stored in the database, 32 bytes -> 43 characters
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return await Bun.password.verify(password, hash);
+  return await argon2.verify(hash, password);
 }
 
 export function createToken(bytes: number = TOKEN_BYTE_LENGTH): string {
@@ -42,7 +42,7 @@ export function createToken(bytes: number = TOKEN_BYTE_LENGTH): string {
  * Uses SHA-256. Do NOT use this for user passwords.
  */
 export function hashToken(key: string): string {
-  return new Bun.CryptoHasher("sha256").update(key).digest("hex");
+  return createHash("sha256").update(key).digest("hex");
 }
 
 /**

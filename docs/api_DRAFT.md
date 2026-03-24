@@ -533,7 +533,7 @@ Example success body:
 	"keys": [
 		{
 			"kty": "RSA",
-			"kid": "2026-03-15-key-1",
+			"kid": "v_aelhFSGMeC8k-jdPVq0GI9MaBL11WAFS_-TJQvu68",
 			"use": "sig",
 			"alg": "RS256",
 			"n": "...",
