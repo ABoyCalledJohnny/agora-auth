@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0-rc.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.2.0...v0.3.0-rc.0) (2026-03-24)
+
+### Features
+
+- **auth:** implement complete backend authentication flow and API wrappers ([#2](https://github.com/ABoyCalledJohnny/agora-auth/issues/2)) ([3f1eceb](https://github.com/ABoyCalledJohnny/agora-auth/commit/3f1eceb088c9085875abdb6e1415f681fa5097dc))
+
+### Chores
+
+- **deps:** update project dependencies and bun ([031b93f](https://github.com/ABoyCalledJohnny/agora-auth/commit/031b93f2ca61504bcc69ee795bf08e0255af6376))
+- improve db seed script and fix drizzle-seed runtime bug ([c992035](https://github.com/ABoyCalledJohnny/agora-auth/commit/c9920350d1be5da26cbf81d3810f6e0cfc9dae11))
+
 ## [0.2.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.2.0-rc.0...v0.2.0) (2026-03-20)
 
 ### Chores
