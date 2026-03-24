@@ -1,10 +1,12 @@
-import { DEFAULT_PREFERENCES, DEFAULT_PRIVACY_SETTINGS, USER_STATUS } from "@/src/config/constants";
-import { type Preferences, type PrivacySettings } from "@/src/lib/validation";
-import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
+import { type InferInsertModel, type InferSelectModel, relations } from "drizzle-orm";
 import { jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+
+import { DEFAULT_PREFERENCES, DEFAULT_PRIVACY_SETTINGS, USER_STATUS } from "@/src/config/constants.ts";
+import { type Preferences, type PrivacySettings } from "@/src/lib/validation.ts";
+
 import { createdAtColumn, idColumn, updatedAtColumn, verifiedAtColumn } from "./_helpers.ts";
-import { userCredentials, userSessions, verificationTokens } from "./auth";
-import { usersRoles, type Role } from "./rbac";
+import { userCredentials, userSessions, verificationTokens } from "./auth.ts";
+import { type Role, usersRoles } from "./rbac.ts";
 
 export const userStatusEnum = pgEnum("user_status", USER_STATUS);
 

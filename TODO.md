@@ -139,7 +139,7 @@
 - **Development:**
     - **Shared Validation and Domain Rules:**
         - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains.
-        - [x] **Global types:** Create `src/types.ts` to define system-wide interfaces like `ApiErrorResponse`, `ApiSuccessResponse`, and standard action states for uniform client-server communication.
+        - [x] **Global types:** Create `src/types.ts` to define system-wide interfaces like `ApiErrorResponse`, `ApiSuccessResponse`, and standard action states for uniform client-server communication as well es `PaginatedList`s.
     - **Database Layer:**
         - **Drizzle schemas:** Translate the ERD into Drizzle schema and relation files.
             - **Validation:** Import shared constants and types from `constants.ts` and `validation.ts` where applicable.
@@ -180,28 +180,29 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
+        - [x] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
     - **Services:**
-        - [ ] **`AuthService`:** Registration and login orchestration.
-        - [ ] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
-        - [ ] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
-        - [ ] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
+        - [x] **`AuthService`:** Registration and login orchestration.
+        - [x] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
+        - [x] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
+        - [x] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
         - [ ] **`NotificationService`:** Email abstraction using `nodemailer`.
             - [ ] Create HTML templates (welcome/verification, password reset).
-        - [ ] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
+            - [ ] Implement service in `AuthService`.
+        - [x] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
     - **API Routes and Server Actions:**
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
-        - [ ] `POST /api/auth/register` - Register new user.
-        - [ ] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
-        - [ ] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
-        - [ ] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.
-        - [ ] `POST /api/auth/verify-email` - Confirm email via token.
-        - [ ] `POST /api/auth/verify-email/resend` - Re-issue verification email.
-        - [ ] `POST /api/auth/reset-password` - Initiate password reset (send email).
+        - [x] `POST /api/auth/register` - Register new user.
+        - [x] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
+        - [x] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
+        - [x] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.
+        - [x] `POST /api/auth/verify-email` - Confirm email via token.
+        - [x] `POST /api/auth/verify-email/resend` - Re-issue verification email.
+        - [ ] `POST /api/auth/reset-password` - Initiate password reset (resend email).
         - [ ] `POST /api/auth/reset-password/confirm` - Set new password via reset token.
-        - [ ] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
+        - [x] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
     - **Auth Infrastructure:**
-        - [ ] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
+        - [x] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
         - [ ] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
     - **Frontend:**
         - [ ] **`SessionProvider`:** Create in `src/providers/` - React Context with `useSession()` hook. Hydrate from `layout.tsx` via server-side `getSession()`. Add to root layout.
@@ -219,6 +220,8 @@
         - [ ] Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
+        - [ ] **`RoleService`:** Handle user role retrieval and assignments, encapsulating authorization queries.
+        - [ ] **`AuthService` Refactor:** Update `AuthService` to use `UserService` and `RoleService` instead of directly calling `DrizzleUserRepository` and `DrizzleRoleRepository`.
     - **API Routes and Server Actions:**
         - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
         - [ ] 🔒 `GET /api/user/profile` - Authenticated user's full profile.
@@ -235,6 +238,7 @@
         - [ ] **`AccountTab`:** Display current values with Change buttons, inline edit forms (`EditEmailForm`, `EditUsernameForm`, `EditPasswordForm`), and `DeleteAccountSection`.
         - [ ] **User hooks:** `useGetProfile`, `useUpdateProfile`, `useUpdateEmail`, `useUpdateUsername`, `useUpdatePassword`, `useDeleteAccount`, `useGetPublicProfile` in `src/features/user/hooks/`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
+    - [ ] Enable email authentication for default client.
 
 ###### Feature: Admin Dashboard (Days 15-16)
 
@@ -262,6 +266,7 @@ _Out of scope for this project._
 
 - [ ] **Project Readme:** Finalise `README.md` from initial draft.
 - [ ] **API Documentation:** Finalise `api.md` (and `api_de.md`) documenting all public endpoints, request/response schemas, authentication requirements, and example usage - share with classmate consuming the API.
+- [ ] **Code quality:** Add JSDoc/DocBlocks and helpful inline comments to complex functions and components (where missing).
 - [ ] **Presentation:** Prepare project presentation.
 
 ---
@@ -287,6 +292,10 @@ _Out of scope for this project._
     - [ ] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
     - [ ] Integrate domain into Dogado mail hosting provider and add config data to `env.local`.
 - **Production Server**
+    - [ ] Bind the PostgreSQL container port to the VPS localhost in `compose.production.yaml`.
+    - [ ] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -L 5433:127.0.0.1:5432 user@vps-ip`).
+    - [ ] Add the database superuser credentials to `.env.local` to override development environment variables.
+    - [ ] Run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
     - [ ] Clean old Docker infrastructure.
     - [ ] Enable continuous deployment.
 - **Client Integration and Seeding**

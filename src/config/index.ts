@@ -1,11 +1,12 @@
 import { z } from "zod";
+
 import {
-  DEFAULT_LOCALE,
-  LOCALES,
   DEFAULT_CLIENT_NAME,
-  DEFAULT_VERIFY_EMAIL_PATH,
+  DEFAULT_LOCALE,
   DEFAULT_RESET_PASSWORD_PATH,
-} from "./constants";
+  DEFAULT_VERIFY_EMAIL_PATH,
+  LOCALES,
+} from "./constants.ts";
 
 // ---------------------------------------------------------------------------
 // 1. Environment schema — validates process.env at import time.

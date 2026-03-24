@@ -1,22 +1,15 @@
-import type { UserStatus } from "@/src/config/constants";
-import type { User } from "@/src/db/schema";
+import type { UserStatus } from "@/src/config/constants.ts";
+import type { User } from "@/src/db/schema/index.ts";
+import type { PaginatedListRequest, PaginatedListResponse } from "@/src/types.ts";
 
 export type UserListSortBy = "createdAt" | "updatedAt" | "username" | "email";
 export type UserListSortDirection = "asc" | "desc";
 
-export type ListUsersPageInput = {
+export type ListUsersPageInput = PaginatedListRequest<UserListSortBy, UserListSortDirection> & {
   page: number;
   limit: number;
   status?: UserStatus;
-  search?: string;
   roleId?: string;
-  sortBy?: UserListSortBy;
-  sortDirection?: UserListSortDirection;
 };
 
-export type ListUsersPageResult = {
-  items: User[];
-  total: number;
-  page: number;
-  limit: number;
-};
+export type ListUsersPageResult = PaginatedListResponse<User>;

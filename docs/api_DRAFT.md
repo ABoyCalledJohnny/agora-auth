@@ -1,5 +1,8 @@
 # Agora Auth API Draft (Auth Only)
 
+> **⚠️ IMPORTANT UPDATE:**
+> All successful API responses are now wrapped in a standardized envelope: `{ "success": true, "message": "...", "data": { ... } }`. Please ensure your client parsers account for the nested `data` object!
+
 This draft intentionally covers only core auth management:
 
 - register
@@ -167,13 +170,19 @@ Example success body:
 
 ```json
 {
-	"id": "uuid",
-	"publicId": "string",
-	"username": "string",
-	"email": "string",
-	"status": "pending",
-	"emailVerifiedAt": null,
-	"createdAt": "2026-03-15T12:00:00.000Z"
+	"success": true,
+	"message": "User registered successfully.",
+	"data": {
+		"id": "uuid",
+		"publicId": "string",
+		"username": "string",
+		"email": "string",
+		"status": "pending",
+		"emailVerifiedAt": null,
+		"createdAt": "2026-03-15T12:00:00.000Z",
+		"updatedAt": "2026-03-15T12:00:00.000Z",
+		"lastSignInAt": null
+	}
 }
 ```
 
@@ -219,18 +228,24 @@ Example success body:
 
 ```json
 {
-	"user": {
-		"id": "uuid",
-		"publicId": "string",
-		"username": "new_user",
-		"email": "new.user@example.com",
-		"status": "active",
-		"emailVerifiedAt": "2026-03-15T12:00:00.000Z",
-		"createdAt": "2026-03-15T10:00:00.000Z"
-	},
-	"accessToken": "jwt_or_session_token",
-	"refreshToken": "opaque_refresh_token",
-	"expiresAt": "2026-03-15T13:00:00.000Z"
+	"success": true,
+	"message": "Login successful.",
+	"data": {
+		"user": {
+			"id": "uuid",
+			"publicId": "string",
+			"username": "new_user",
+			"email": "new.user@example.com",
+			"status": "active",
+			"emailVerifiedAt": "2026-03-15T12:00:00.000Z",
+			"createdAt": "2026-03-15T10:00:00.000Z",
+			"updatedAt": "2026-03-15T10:00:00.000Z",
+			"lastSignInAt": "2026-03-15T10:00:00.000Z"
+		},
+		"accessToken": "jwt_or_session_token",
+		"refreshToken": "opaque_refresh_token",
+		"expiresAt": "2026-03-15T13:00:00.000Z"
+	}
 }
 ```
 
@@ -252,7 +267,17 @@ Request body:
 
 Possible success values:
 
-- `204 No Content`
+- `200 OK`
+
+Example success body:
+
+```json
+{
+	"success": true,
+	"message": "Logout successful.",
+	"data": null
+}
+```
 
 Possible errors:
 
@@ -286,9 +311,13 @@ Example success body:
 
 ```json
 {
-	"accessToken": "new_access_token",
-	"refreshToken": "new_refresh_token",
-	"expiresAt": "2026-03-15T14:00:00.000Z"
+	"success": true,
+	"message": "Token refreshed successfully.",
+	"data": {
+		"accessToken": "new_access_token",
+		"refreshToken": "new_refresh_token",
+		"expiresAt": "2026-03-15T14:00:00.000Z"
+	}
 }
 ```
 
@@ -332,7 +361,9 @@ Example success body:
 
 ```json
 {
-	"message": "If the account exists, a verification email has been sent"
+	"success": true,
+	"message": "If the account exists, a verification email has been sent.",
+	"data": null
 }
 ```
 
@@ -373,7 +404,9 @@ Example success body:
 
 ```json
 {
-	"message": "Email verified successfully"
+	"success": true,
+	"message": "Email verified successfully.",
+	"data": null
 }
 ```
 
@@ -422,7 +455,9 @@ Example success body:
 
 ```json
 {
-	"message": "If the account exists, a reset email has been sent"
+	"success": true,
+	"message": "If the account exists, a reset email has been sent.",
+	"data": null
 }
 ```
 
@@ -444,7 +479,7 @@ Request body (draft):
 ```json
 {
 	"token": "string",
-	"newPassword": "string"
+	"password": "string"
 }
 ```
 
@@ -452,20 +487,9 @@ Example request body:
 
 ```json
 {
-	"token": "TOKEN_FROM_EMAIL",
-	"newPassword": "AnotherStrongPassword123!"
-}
-```
-
-Success:
-
-- `200 OK` password updated
-
-Example success body:
-
-```json
-{
-	"message": "Password updated successfully"
+        "token": "TOKEN_FROM_EMAIL",
+        "password": "AnotherStrongPassword123!"
+	"data": null
 }
 ```
 
@@ -509,7 +533,7 @@ Example success body:
 	"keys": [
 		{
 			"kty": "RSA",
-			"kid": "2026-03-15-key-1",
+			"kid": "v_aelhFSGMeC8k-jdPVq0GI9MaBL11WAFS_-TJQvu68",
 			"use": "sig",
 			"alg": "RS256",
 			"n": "...",
@@ -576,17 +600,7 @@ const resetRes = await fetch("http://localhost:3000/api/auth/reset-password/conf
 	},
 	body: JSON.stringify({
 		token: "TOKEN_FROM_EMAIL",
-		newPassword: "AnotherStrongPassword123!",
-	}),
-});
-
-const resetData = await resetRes.json();
-console.log(resetData);
-```
-
-### Refresh
-
-```ts
+                password: "AnotherStrongPassword123!",
 const refreshRes = await fetch("http://localhost:3000/api/auth/refresh", {
 	method: "POST",
 	headers: {
@@ -601,14 +615,14 @@ const refreshData = await refreshRes.json();
 console.log(refreshData);
 ```
 
-### Logout (`204 No Content`)
+### Logout (`200 OK`)
 
 ```ts
 const logoutRes = await fetch("http://localhost:3000/api/auth/logout", {
 	method: "POST",
 });
 
-if (logoutRes.status === 204) {
+if (logoutRes.status === 200) {
 	console.log("Logged out successfully");
 }
 ```

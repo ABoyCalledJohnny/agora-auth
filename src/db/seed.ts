@@ -1,5 +1,6 @@
 import { like } from "drizzle-orm";
 import { firstNames, lastNames, seed } from "drizzle-seed";
+
 import { USER_STATUS } from "../config/constants.ts";
 import { appConfig } from "../config/index.ts";
 import { createPublicId } from "../lib/utils.ts";

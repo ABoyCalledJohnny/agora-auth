@@ -11,6 +11,8 @@
  * 5. COMPOSITE DOMAIN SCHEMAS - Complex object definitions for configurations and forms.
  */
 
+import { z } from "zod";
+
 import {
   DEFAULT_PREFERENCES,
   DEFAULT_PRIVACY_SETTINGS,
@@ -25,7 +27,6 @@ import {
   USERNAME_MIN_LENGTH,
   VERIFICATION_TOKEN_TYPE,
 } from "@/src/config/constants.ts";
-import { z } from "zod";
 
 // ============================================================================
 // 1. MESSAGES & I18N

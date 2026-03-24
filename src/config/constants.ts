@@ -34,13 +34,17 @@ export const NO_STORE_HEADERS = {
 export const PUBLIC_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 export const PUBLIC_ID_LENGTH = 27;
 
+// 32-bytes of high-entropy data encoded as base64url will always be exactly 43 characters long.
+export const TOKEN_BYTE_LENGTH = 32;
+export const TOKEN_STRING_LENGTH = 43;
+
 export const PASSWORD_MIN_LENGTH = 12;
 export const PASSWORD_MAX_LENGTH = 72;
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 30;
 
 // Block reserved words for usernames to avoid impersonation and route conflicts.
-export const RESERVED_USERNAMES = [
+export const RESERVED_USERNAMES = new Set([
   "admin",
   "api",
   "support",
@@ -70,7 +74,7 @@ export const RESERVED_USERNAMES = [
   "rechnung",
   "pay",
   "zahlungen",
-] as const;
+]);
 
 // ============================================================================
 // 4. ENUMS & SYSTEM TYPES
@@ -117,3 +121,31 @@ export const DEFAULT_PREFERENCES = {
     },
   },
 } as const;
+
+// ============================================================================
+// 6. SECURITY & LOGGING
+// ============================================================================
+/** Object keys that should be automatically redacted in server logs to prevent sensitive data leaks. */
+export const SENSITIVE_LOG_KEYS = new Set([
+  // Passwords
+  "password",
+  "oldpassword",
+  "newpassword",
+  "passwordhash",
+
+  // Tokens & Secrets
+  "token",
+  "tokenhash",
+  "accesstoken",
+  "refreshtoken",
+  "sessiontoken",
+  "sessiontokenhash",
+  "secret",
+
+  // API Keys
+  "apikey",
+  "apikeyhash",
+
+  // HTTP Headers
+  "authorization",
+]);

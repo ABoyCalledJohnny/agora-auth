@@ -69,7 +69,8 @@
       "submitting": "Logging in…",
       "forgotPassword": "Forgot your password?",
       "noAccount": "Don't have an account?",
-      "noAccountLink": "Register"
+      "noAccountLink": "Register",
+      "success": "Login successful"
     },
     "Register": {
       "heading": "Create an account",
@@ -85,7 +86,8 @@
       "submit": "Create account",
       "submitting": "Creating account…",
       "hasAccount": "Already have an account?",
-      "hasAccountLink": "Log in"
+      "hasAccountLink": "Log in",
+      "success": "User registered successfully"
     },
     "ForgotPassword": {
       "heading": "Forgot your password?",
@@ -112,11 +114,12 @@
       "description": "We've sent a verification link to {email}.",
       "resend": "Resend verification email",
       "resending": "Resending…",
-      "resendSuccess": "Verification email resent.",
-      "verified": "Your email has been verified."
+      "resendSuccess": "If that email is registered and unverified, a new link was sent.",
+      "verified": "Email verified successfully. You may now log in."
     },
     "logout": "Log out",
-    "logoutSuccess": "You have been logged out."
+    "logoutSuccess": "You have been logged out.",
+    "refreshSuccess": "Token refreshed successfully."
   },
   "User": {
     "Profile": {

@@ -13,8 +13,9 @@ import type { BaseRepository, CrudRepository } from "@/src/repositories/contract
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { apiClients, users } from "@/src/db/schema/index.ts";
-import { passwordRules } from "@/src/lib/validation.ts";
+import { TOKEN_STRING_LENGTH } from "@/src/config/constants.ts";
+import { apiClients } from "@/src/db/schema/index.ts";
+import { passwordRules, usernameRules } from "@/src/lib/validation.ts";
 
 export interface RoleRepository extends CrudRepository<
   Role,
@@ -68,6 +69,14 @@ export interface VerificationTokenRepository extends BaseRepository<Verification
   deleteExpired(): Promise<VerificationToken[]>;
 }
 
+/** Schema to validate high-entropy 32-byte base64url encoded tokens via API / JSON inputs */
+export const tokenStringSchema = z
+  .string()
+  // 32 byte base64url is exactly 43 characters long
+  .length(TOKEN_STRING_LENGTH, "Token format invalid (must be 43-character base64url string)")
+  // Base64url character set standard
+  .regex(/^[A-Za-z0-9_-]+$/, "Token format invalid (must be 43-character base64url string)");
+
 const ClientSchema = createInsertSchema(apiClients);
 
 export const createClientSchema = ClientSchema.pick({
@@ -78,10 +87,7 @@ export const createClientSchema = ClientSchema.pick({
   isActive: true,
   skipEmailVerification: true,
 }).extend({
-  plainApiKey: z
-    .string()
-    .length(43)
-    .regex(/^[A-Za-z0-9_-]+$/, "Must be a valid base64url string"),
+  plainApiKey: tokenStringSchema,
 });
 
 export type CreateClientRequest = z.infer<typeof createClientSchema>;
@@ -90,24 +96,13 @@ export const updateClientSchema = createClientSchema.omit({ plainApiKey: true })
 
 export type UpdateClientRequest = z.infer<typeof updateClientSchema>;
 
-const UserSchema = createInsertSchema(users);
-
-export const registerSchema = UserSchema.pick({
-  username: true,
-  email: true,
-}).extend({
+export const registerSchema = z.object({
+  username: usernameRules((key) => key),
+  email: z.email(),
   password: passwordRules((key) => key),
 });
 
 export type RegisterRequest = z.infer<typeof registerSchema>;
-
-/** Schema to validate high-entropy 32-byte base64url encoded tokens via API / JSON inputs */
-export const tokenStringSchema = z
-  .string()
-  // 32 byte base64url is exactly 43 characters long
-  .length(43, "Token format invalid")
-  // Base64url character set standard
-  .regex(/^[A-Za-z0-9_-]+$/, "Token format invalid");
 
 export const loginSchema = z.object({
   identifier: z.string().min(1, "Email or username is required"),
@@ -116,14 +111,39 @@ export const loginSchema = z.object({
 
 export type LoginRequest = z.infer<typeof loginSchema>;
 
-export const resetPasswordSchema = UserSchema.pick({
-  email: true,
+export const resetPasswordRequestSchema = z.object({
+  email: z.email("Invalid email address"),
 });
 
-export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
+export type ResetPasswordRequest = z.infer<typeof resetPasswordRequestSchema>;
 
-export const newPasswordSchema = z.object({
+export const resetPasswordConfirmSchema = z.object({
+  token: tokenStringSchema,
   password: passwordRules((key) => key),
 });
 
-export type NewPasswordRequest = z.infer<typeof newPasswordSchema>;
+export type ResetPasswordConfirmRequest = z.infer<typeof resetPasswordConfirmSchema>;
+
+export const logoutSchema = z.object({
+  refreshToken: tokenStringSchema,
+});
+
+export type LogoutRequest = z.infer<typeof logoutSchema>;
+
+export const refreshSchema = z.object({
+  refreshToken: tokenStringSchema,
+});
+
+export type RefreshRequest = z.infer<typeof refreshSchema>;
+
+export const verifyEmailSchema = z.object({
+  token: tokenStringSchema,
+});
+
+export type VerifyEmailRequest = z.infer<typeof verifyEmailSchema>;
+
+export const resendVerifyEmailSchema = z.object({
+  email: z.email(),
+});
+
+export type ResendVerifyEmailRequest = z.infer<typeof resendVerifyEmailSchema>;

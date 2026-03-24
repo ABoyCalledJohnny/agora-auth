@@ -2,7 +2,7 @@
 
 > [!WARNING]
 > **Aktive Entwicklung**
-> Dieses Projekt befindet sich derzeit in der **anfänglichen Einrichtungsphase**. Die Kernarchitektur ist in Arbeit und viele Funktionen sind noch unvollständig.
+> Die **Kern-Authentifizierungslogik** (API-Routen, Server Actions, Zod-Schemas, Datenbankmodelle und typsichere Wrapper) ist weitgehend implementiert. Das Projekt konzentriert sich derzeit auf die Fertigstellung der Frontend-UI und die Anbindung von externen Benachrichtigungs-Diensten.
 
 Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-Lösung, die mit Next.js, Drizzle ORM und PostgreSQL entwickelt wurde.
 
@@ -62,8 +62,8 @@ Das Ziel ist es, eine solide Grundlage für Benutzerregistrierung, Login, Profil
 
 ## Erste Schritte (In Arbeit)
 
-> [!CAUTION]
-> **Projektstatus:** Das Projekt befindet sich in einem sehr frühen Stadium der Initialisierung. Kernarchitektur und Funktionen werden weiterhin aktiv implementiert, daher kann sich das Verhalten häufig ändern und viele Abläufe sind noch unvollständig.
+> [!WARNING]
+> **Projektstatus:** Während die wichtigsten Authentifizierungs-Endpunkte (Login, Registrierung, Refresh, Verifizierung, Passwort-Reset) funktionsfähig sind, befinden sich Frontend-UI-Integrationen, Admin-Abläufe und E-Mail-Benachrichtigungen noch in der aktiven Implementierung.
 
 Aktuell verwendetes Mindest-Setup für die lokale Entwicklung in diesem Repository:
 
@@ -116,6 +116,7 @@ Das Projekt folgt einer feature-getriebenen, modularen Struktur, die auf dem Nex
 ├── docs/                   # API-Dokumentation und Entwürfe
 ├── drizzle/                # Ausgabe der Datenbankmigrationen
 ├── messages/               # Übersetzungsdateien (i18n)
+├── public/                 # Statische Ressourcen (robots.txt, etc.)
 └── src/                    # Quellcode der Anwendung
     ├── app/                # Next.js App Router (Layout, Seiten und API-Routen)
     ├── components/         # Gemeinsam genutzte UI-Komponenten (Layout, Formulare, Tabellen)
@@ -123,18 +124,28 @@ Das Projekt folgt einer feature-getriebenen, modularen Struktur, die auf dem Nex
     ├── db/                 # Datenbankverbindung, Schemas und Seeding-Skripte
     ├── features/           # Feature-gesteuerte Logik (Auth, User, Admin)
     │   └── [feature]/      # Jedes Feature enthält spezifische Grenzen (Contracts, Dokumentation, Services, UI)
+    │       ├── actions/    # Next.js Server Actions
+    │       ├── components/ # Feature-spezifische UI-Komponenten
+    │       ├── hooks/      # Feature-spezifische React-Hooks
+    │       ├── services/   # Geschäftslogik und externe Aufrufe
+    │       ├── contracts.ts# Zod-Validierungsschemata und DTOs
+    │       ├── index.ts    # Öffentliche Feature-Exports
+    │       └── types.ts    # TypeScript-Definitionen
     ├── hooks/              # Gemeinsam genutzte React-Hooks
     ├── lib/                # Kernfunktionen, Validierung und Wrapper
     ├── providers/          # Globale React-Context-Provider
-    └── repositories/       # Datenzugriffsschicht (Repositories)
+    ├── repositories/       # Datenzugriffsschicht (Repositories)
+    ├── i18n.ts             # Internationalisierungs-Setup
+    ├── proxy.ts            # Proxy-Konfiguration
+    └── types.ts            # Globale TypeScript-Definitionen
 ```
 
 ---
 
 ## Entwicklungs-Workflow
 
-> [!WARNING]
-> Da sich das Projekt in der Initialisierungsphase befindet, ist der vollständige Entwicklungs-Workflow noch nicht verfügbar.
+> [!NOTE]
+> Die grundlegende Entwicklungsumgebung wurde etabliert. Mit zentralen Bun-Skripten lassen sich Datenbank-Migrationen, Typprüfungen, Formatierungen sowie der Next.js-Entwicklungsserver im Verbund mit dem lokalen Docker-Netzwerk nahtlos ausführen.
 
 Die aktuellen Next.js- und Bun-Skripte in der `package.json` unterstützen bereits unter anderem folgende Operationen:
 
@@ -144,14 +155,19 @@ Die aktuellen Next.js- und Bun-Skripte in der `package.json` unterstützen berei
 
 ### Nützliche Befehle
 
-| **Befehl**               | **Beschreibung**                                                   |
-| ------------------------ | ------------------------------------------------------------------ |
-| `bun run dev`            | Startet Docker-Dienste und führt danach `next dev --turbopack` aus |
-| `bun run build`          | Baut die Anwendung für die Produktionsumgebung                     |
-| `bun run db:generate`    | Generiert Drizzle SQL-Migrationen basierend auf Schema-Änderungen  |
-| `bun run db:migrate:dev` | Wendet ausstehende Datenbankmigrationen an                         |
-| `bun run typecheck`      | Führt die TypeScript-Typprüfung im gesamten Projekt aus            |
-| `bun run verify`         | Führt Linting, Typecheck und Format-Checks aus                     |
+| **Befehl**            | **Beschreibung**                                                   |
+| --------------------- | ------------------------------------------------------------------ |
+| `bun run dev`         | Startet Docker-Dienste und führt danach `next dev --turbopack` aus |
+| `bun run build`       | Baut die Anwendung für die Produktionsumgebung                     |
+| `bun run db:generate` | Generiert Drizzle SQL-Migrationen basierend auf Schema-Änderungen  |
+| `bun run db:migrate`  | Wendet ausstehende Datenbankmigrationen an                         |
+| `bun run db:push`     | Sendet Schema-Änderungen direkt an die Datenbank                   |
+| `bun run db:studio`   | Öffnet Drizzle Studio zur Inspektion der Datenbank                 |
+| `bun run db:reset`    | Setzt die Datenbank zurück und führt Seed-Skripte aus              |
+| `bun run typecheck`   | Führt die TypeScript-Typprüfung im gesamten Projekt aus            |
+| `bun run verify`      | Führt Linting, Typecheck und Format-Checks aus                     |
+| `bun run docker:up`   | Startet die benötigten Docker-Container                            |
+| `bun run docker:stop` | Stoppt die Docker-Container                                        |
 
 ---
 

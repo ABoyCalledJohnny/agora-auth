@@ -1,37 +1,52 @@
-import { timingSafeEqual } from "node:crypto";
+/**
+ * Cryptography Utility Functions:
+ *
+ * - `hashPassword`: Secure password hashing using Bun's native optimized Argon2id implementation.
+ * - `verifyPassword`: Verifies a plain text password against an Argon2id hash.
+ * - `hashToken`: Fast, deterministic SHA-256 hashing for high-entropy secrets like API keys and verification tokens.
+ * - `verifyToken`: Verifies a plaintext token against its SHA-256 hash using a constant-time comparison.
+ */
+
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+
+import * as argon2 from "argon2";
+
+import { TOKEN_BYTE_LENGTH } from "@/src/config/constants.ts";
 
 /**
- * Secure password hashing using Bun's native optimized Argon2id implementation.
+ * Secure password hashing using Argon2id implementation.
  * Argon2id is the current industry recommended algorithm for password hashing.
- *
- * @see https://bun.sh/docs/api/hashing#bun-password
  */
 export async function hashPassword(password: string): Promise<string> {
-  // Bun.password.hash automatically generates a salt and returns
+  // argon2.hash automatically generates a salt and returns
   // the fully formatted $argon2id$... string.
-  return await Bun.password.hash(password);
+  return await argon2.hash(password);
 }
 
 /**
  * Verify a plain text password against an Argon2id hash.
  *
  * @param password The plain text password to verify
- * @param hash The Argon2id hash stored in the database
+ * @param hash The Argon2id hash stored in the database, 32 bytes -> 43 characters
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return await Bun.password.verify(password, hash);
+  return await argon2.verify(hash, password);
+}
+
+export function createToken(bytes: number = TOKEN_BYTE_LENGTH): string {
+  return randomBytes(bytes).toString("base64url");
 }
 
 /**
- * Fast, deterministic hashing for high-entropy secrets like API keys.
+ * Fast, deterministic hashing for high-entropy secrets like API keys or verification tokens.
  * Uses SHA-256. Do NOT use this for user passwords.
  */
-export function hashApiKey(key: string): string {
-  return new Bun.CryptoHasher("sha256").update(key).digest("hex");
+export function hashToken(key: string): string {
+  return createHash("sha256").update(key).digest("hex");
 }
 
 /**
- * Verify a plaintext API key against its SHA-256 hash securely.
+ * Verify a plaintext high-entropy string against its SHA-256 hash securely.
  *
  * Why not use `===`?
  * Standard string comparison (`===`) stops at the first mismatched character.
@@ -39,8 +54,8 @@ export function hashApiKey(key: string): string {
  * guess the hash character by character (a "timing attack").
  * This function uses a constant-time comparison to prevent that.
  */
-export function verifyApiKey(plainKey: string, hashedKey: string): boolean {
-  const plainHash = hashApiKey(plainKey);
+export function verifyToken(plainKey: string, hashedKey: string): boolean {
+  const plainHash = hashToken(plainKey);
 
   // Convert hex strings to byte arrays (Buffers).
   // timingSafeEqual requires binary data formats, not standard JS strings.

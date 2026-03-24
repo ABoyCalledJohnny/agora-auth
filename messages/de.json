@@ -69,7 +69,8 @@
       "submitting": "Anmeldung läuft…",
       "forgotPassword": "Passwort vergessen?",
       "noAccount": "Noch kein Konto?",
-      "noAccountLink": "Registrieren"
+      "noAccountLink": "Registrieren",
+      "success": "Anmeldung erfolgreich."
     },
     "Register": {
       "heading": "Konto erstellen",
@@ -85,7 +86,8 @@
       "submit": "Konto erstellen",
       "submitting": "Konto wird erstellt…",
       "hasAccount": "Bereits ein Konto?",
-      "hasAccountLink": "Anmelden"
+      "hasAccountLink": "Anmelden",
+      "success": "Benutzer erfolgreich registriert."
     },
     "ForgotPassword": {
       "heading": "Passwort vergessen?",
@@ -112,11 +114,12 @@
       "description": "Wir haben einen Bestätigungslink an {email} gesendet.",
       "resend": "Bestätigungs-E-Mail erneut senden",
       "resending": "Wird erneut gesendet…",
-      "resendSuccess": "Bestätigungs-E-Mail wurde erneut gesendet.",
-      "verified": "Deine E-Mail-Adresse wurde bestätigt."
+      "resendSuccess": "Wenn die E-Mail-Adresse registriert und unbestätigt ist, wurde ein neuer Link gesendet.",
+      "verified": "E-Mail erfolgreich verifiziert. Du kannst dich nun anmelden."
     },
     "logout": "Abmelden",
-    "logoutSuccess": "Du wurdest abgemeldet."
+    "logoutSuccess": "Du wurdest abgemeldet.",
+    "refreshSuccess": "Token erfolgreich aktualisiert."
   },
   "User": {
     "Profile": {

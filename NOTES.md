@@ -730,19 +730,19 @@ See `./messages/{language}.json`
 
 #### Schedule
 
-| Task                                      | Est. | Dates         | Notes                                                                                         |
-| :---------------------------------------- | :--- | :------------ | :-------------------------------------------------------------------------------------------- |
-| **1. Preparation and Planning**           | Pre  | before 16/03  | Completed before development starts.                                                          |
-| **2. Setup**                              | Pre  | before 16/03  | Mostly pre-development. 2.3 (Project Identity) spills into Day 1.                             |
-| **3.1 Infrastructure & Core Setup**       | ~4   | 16/03 - 20/03 | Validation, DB, repos, wrappers.                                                              |
-| **3.2 Auth - Backend**<br>**5. API Docs** | ~4.5 | 20/03 - 27/03 | 6 services, 9 dual-channel endpoints, `auth.ts`, `proxy.ts`. <br>Final `api.md`               |
-| **6. Deploy**<br>**External connection**  | ~1.5 | 27/03 - 31/03 | Docker, Pipeline, DNS, client and seeding<br>External client hookup.                          |
-| **3.1 Frontend Shell**                    | ~1.5 | 31/03 - 02/04 | Root layout, landing page, header/footer, nav, error pages, UI primitives.                    |
-| **3.2 User Mgmt - Backend**               | ~1   | 02/04 - 07/04 | Minimal UserService + DTOs for Admin Dashboard only. Easter break (03-06/04) in between.      |
-| **3.2 Auth - Frontend**                   | ~1.5 | 07/04 - 09/04 | Minimal forms, SessionProvider, nav update, hooks.                                            |
-| **3.2 Admin Dashboard**                   | ~2   | 09/04 - 12/04 | 3 endpoints, AdminUserTable (primitives from 3.1, plus extra time for a rich UI).             |
-| **6. CI/CD + 5. Docs + Presentation**     | ~1   | 12/04 - 13/04 | Pipeline, env vars, README, presentation prep.                                                |
-| _Buffer_                                  | ~2.5 | 13/04 - 15/04 | Overflow, bug fixes. **Finish User Mgmt backend, then profile + settings UI if time allows.** |
+| Task                                               | Est. | Dates         | Notes                                                                                         |
+| :------------------------------------------------- | :--- | :------------ | :-------------------------------------------------------------------------------------------- |
+| **1. Preparation and Planning** ✅                 | Pre  | before 16/03  | Completed before development starts.                                                          |
+| **2. Setup** ✅                                    | Pre  | before 16/03  | Mostly pre-development. 2.3 (Project Identity) spills into Day 1.                             |
+| **3.1 Infrastructure & Core Setup** ✅             | ~3.5 | 16/03 - 20/03 | Validation, DB, repos, `api-wrapper.ts`.                                                      |
+| **3.2 Auth - Backend**<br>**5. API Docs**          | ~3   | 20/03 - 25/03 | 5 services, API endpoints, `auth.ts`. <br>Final `api.md`                                      |
+| **6. Deploy**<br>**External connection**           | ~1.5 | 25/03 - 27/03 | Docker, Pipeline, DNS, client and seeding<br>External client hookup.                          |
+| **3.1 Frontend Shell**                             | ~1.5 | 27/03 - 31/03 | Root layout, landing page, header/footer, nav, error pages, UI primitives.                    |
+| **3.1 & 3.2: Misc**<br>**3.2 User Mgmt - Backend** | ~3   | 31/03 - 07/04 | `action-wrapper`, `proxy`, `Notification`, Minimal User. Easter break (03-06/04).             |
+| **3.2 Auth - Frontend**                            | ~1.5 | 07/04 - 09/04 | Minimal forms, SessionProvider, nav update, form, hooks.                                      |
+| **3.2 Admin Dashboard**                            | ~2   | 09/04 - 12/04 | 3 endpoints, AdminUserTable (primitives from 3.1, plus extra time for a rich UI).             |
+| **6. CI/CD + 5. Docs + Presentation**              | ~1   | 12/04 - 13/04 | Pipeline, env vars, README, presentation prep.                                                |
+| _Buffer_                                           | ~2.5 | 13/04 - 15/04 | Overflow, bug fixes. **Finish User Mgmt backend, then profile + settings UI if time allows.** |
 
 ---
 
@@ -820,12 +820,14 @@ See `./messages/{language}.json`
 
 **Admin**
 
+- **AdminService:** Create an `AdminService` to handle high-level global configurations, cross-cutting system actions, and administrative user management.
 - **Admin Dashboard:** Overview/landing page with key metrics (total users, recent registrations, active sessions).
 - **Admin User Table Enhancements:** Extend the MVP table with advanced filtering, sorting, search, and bulk actions.
 - **Admin User Detail View:** Detailed account view for a specific user (`GET /api/admin/users/:id`).
 - **Admin User Creation:** Manually create new users (e.g., staff accounts) (`POST /api/admin/users`).
 - **Admin User Editing:** Edit another user's details (`PATCH /api/admin/users/:id`).
 - **API Client Management:** UI form to register and manage additional API clients (beyond the default `agora_web_default` in config).
+- **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
 
 ## 5. Documentation
 

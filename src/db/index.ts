@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+
 import { appConfig } from "../config/index.ts";
 import * as schema from "./schema/index.ts";
 

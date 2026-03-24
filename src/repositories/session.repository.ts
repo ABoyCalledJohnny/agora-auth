@@ -20,8 +20,8 @@ export const DrizzleSessionRepository: SessionRepository = {
 
       if (!session) throw new AgoraError("INTERNAL", "Failed to create session.");
       return session;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while creating the session.");
     }
   },
@@ -82,8 +82,8 @@ export const DrizzleSessionRepository: SessionRepository = {
 
       if (!updatedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
       return updatedSession;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while updating the session.");
     }
   },
@@ -101,8 +101,8 @@ export const DrizzleSessionRepository: SessionRepository = {
 
       if (!revokedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
       return revokedSession;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while revoking the session.");
     }
   },
@@ -116,8 +116,8 @@ export const DrizzleSessionRepository: SessionRepository = {
         .returning();
 
       return revokedSessions; // Note: Drizzle always returns an array here, empty if no updates occurred
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while revoking user sessions.");
     }
   },
@@ -131,8 +131,8 @@ export const DrizzleSessionRepository: SessionRepository = {
 
       if (!deletedSession) throw new AgoraError("NOT_FOUND", "Session not found.");
       return deletedSession;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while deleting the session.");
     }
   },
@@ -143,8 +143,8 @@ export const DrizzleSessionRepository: SessionRepository = {
       const expiredSessions = await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date())).returning();
 
       return expiredSessions;
-    } catch (e) {
-      if (e instanceof AgoraError) throw e;
+    } catch (error) {
+      if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while deleting expired sessions.");
     }
   },
