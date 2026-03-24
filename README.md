@@ -2,7 +2,7 @@
 
 > [!WARNING]
 > **Active Development**
-> The **initial infrastructure setup** (database, ORM, Docker pipelines, API/Action wrappers) is complete. The project is currently in the **active feature development phase**, focusing on Authentication services.
+> The **core authentication logic** (API routes, server actions, Zod schemas, database models, and strict type-safe wrappers) is heavily implemented. The project is currently focusing on frontend UI completion and hooking up external notification services.
 
 A robust, secure, and modern authentication and user management system built with Next.js, Drizzle ORM, and PostgreSQL.
 
@@ -63,7 +63,7 @@ It aims to provide a solid foundation for user registration, login, profile mana
 ## Getting Started (WIP)
 
 > [!WARNING]
-> **Project Status:** While the core infrastructure (database, Next.js setups, type-safety wrappers) is fully set up, features are under active implementation. Many user/admin flows are currently incomplete.
+> **Project Status:** While the core authentication endpoints (Login, Register, Refresh, Verify, Reset) are functional, frontend UI integrations, admin flows, and email notifications are still under active implementation.
 
 Minimum local setup currently used in this repository:
 
@@ -116,6 +116,7 @@ The project follows a feature-driven, modular structure built on top of Next.js 
 ├── docs/                   # API documentation and drafts
 ├── drizzle/                # Database migrations output
 ├── messages/               # Internationalisation (i18n) translation files
+├── public/                 # Static assets (robots.txt, etc.)
 └── src/                    # Application source code
     ├── app/                # Next.js App Router layout, pages, and API routes
     ├── components/         # Shared UI components (layout, forms, tables)
@@ -123,10 +124,20 @@ The project follows a feature-driven, modular structure built on top of Next.js 
     ├── db/                 # Database connection, schemas, and seeding scripts
     ├── features/           # Feature-driven logic (auth, user, admin)
     │   └── [feature]/      # Each feature contains boundaries (contracts, docs, services, UI)
+    │       ├── actions/    # Next.js Server Actions
+    │       ├── components/ # Feature-specific UI components
+    │       ├── hooks/      # Feature-specific React hooks
+    │       ├── services/   # Business logic and external calls
+    │       ├── contracts.ts# Zod validation schemas and DTOs
+    │       ├── index.ts    # Public exports for the feature
+    │       └── types.ts    # TypeScript definitions
     ├── hooks/              # Shared React hooks
     ├── lib/                # Core utilities, validation, and wrappers
     ├── providers/          # Global React context providers
-    └── repositories/       # Database data access layer
+    ├── repositories/       # Database data access layer
+    ├── i18n.ts             # Internationalisation setup
+    ├── proxy.ts            # Proxy configuration
+    └── types.ts            # Global TypeScript definitions
 ```
 
 ---
@@ -144,14 +155,19 @@ Current Next.js and Bun scripts in `package.json` already support operations suc
 
 ### Useful Commands
 
-| **Command**              | **Description**                                             |
-| ------------------------ | ----------------------------------------------------------- |
-| `bun run dev`            | Starts Docker services and then runs `next dev --turbopack` |
-| `bun run build`          | Builds the application for production                       |
-| `bun run db:generate`    | Generates Drizzle SQL migrations based on schema changes    |
-| `bun run db:migrate:dev` | Applies pending database migrations                         |
-| `bun run typecheck`      | Runs TypeScript type checking across the project            |
-| `bun run verify`         | Runs lint, typecheck, and format checks                     |
+| **Command**           | **Description**                                             |
+| --------------------- | ----------------------------------------------------------- |
+| `bun run dev`         | Starts Docker services and then runs `next dev --turbopack` |
+| `bun run build`       | Builds the application for production                       |
+| `bun run db:generate` | Generates Drizzle SQL migrations based on schema changes    |
+| `bun run db:migrate`  | Applies pending database migrations                         |
+| `bun run db:push`     | Pushes database schema changes directly                     |
+| `bun run db:studio`   | Opens Drizzle Studio to inspect the database                |
+| `bun run db:reset`    | Resets the database, pushes schema, and seeds data          |
+| `bun run typecheck`   | Runs TypeScript type checking across the project            |
+| `bun run verify`      | Runs lint, typecheck, and format checks                     |
+| `bun run docker:up`   | Starts the necessary Docker containers                      |
+| `bun run docker:stop` | Stops the Docker containers                                 |
 
 ---
 

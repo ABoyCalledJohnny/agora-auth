@@ -479,7 +479,7 @@ Request body (draft):
 ```json
 {
 	"token": "string",
-	"newPassword": "string"
+	"password": "string"
 }
 ```
 
@@ -487,21 +487,8 @@ Example request body:
 
 ```json
 {
-	"token": "TOKEN_FROM_EMAIL",
-	"newPassword": "AnotherStrongPassword123!"
-}
-```
-
-Success:
-
-- `200 OK` password updated
-
-Example success body:
-
-```json
-{
-	"success": true,
-	"message": "Password updated successfully.",
+        "token": "TOKEN_FROM_EMAIL",
+        "password": "AnotherStrongPassword123!"
 	"data": null
 }
 ```
@@ -613,17 +600,7 @@ const resetRes = await fetch("http://localhost:3000/api/auth/reset-password/conf
 	},
 	body: JSON.stringify({
 		token: "TOKEN_FROM_EMAIL",
-		newPassword: "AnotherStrongPassword123!",
-	}),
-});
-
-const resetData = await resetRes.json();
-console.log(resetData);
-```
-
-### Refresh
-
-```ts
+                password: "AnotherStrongPassword123!",
 const refreshRes = await fetch("http://localhost:3000/api/auth/refresh", {
 	method: "POST",
 	headers: {

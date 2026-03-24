@@ -471,21 +471,16 @@ Request-Body (Entwurf):
 ```json
 {
 	"token": "string",
-	"newPassword": "string"
+	"password": "string"
 }
 ```
 
 Beispiel Request-Body:
 
-```json
+````json
 {
-	"token": "TOKEN_FROM_EMAIL",
-	"newPassword": "AnotherStrongPassword123!"
-}
-```
-
-Erfolg:
-
+        "token": "TOKEN_FROM_EMAIL",
+        "password": "AnotherStrongPassword123!"
 - `200 OK` Passwort aktualisiert
 
 Beispiel Success-Body:
@@ -496,7 +491,7 @@ Beispiel Success-Body:
 	"message": "Password updated successfully.",
 	"data": null
 }
-```
+````
 
 Fehler:
 
@@ -605,17 +600,7 @@ const resetRes = await fetch("http://localhost:3000/api/auth/reset-password/conf
 	},
 	body: JSON.stringify({
 		token: "TOKEN_FROM_EMAIL",
-		newPassword: "AnotherStrongPassword123!",
-	}),
-});
-
-const resetData = await resetRes.json();
-console.log(resetData);
-```
-
-### Refresh
-
-```ts
+                password: "AnotherStrongPassword123!",
 const refreshRes = await fetch("http://localhost:3000/api/auth/refresh", {
 	method: "POST",
 	headers: {
