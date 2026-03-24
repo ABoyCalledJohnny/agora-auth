@@ -1,5 +1,4 @@
 import type { VerificationTokenType } from "@/src/config/constants.ts";
-import type { VerificationTokenType } from "@/src/config/constants.ts";
 import type {
   ApiClient,
   NewApiClient,
