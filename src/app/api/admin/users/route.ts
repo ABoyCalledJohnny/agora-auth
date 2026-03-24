@@ -1,6 +1,6 @@
-import { notImplementedResponse } from "@/src/app/api/_utils/not-implemented.ts";
 import { withApiHandler } from "@/src/lib/api-wrapper.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
 
-export const GET = withApiHandler({ auth: true, roles: ["admin"] }, async () =>
-  notImplementedResponse("GET /api/admin/users"),
-);
+export const GET = withApiHandler({ auth: true, roles: ["admin"] }, async () => {
+  throw new AgoraError("NOT_IMPLEMENTED");
+});

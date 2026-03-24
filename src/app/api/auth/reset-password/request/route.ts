@@ -1,4 +1,6 @@
-import { notImplementedResponse } from "@/src/app/api/_utils/not-implemented.ts";
 import { withApiHandler } from "@/src/lib/api-wrapper.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
 
-export const POST = withApiHandler({}, async () => notImplementedResponse("POST /api/auth/reset-password/request"));
+export const POST = withApiHandler({}, async () => {
+  throw new AgoraError("NOT_IMPLEMENTED");
+});

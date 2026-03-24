@@ -1,4 +1,6 @@
-import { notImplementedResponse } from "@/src/app/api/_utils/not-implemented.ts";
 import { withApiHandler } from "@/src/lib/api-wrapper.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
 
-export const PATCH = withApiHandler({ auth: true }, async () => notImplementedResponse("PATCH /api/user/username"));
+export const PATCH = withApiHandler({ auth: true }, async () => {
+  throw new AgoraError("NOT_IMPLEMENTED");
+});

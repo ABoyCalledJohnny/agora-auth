@@ -47,6 +47,7 @@ export const AuthService = {
 
       // 4. If email verification is required: Create a verification token via `VerificationTokenService.create()`.
       if (!client.skipEmailVerification) {
+        throw new AgoraError("NOT_IMPLEMENTED");
         // const verificationToken = await VerificationTokenService.create({userId: newUser.id, type: 'email_verification'});
       }
 
