@@ -50,7 +50,7 @@ jobs:
         run: bun run format:check
 
       - name: 🧹 Run Linting
-        run: bun run lint
+        run: bun run lint:check
 
       - name: 🏷️ Type Check
         run: bun run typecheck

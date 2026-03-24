@@ -89,6 +89,7 @@ async function seedDefaultClient() {
     clientId: appConfig.clients.defaultClientId,
     apiKeyHash: hashToken(appConfig.bootstrap.defaultClientSecret),
     baseUrl: appConfig.app.url,
+    skipEmailVerification: true,
     verifyEmailPath: appConfig.clients.defaultVerifyEmailPath,
     resetPasswordPath: appConfig.clients.defaultResetPasswordPath,
   });
