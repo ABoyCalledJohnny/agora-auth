@@ -1,4 +1,4 @@
-import { like } from "drizzle-orm";
+import { eq, like } from "drizzle-orm";
 import { firstNames, lastNames, seed } from "drizzle-seed";
 
 import { USER_STATUS } from "../config/constants.ts";
@@ -200,12 +200,44 @@ async function seedDevData(): Promise<void> {
         location: funcs.city(),
         pronouns: funcs.valuesFromArray({ values: ["he/him", "she/her", "they/them"] }),
         websiteUrl: funcs.default({ defaultValue: null }),
-        avatarUrl: funcs.default({ defaultValue: null }),
+        avatarUrl: funcs.valuesFromArray({
+          values: seedUsers.map((user) => `https://api.dicebear.com/9.x/avataaars/svg?seed=${user.username}`),
+        }),
+        hobbies: funcs.valuesFromArray({
+          values: [
+            ["Reading", "Traveling"] as unknown as string,
+            ["Coding", "Gaming"] as unknown as string,
+            ["Photography", "Cooking"] as unknown as string,
+            ["Music", "Running"] as unknown as string,
+            ["Writing", "Hiking"] as unknown as string,
+            ["Painting", "Cycling"] as unknown as string,
+            ["Yoga", "Meditation"] as unknown as string,
+            ["Gardening", "Baking"] as unknown as string,
+            ["Dancing", "Singing"] as unknown as string,
+            ["Swimming", "Dancing"] as unknown as string,
+          ],
+        }),
       },
     },
   }));
 
-  console.log(`Development seed data inserted (${SEED_COUNT} users with realistic profiles/settings).`);
+  // Assign "user" role to seeded users
+  const [userRole] = await db.select().from(schema.roles).where(eq(schema.roles.name, "user"));
+  if (userRole) {
+    const seededUsers = await db
+      .select()
+      .from(schema.users)
+      .where(like(schema.users.email, `%@${SEED_EMAIL_DOMAIN}`));
+    const userRoleInserts = seededUsers.map((user) => ({
+      userId: user.id,
+      roleId: userRole.id,
+    }));
+    if (userRoleInserts.length > 0) {
+      await db.insert(schema.usersRoles).values(userRoleInserts).onConflictDoNothing();
+    }
+  }
+
+  console.log(`Development seed data inserted (${SEED_COUNT} users with realistic profiles/settings and "user" role).`);
 }
 
 async function main(): Promise<void> {
