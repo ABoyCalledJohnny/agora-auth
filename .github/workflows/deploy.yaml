@@ -167,7 +167,6 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           APP_DB_USER: ${{ secrets.APP_DB_USER }}
           APP_DB_PASSWORD: ${{ secrets.APP_DB_PASSWORD }}
           JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
@@ -176,12 +175,17 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          INITIAL_ADMIN_EMAIL: ${{ secrets.INITIAL_ADMIN_EMAIL }}
+          INITIAL_ADMIN_USERNAME: ${{ secrets.INITIAL_ADMIN_USERNAME }}
+          INITIAL_ADMIN_PASSWORD: ${{ secrets.INITIAL_ADMIN_PASSWORD }}
+          DEFAULT_CLIENT_ID: ${{ secrets.DEFAULT_CLIENT_ID }}
+          DEFAULT_CLIENT_SECRET: ${{ secrets.DEFAULT_CLIENT_SECRET }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: PROJECT_PATH,REGISTRY,TAG,APP_IMAGE_NAME,MIGRATOR_IMAGE_NAME,POSTGRES_USER,POSTGRES_PASSWORD,AUTH_SECRET,POSTGRES_DB,APP_DB_USER,APP_DB_PASSWORD,JWT_PRIVATE_KEY,JWT_PUBLIC_KEY,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD
+          envs: PROJECT_PATH,REGISTRY,TAG,APP_IMAGE_NAME,MIGRATOR_IMAGE_NAME,POSTGRES_USER,POSTGRES_PASSWORD,AUTH_SECRET,APP_DB_USER,APP_DB_PASSWORD,JWT_PRIVATE_KEY,JWT_PUBLIC_KEY,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD,INITIAL_ADMIN_EMAIL,INITIAL_ADMIN_USERNAME,INITIAL_ADMIN_PASSWORD,DEFAULT_CLIENT_ID,DEFAULT_CLIENT_SECRET
           script: |
             set -euo pipefail
 
@@ -200,7 +204,6 @@ jobs:
             # postgres service
             echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.postgres
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.postgres
-            echo "POSTGRES_DB=$POSTGRES_DB" >> .env.secrets.production.postgres
 
             # app service
             echo "APP_DB_USER=$APP_DB_USER" > .env.secrets.production.app
@@ -212,11 +215,15 @@ jobs:
             echo "SMTP_USER=$SMTP_USER" >> .env.secrets.production.app
             echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env.secrets.production.app
             echo "AUTH_SECRET=$AUTH_SECRET" >> .env.secrets.production.app
+            echo "INITIAL_ADMIN_EMAIL=$INITIAL_ADMIN_EMAIL" >> .env.secrets.production.app
+            echo "INITIAL_ADMIN_USERNAME=$INITIAL_ADMIN_USERNAME" >> .env.secrets.production.app
+            echo "INITIAL_ADMIN_PASSWORD=$INITIAL_ADMIN_PASSWORD" >> .env.secrets.production.app
+            echo "DEFAULT_CLIENT_ID=$DEFAULT_CLIENT_ID" >> .env.secrets.production.app
+            echo "DEFAULT_CLIENT_SECRET=$DEFAULT_CLIENT_SECRET" >> .env.secrets.production.app
 
             # migrator service
             echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.migrator
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.migrator
-            echo "POSTGRES_DB=$POSTGRES_DB" >> .env.secrets.production.migrator
 
             # 2. Network Setup
             docker network inspect caddy_net >/dev/null 2>&1 || docker network create caddy_net

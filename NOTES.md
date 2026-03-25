@@ -314,7 +314,7 @@ Implement a unified `AgoraError` class driven by a fixed union of `ErrorCode` ty
 > - This project only uses `development` and `production` environments. There are no dedicated test or staging environments - the staging/test columns below are included for reference and completeness only.
 > - This list serves as a comprehensive reference guide for the underlying boilerplate. Not all environment variables listed in these tables (e.g., `RATE_LIMIT_*`, `UPLOAD_DIR`, `MAX_UPLOAD_SIZE`) are actively used or strictly required by the current project scope.
 
-###### Secrets - Secret Manager (Bitwarden etc. / CI/CD)
+###### Env Vars / Files and Secrets - Secret Manager (Bitwarden etc. / CI/CD)
 
 All values in this table are **never committed** to version control. They are stored in the project's secret manager entry and injected by the CI/CD pipeline as runtime environment variables during deployment.
 
@@ -339,11 +339,12 @@ All values in this table are **never committed** to version control. They are st
 | `PROD_INITIAL_ADMIN_EMAIL`       | `INITIAL_ADMIN_EMAIL`    |  prod   | Email for the initial admin account                     |
 | `PROD_INITIAL_ADMIN_USERNAME`    | `INITIAL_ADMIN_USERNAME` |  prod   | Username for the initial admin account                  |
 | `PROD_INITIAL_ADMIN_PASSWORD`    | `INITIAL_ADMIN_PASSWORD` |  prod   | Password for the initial admin account                  |
-|                                  |                          |  prod   | Default System Client ID                                |
-|                                  |                          |  prod   | Raw API Key for the default system client               |
+| `PROD_DEFAULT_CLIENT_ID`         | `DEFAULT_CLIENT_ID`      |  prod   | Default System Client ID                                |
+| `PROD_DEFAULT_CLIENT_SECRET`     | `DEFAULT_CLIENT_SECRET`  |  prod   | Raw API Key for the default system client               |
 | `STAGING_INITIAL_ADMIN_EMAIL`    | `INITIAL_ADMIN_EMAIL`    | staging | Email for the initial admin account (staging)           |
 | `STAGING_INITIAL_ADMIN_USERNAME` | `INITIAL_ADMIN_USERNAME` | staging | Username for the initial admin account (staging)        |
 | `STAGING_INITIAL_ADMIN_PASSWORD` | `INITIAL_ADMIN_PASSWORD` | staging | Password for the initial admin account (staging)        |
+| `STAGING_DEFAULT_CLIENT_ID`      | `DEFAULT_CLIENT_ID`      | staging | Default System Client ID (staging)                      |
 | `STAGING_DEFAULT_CLIENT_SECRET`  | `DEFAULT_CLIENT_SECRET`  | staging | Raw API Key for the default system client (staging)     |
 | **Email (SMTP)**                 |                          |         |                                                         |
 | `PROD_SMTP_HOST`                 | `SMTP_HOST`              |  prod   | SMTP server hostname                                    |
@@ -354,9 +355,13 @@ All values in this table are **never committed** to version control. They are st
 | `STAGING_SMTP_PORT`              | `SMTP_PORT`              | staging | SMTP server port                                        |
 | `STAGING_SMTP_USER`              | `SMTP_USER`              | staging | SMTP authentication username                            |
 | `STAGING_SMTP_PASSWORD`          | `SMTP_PASSWORD`          | staging | SMTP authentication password                            |
-| **Infrastructure**               |                          |         |                                                         |
+| **Infrastructure (CI/CD)**       |                          |         |                                                         |
 | `PROD_CRON_SECRET`               | `CRON_SECRET`            |  prod   | Bearer token for cron / webhook endpoints               |
 | `STAGING_CRON_SECRET`            | `CRON_SECRET`            | staging | Bearer token for cron / webhook endpoints               |
+| `VPS_SSH_KEY`                    | `VPS_SSH_KEY`            |   all   | Private SSH key for CD pipeline to access VPS           |
+| `VPS_HOST`                       | `VPS_HOST`               |   all   | IP/Hostname of the VPS server                           |
+| `VPS_USER`                       | `VPS_USER`               |   all   | SSH Username for VPS deployments                        |
+| `VPS_PORT`                       | `VPS_PORT`               |   all   | SSH Port for VPS deployments                            |
 
 > [!NOTE]
 > **Details**
@@ -364,7 +369,7 @@ All values in this table are **never committed** to version control. They are st
 > - `POSTGRES_DB` is **not** a secret - it stays in the committed `.env.staging` / `.env.production` files alongside the other environments. The secret manager only holds credentials that grant access.
 > - The app and superuser credentials inject into their respective env var names (`APP_DB_USER` vs. `POSTGRES_USER`). `config/index.ts` uses the **app user** creds while `drizzle.config.ts` uses the **superuser** creds.
 > - `DATABASE_URL` is composed at runtime in `config/index.ts` - no env var needed.
-> - `CRON_SECRET` is a bearer token used when an external scheduler (cron daemon, GitHub Actions, etc.) calls your app's `/api/cron/*` endpoints to prove it is a trusted caller. Not needed in project.
+> - `CRON_SECRET` is a bearer token used when an external scheduler (cron daemon, GitHub Actions, etc.) calls your app's `/api/cron/*` endpoints to prove it is a trusted caller. Not actively utilized right now but kept for overview.
 > - `AUTH_SECRET` follows the standard Next.js Auth convention for cookie/session signing. It is distinct from `JWT_PRIVATE_KEY` which signs the stateless access JWTs. Not needed in project.
 > - **Bootstrapping Variables** (`INITIAL_ADMIN_*`, `DEFAULT_CLIENT_SECRET`) are only consumed once during initialization scripts, bypassing typical lifetime persistence, but should remain correctly set for infrastructure recovery.
 
