@@ -1,5 +1,8 @@
 # Agora Auth
 
+![Badge: Latest Release](https://img.shields.io/github/v/release/ABoyCalledJohnny/agora-auth)
+![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
+
 > [!WARNING]
 > **Active Development**
 > The **core authentication logic** (API routes, server actions, Zod schemas, database models, and strict type-safe wrappers) is heavily implemented. The project is currently focusing on frontend UI completion and hooking up external notification services.

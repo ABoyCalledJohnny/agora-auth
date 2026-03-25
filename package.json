@@ -37,6 +37,8 @@
     "docker:stop": "sudo docker compose --env-file .env --env-file .env.development --profile docker down",
     "docker:app:shell": "sudo docker compose exec app /bin/sh",
     "docker:db:shell": "sudo docker compose --env-file .env --env-file .env.development exec postgres sh -lc 'psql -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\"'",
+    "docker:db:logs": "sudo docker compose --env-file .env --env-file .env.development logs postgres",
+    "docker:db:logs:follow": "sudo docker compose --env-file .env --env-file .env.development logs -f postgres",
     "release": "release-it",
     "release:rc": "release-it --preRelease=rc",
     "cleanup": "rm -rf .next node_modules",

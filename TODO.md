@@ -168,8 +168,9 @@
         - [ ] **Error pages:** Implement `error.tsx`, `not-found.tsx`, `global-error.tsx`, `unauthorized.tsx`, `forbidden.tsx`.
         - [ ] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
-            - [ ] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`.
-            - [ ] General: `Button`, `Tabs`, `Alert`, `Pill`.
+            - [ ] Layout/Architecture: `Container`, `Card`, `Sheet` (for mobile menus).
+            - [ ] Form: `Form`, `Input`, `SearchInput`, `Select`, `Label`, `InputField`, `PasswordField`.
+            - [ ] General: `Button`, `Avatar`, `Modal`, `Tabs`, `Alert`, `Pill`.
             - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
 
@@ -284,20 +285,20 @@ _Out of scope for this project._
         - [ ] Build full `deploy.yaml` with CI and CD build needs (not activated yet) and remove `ci.yaml`.
         - [ ] Inject all required production environment variables into your repository's CI/CD secret manager .
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
+    - [ ] Bind the PostgreSQL container port to the VPS localhost in `compose.production.yaml` (for port tunnelling).
+    - [ ] Add the database superuser credentials to `.env.local` to override development environment variables.
 
 ##### DevOps and Deployment
 
 - **DNS and Domain Management**
-    - [ ] Configure DNS records (A/AAAA) to point your domain(s) to the production IP addresses.
-    - [ ] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
     - [ ] Integrate domain into Dogado mail hosting provider and add config data to `env.local`.
+        - [ ] Configure DNS records (A/AAAA) to point your domain(s) to the production IP addresses.
+        - [ ] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
 - **Production Server**
-    - [ ] Bind the PostgreSQL container port to the VPS localhost in `compose.production.yaml`.
-    - [ ] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -L 5433:127.0.0.1:5432 user@vps-ip`).
-    - [ ] Add the database superuser credentials to `.env.local` to override development environment variables.
-    - [ ] Run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
     - [ ] Clean old Docker infrastructure.
-    - [ ] Enable continuous deployment.
+        - [ ] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -L 5433:127.0.0.1:5432 user@vps-ip`).
+        - [ ] Run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
+        - [ ] Enable continuous deployment.
 - **Client Integration and Seeding**
     - [ ] Create client entry for classmate in db and share access data (`name`, `domain_name`, `verify_email_path`, `reset_password_path`. `client_id`, `api_key_hash`).
     - [ ] Add dummy users needed for project presentation.
