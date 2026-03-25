@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.3.0-rc.0...v0.3.0) (2026-03-25)
+
+### Documentation
+
+- **notes:** update schedule ([32191ae](https://github.com/ABoyCalledJohnny/agora-auth/commit/32191ae21350a59318c6fe9e948353a8631df9f9))
+- update MVP frontend scoping in documentation and badge ([d1f2453](https://github.com/ABoyCalledJohnny/agora-auth/commit/d1f245365353e14c180a84262374676945a3c8e6))
+
 ## [0.3.0-rc.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.2.0...v0.3.0-rc.0) (2026-03-24)
 
 ### Features
