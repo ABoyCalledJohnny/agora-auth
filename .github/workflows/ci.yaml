@@ -10,6 +10,8 @@ on:
 
 env:
   BUN_VERSION: "1.3.11"
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+  TAG: ${{ github.sha }}
   APP_DB_USER: "ci_app_user"
   APP_DB_PASSWORD: "ci_app_password"
   JWT_PRIVATE_KEY: "ci_dummy_private_key"
@@ -58,3 +60,23 @@ jobs:
       - name: 🏗️ Build Application
         # Verifies that Next.js can successfully compile the project
         run: bun run build
+
+      - name: 🔑 Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Build and Push Docker Images
+        run: |
+          # Ensure registry is lowercase as Docker strictly requires lowercase repository names
+          LOWERCASE_REGISTRY=$(echo "${{ env.REGISTRY }}" | tr '[:upper:]' '[:lower:]')
+
+          # Build & Push App
+          docker build -t $LOWERCASE_REGISTRY/agora-auth-app:${{ env.TAG }} -f docker/app/Dockerfile .
+          docker push $LOWERCASE_REGISTRY/agora-auth-app:${{ env.TAG }}
+
+          # Build & Push Migrator
+          docker build -t $LOWERCASE_REGISTRY/agora-auth-migrator:${{ env.TAG }} -f docker/migrator/Dockerfile .
+          docker push $LOWERCASE_REGISTRY/agora-auth-migrator:${{ env.TAG }}

@@ -3,20 +3,38 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - "**" # Runs on ALL branches on push
   pull_request:
     branches:
       - main
 
 env:
-  BUN_VERSION: '1.3.11'
+  BUN_VERSION: "1.3.11"
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+  TAG: ${{ github.sha }}
+  # Dummy variables needed strictly for Next.js build validation (until SKIP_ENV_VALIDATION covers all phases if used)
+  APP_DB_USER: "ci_app_user"
+  APP_DB_PASSWORD: "ci_app_password"
+  JWT_PRIVATE_KEY: "ci_dummy_private_key"
+  JWT_PUBLIC_KEY: "ci_dummy_public_key"
+  SMTP_HOST: "localhost"
+  SMTP_PORT: "1025"
+  SMTP_USER: "ci_dummy_smtp_user"
+  SMTP_PASSWORD: "ci_dummy_smtp_password"
+  AUTH_SECRET: "ci_dummy_auth_secret_must_be_32_chars_long"
+  INITIAL_ADMIN_EMAIL: "admin@localhost.com"
+  INITIAL_ADMIN_PASSWORD: "ci_dummy_admin_password"
+  INITIAL_ADMIN_USERNAME: "ci_dummy_admin_username"
+  DEFAULT_CLIENT_ID: "ci_dummy_client_id"
+  DEFAULT_CLIENT_SECRET: "ci_dummy_client_secret"
+  POSTGRES_DB: "ci_dummy_db"
 
 jobs:
   # ---------------------------------------------------------------------------
-  # JOB 1: BUILD (CI)
+  # JOB 1: VERIFY & BUILD (CI)
   # ---------------------------------------------------------------------------
   build:
-    name: 🏗️ Build Application
+    name: 🧪 Verify & Build
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
@@ -38,7 +56,7 @@ jobs:
         run: bun run format:check
 
       - name: 🧹 Run Linting
-        run: bun run lint
+        run: bun run lint:check
 
       - name: 🏷️ Type Check
         run: bun run typecheck
@@ -47,29 +65,36 @@ jobs:
         # Verifies that Next.js can successfully compile the project
         run: bun run build
 
-      # Prepare the artifact for deployment
+      - name: 🔑 Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Build and Push Docker Images
+        run: |
+          # Ensure registry is lowercase as Docker strictly requires lowercase repository names
+          LOWERCASE_REGISTRY=$(echo "${{ env.REGISTRY }}" | tr '[:upper:]' '[:lower:]')
+          
+          # Build & Push App
+          docker build -t $LOWERCASE_REGISTRY/agora-auth-app:${{ env.TAG }} -f docker/app/Dockerfile .
+          docker push $LOWERCASE_REGISTRY/agora-auth-app:${{ env.TAG }}
+          
+          # Build & Push Migrator
+          docker build -t $LOWERCASE_REGISTRY/agora-auth-migrator:${{ env.TAG }} -f docker/migrator/Dockerfile .
+          docker push $LOWERCASE_REGISTRY/agora-auth-migrator:${{ env.TAG }}
+
+      # Prepare the artifact for deployment (We only need compose files since code is inside Docker images)
       - name: 📦 Prepare Deployment Artifact
         run: |
           set -euo pipefail
-          mkdir -p deployment/app_build
+          mkdir -p deployment
           
           # Copy environment configs (so Rsync pushes them to the VPS)
-          # Note: We don't need to rename them to 'env.public' anymore since rsync handles dotfiles easily!
           cp .env deployment/.env
           cp .env.production deployment/.env.production
           
-          # Copy standalone build (server.js, node_modules, etc.)
-          cp -r .next/standalone/. deployment/app_build/
-          
-          # Copy public assets (required for standalone)
-          # Only copy if the directory exists and is not empty
-          if [ -d "public" ] && [ "$(ls -A public)" ]; then
-            cp -r public deployment/app_build/
-          fi
-          
-          # Copy static assets (required for standalone)
-          cp -r .next/static deployment/app_build/.next/
-
           # Copy Docker configuration
           cp -r docker deployment/
           cp compose.yaml deployment/
@@ -131,6 +156,8 @@ jobs:
       - name: 🚀 Start Services
         uses: appleboy/ssh-action@v1
         env:
+            REGISTRY: ${{ env.REGISTRY }}
+            TAG: ${{ env.TAG }}
             POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
             POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
             AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
@@ -148,9 +175,14 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: POSTGRES_USER,POSTGRES_PASSWORD,AUTH_SECRET,POSTGRES_DB,APP_DB_USER,APP_DB_PASSWORD,JWT_PRIVATE_KEY,JWT_PUBLIC_KEY,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD
+          envs: REGISTRY,TAG,POSTGRES_USER,POSTGRES_PASSWORD,AUTH_SECRET,POSTGRES_DB,APP_DB_USER,APP_DB_PASSWORD,JWT_PRIVATE_KEY,JWT_PUBLIC_KEY,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD
           script: |
             set -euo pipefail
+
+            # Ensure registry is lowercase as Docker strictly requires lowercase repository names
+            LOWERCASE_REGISTRY=$(echo "$REGISTRY" | tr '[:upper:]' '[:lower:]')
+            export IMAGE_REGISTRY=$LOWERCASE_REGISTRY
+            export IMAGE_TAG=$TAG
 
             cd /srv/webapps/mini-project
             
@@ -194,32 +226,6 @@ jobs:
             docker image prune -f
             # Too aggressive
             # docker system prune -f --volumes 
-
-
-
-# env:
-#   REGISTRY: ghcr.io/${{ github.repository_owner }}
-#   TAG: ${{ github.sha }}
-
-# jobs:
-#   build:
-#     steps:
-#       # Build App
-#       - run: docker build -t ${{ env.REGISTRY }}/agora-auth-app:${{ env.TAG }} -f docker/app/Dockerfile .
-#       - run: docker push ${{ env.REGISTRY }}/agora-auth-app:${{ env.TAG }}
-      
-#       # Build Migrator
-#       - run: docker build -t ${{ env.REGISTRY }}/agora-auth-migrator:${{ env.TAG }} -f docker/migrator/Dockerfile .
-#       - run: docker push ${{ env.REGISTRY }}/agora-auth-migrator:${{ env.TAG }}
-
-
-# # Pass the pipeline's dynamic SHA into the VPS's environment file
-# echo "IMAGE_TAG=${{ github.sha }}" >> .env.secrets.production.app
-# echo "IMAGE_REGISTRY=ghcr.io/${{ github.repository_owner }}" >> .env.secrets.production.app
-
-
-# - name: Compute image tag
-#   run: echo "IMAGE_TAG=v$(node -p "require('./package.json').version")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
 # =============================================================================
 # REFERENCE: Removed Production Commands (for manual VPS usage)
