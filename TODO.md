@@ -278,27 +278,29 @@ _Out of scope for this project._
 
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
-    - **Application Runtime (Docker Compose)**
+    - **Application Runtime (Docker and Compose)**
         - [ ] Finalise the production/staging `Dockerfile`s and `compose.{environment}.yaml` to configure necessary services, custom networks, and persistent volumes.
-    - **CI/CD Pipeline Setup**
-        - [ ] Create and link an artifact registry account (e.g., GitHub Container Registry - GHCR).
+        - [ ] Prepare for remote DB access via SSH tunnelling:
+            - Bind the PostgreSQL container port to the VPS localhost in `compose.production.yaml` (for port tunnelling).
+            - Add the database superuser credentials to `.env.local` to permanently override development environment variables (or set up a dedicated script/command to specify which DB to access).
+    - **CI/CD Pipeline**
         - [ ] Build full `deploy.yaml` with CI and CD build needs (not activated yet) and remove `ci.yaml`.
-        - [ ] Inject all required production environment variables into your repository's CI/CD secret manager .
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
-    - [ ] Bind the PostgreSQL container port to the VPS localhost in `compose.production.yaml` (for port tunnelling).
-    - [ ] Add the database superuser credentials to `.env.local` to override development environment variables.
 
 ##### DevOps and Deployment
 
 - **DNS and Domain Management**
     - [ ] Integrate domain into Dogado mail hosting provider and add config data to `env.local`.
-        - [ ] Configure DNS records (A/AAAA) to point your domain(s) to the production IP addresses.
-        - [ ] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
+    - [ ] Configure DNS records (A/AAAA) to point your domain(s) to the production IP addresses.
+    - [ ] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
+- **CI/CD Pipeline Setup**
+    - [ ] Create and link an artifact registry account (e.g., GitHub Container Registry - GHCR).
+    - [ ] Inject all required production environment variables into your repository's CI/CD secret manager.
 - **Production Server**
     - [ ] Clean old Docker infrastructure.
-        - [ ] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -L 5433:127.0.0.1:5432 user@vps-ip`).
-        - [ ] Run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
-        - [ ] Enable continuous deployment.
+    - [ ] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -L 5433:127.0.0.1:5432 user@vps-ip`).
+    - [ ] Run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
+    - [ ] Enable continuous deployment.
 - **Client Integration and Seeding**
     - [ ] Create client entry for classmate in db and share access data (`name`, `domain_name`, `verify_email_path`, `reset_password_path`. `client_id`, `api_key_hash`).
     - [ ] Add dummy users needed for project presentation.
