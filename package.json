@@ -17,7 +17,7 @@
     "update:deps": "bunx npm-check-updates --target minor -u",
     "dev": "bun run docker:up && next dev --turbopack",
     "dev:docker": "bun run docker:full:up",
-    "build": "next build",
+    "build": "SKIP_ENV_VALIDATION=1 next build",
     "lint": "eslint --fix",
     "lint:check": "eslint",
     "format": "prettier --write .",

@@ -27,4 +27,4 @@ COPY src/lib ./src/lib
 COPY src/db ./src/db
 
 # 3. Execute migrations and bootstrap scripts
-CMD ["sh", "-c", "bun run db:migrate:prod && bun run db:bootstrap:prod"]
+CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/db/bootstrap.ts"]

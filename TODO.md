@@ -285,9 +285,7 @@ _Out of scope for this project._
             - Add the database superuser credentials to `.env.local` to permanently override development environment variables (or set up a dedicated script/command to specify which DB to access).
     - **CI/CD Pipeline**
         - [ ] Build full `deploy.yaml` with CI and CD build needs (not activated yet) and remove `ci.yaml`.
-            - Package Visibility
             - Permissions
-            - Allow permissions on GitHub
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
 
 ##### DevOps and Deployment
@@ -298,6 +296,7 @@ _Out of scope for this project._
     - [x] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
 - **CI/CD Pipeline Setup**
     - [ ] Inject all required production environment variables into your repository's CI/CD secret manager.
+    - [x] Set read/write permissions for GitHub workflows in repository `Actions` settings.
 - **Production Server**
     - [x] Clean old Docker infrastructure.
     - [ ] Enable continuous deployment.

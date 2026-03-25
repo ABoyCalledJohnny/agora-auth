@@ -78,11 +78,11 @@ jobs:
         run: |
           # Ensure registry is lowercase as Docker strictly requires lowercase repository names
           LOWERCASE_REGISTRY=$(echo "${{ env.REGISTRY }}" | tr '[:upper:]' '[:lower:]')
-          
+
           # Build & Push App
           docker build -t $LOWERCASE_REGISTRY/${{ env.APP_IMAGE_NAME }}:${{ env.TAG }} -f docker/app/Dockerfile .
           docker push $LOWERCASE_REGISTRY/${{ env.APP_IMAGE_NAME }}:${{ env.TAG }}
-          
+
           # Build & Push Migrator
           docker build -t $LOWERCASE_REGISTRY/${{ env.MIGRATOR_IMAGE_NAME }}:${{ env.TAG }} -f docker/migrator/Dockerfile .
           docker push $LOWERCASE_REGISTRY/${{ env.MIGRATOR_IMAGE_NAME }}:${{ env.TAG }}
@@ -92,17 +92,17 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p deployment
-          
+
           # Copy environment configs (so Rsync pushes them to the VPS)
           cp .env deployment/.env
           cp .env.production deployment/.env.production
-          
+
           # Copy Docker configuration
           cp -r docker deployment/
           cp compose.yaml deployment/
           cp compose.production.yaml deployment/
           cp compose.caddy.yaml deployment/
-        
+
       - name: 📤 Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -140,10 +140,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          
+
           # Add VPS to known hosts to prevent interactive prompt
           ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
-          
+
           # 2. Rsync the deployment directory
           # --delete removes files on the VPS that no longer exist in our deployment/ folder
           # We explicitly exclude persistent folders like uploads/ so they aren't deleted remotely.
@@ -159,23 +159,23 @@ jobs:
       - name: 🚀 Start Services
         uses: appleboy/ssh-action@v1
         env:
-            PROJECT_PATH: ${{ env.PROJECT_PATH }}
-            REGISTRY: ${{ env.REGISTRY }}
-            TAG: ${{ env.TAG }}
-            APP_IMAGE_NAME: ${{ env.APP_IMAGE_NAME }}
-            MIGRATOR_IMAGE_NAME: ${{ env.MIGRATOR_IMAGE_NAME }}
-            POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-            POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-            AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-            POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-            APP_DB_USER: ${{ secrets.APP_DB_USER }}
-            APP_DB_PASSWORD: ${{ secrets.APP_DB_PASSWORD }}
-            JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
-            JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
-            SMTP_HOST: ${{ secrets.SMTP_HOST }}
-            SMTP_PORT: ${{ secrets.SMTP_PORT }}
-            SMTP_USER: ${{ secrets.SMTP_USER }}
-            SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          PROJECT_PATH: ${{ env.PROJECT_PATH }}
+          REGISTRY: ${{ env.REGISTRY }}
+          TAG: ${{ env.TAG }}
+          APP_IMAGE_NAME: ${{ env.APP_IMAGE_NAME }}
+          MIGRATOR_IMAGE_NAME: ${{ env.MIGRATOR_IMAGE_NAME }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          APP_DB_USER: ${{ secrets.APP_DB_USER }}
+          APP_DB_PASSWORD: ${{ secrets.APP_DB_PASSWORD }}
+          JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
+          JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
@@ -191,7 +191,7 @@ jobs:
             export IMAGE_TAG=$TAG
 
             cd $PROJECT_PATH
-            
+
             # Export environment variable names to docker compose
             export APP_IMAGE_NAME=$APP_IMAGE_NAME
             export MIGRATOR_IMAGE_NAME=$MIGRATOR_IMAGE_NAME
@@ -220,7 +220,7 @@ jobs:
 
             # 2. Network Setup
             docker network inspect caddy_net >/dev/null 2>&1 || docker network create caddy_net
-            
+
             # 3. START EVERYTHING IN ONE GO
             # Combining the files prevents "--remove-orphans" from killing Caddy.
             docker compose \
@@ -236,11 +236,11 @@ jobs:
               -f compose.yaml \
               -f compose.production.yaml \
               run --rm migrator
-            
+
             # 5. Reload Caddy to pick up config changes (Zero Downtime)
             # We explicitly tell Caddy to reload using the API to ensure the new config is applied.
             docker compose -f compose.caddy.yaml exec -w /etc/caddy caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
-            
+
             # Clean up old images but keep the last 7 days of images for emergency rollbacks
             docker image prune -a -f --filter "until=168h"
             # Too aggressive

@@ -34,7 +34,7 @@ services:
         max-file: "3"
 
   app:
-    image: ${IMAGE_REGISTRY:-local}/agora-auth-app:${IMAGE_TAG:-latest}
+    image: ${IMAGE_REGISTRY:-local}/${APP_IMAGE_NAME:-agora-auth-app}:${IMAGE_TAG:-latest}
     restart: unless-stopped
     healthcheck:
       test:
@@ -56,7 +56,7 @@ services:
         max-file: "3"
 
   migrator:
-    image: ${IMAGE_REGISTRY:-local}/agora-auth-migrator:${IMAGE_TAG:-latest}
+    image: ${IMAGE_REGISTRY:-local}/${MIGRATOR_IMAGE_NAME:-agora-auth-migrator}:${IMAGE_TAG:-latest}
     depends_on:
       postgres:
         condition: service_healthy
