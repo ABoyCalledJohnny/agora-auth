@@ -314,7 +314,7 @@ Implement a unified `AgoraError` class driven by a fixed union of `ErrorCode` ty
 > - This project only uses `development` and `production` environments. There are no dedicated test or staging environments - the staging/test columns below are included for reference and completeness only.
 > - This list serves as a comprehensive reference guide for the underlying boilerplate. Not all environment variables listed in these tables (e.g., `RATE_LIMIT_*`, `UPLOAD_DIR`, `MAX_UPLOAD_SIZE`) are actively used or strictly required by the current project scope.
 
-**Secrets - Secret Manager (Bitwarden etc. / CI/CD)**
+###### Secrets - Secret Manager (Bitwarden etc. / CI/CD)
 
 All values in this table are **never committed** to version control. They are stored in the project's secret manager entry and injected by the CI/CD pipeline as runtime environment variables during deployment.
 
@@ -481,34 +481,33 @@ Complete matrix of every variable across all committed `.env` files. Replace `{p
 >
 > ¹ `${PORT}` is interpolated by Bun's built-in env variable expansion. `.env` loads first and sets `PORT=3000`, so `.env.development` resolves to `http://localhost:3000`. `.env.test` overrides `PORT=3001` before `APP_URL`, so it resolves to `http://localhost:3001`.
 
-**Application Configuration (`src/config/index.ts` - committed)**
+###### Application Configuration & Constants (`src/config/`)
 
-Hardcoded, non-secret defaults that live in code. The `config/index.ts` module is the **single entry point** for all configuration - application code imports from here and never reads `process.env` directly. Environment variables override defaults where applicable; Zod validates everything at startup to fail fast on missing or invalid config.
+To prevent "magic strings" and guarantee environment variables are correctly parsed, all configuration is centralised here. Application code imports from these files and **never** reads `process.env` directly.
 
-| Category            | Key                       | Default / Source                                                                    | Notes                                          |
-| :------------------ | :------------------------ | :---------------------------------------------------------------------------------- | :--------------------------------------------- |
-| **App**             | `name`                    | `"Agora Auth"`                                                                      |                                                |
-|                     | `tagline`                 | `"A robust, secure, and modern authentication and user management system."`         | For meta tags, emails                          |
-|                     | `url`                     | `env.APP_URL \|\| "http://localhost:3000"`                                          | Server-side only                               |
-|                     | `env`                     | `env.APP_ENV \|\| "development"`                                                    | `development \| test \| staging \| production` |
-| **i18n**            | `locales`                 | `["en", "de"]`                                                                      |                                                |
-|                     | `defaultLocale`           | `"en"`                                                                              |                                                |
-| **Database**        | `url`                     | composed from `DB_HOST`, `DB_PORT`, `POSTGRES_DB`, `APP_DB_USER`, `APP_DB_PASSWORD` | Single URL used by the application at runtime  |
-| **Auth Cookies**    | `cookieName`              | `"agora_session"`                                                                   | HTTP-only refresh cookie                       |
-|                     | `cookieMaxAge`            | `7 * 24 * 60 * 60`                                                                  | 7 days (seconds)                               |
-|                     | `cookieSameSite`          | `"lax"`                                                                             |                                                |
-| **Auth Tokens**     | `accessTokenExpiry`       | `"15m"`                                                                             | Stateless JWT lifespan                         |
-|                     | `refreshTokenExpiry`      | `"7d"`                                                                              | DB-backed session lifespan                     |
-|                     | `verificationTokenExpiry` | `"24h"`                                                                             | Email verification / password reset            |
-| **Auth · Security** | `allowSessionIpChange`    | `true`                                                                              | If `false`, session is revoked on IP change    |
-|                     | `allowSessionAgentChange` | `true`                                                                              | If `false`, session is revoked on UA change    |
-| **Clients**         | `defaultClientId`         | `"agora_web_default"`                                                               | Internal app client for Server Actions         |
-| **Email**           | `mailFrom`                | `env.MAIL_FROM \|\| "noreply@localhost.com"`                                        | Sender address                                 |
-| **Rate Limiting**   | `rateLimitMax`            | `Number(env.RATE_LIMIT_MAX) \|\| 100`                                               | Per IP per window                              |
-|                     | `rateLimitWindow`         | `Number(env.RATE_LIMIT_WINDOW) \|\| 60`                                             | Seconds                                        |
-| **Files**           | `uploadDir`               | `env.UPLOAD_DIR \|\| "./uploads"`                                                   |                                                |
-|                     | `maxUploadSize`           | `Number(env.MAX_UPLOAD_SIZE) \|\| 5_242_880`                                        | Bytes (5 MB)                                   |
-| **Logging**         | `logLevel`                | `env.LOG_LEVEL \|\| "info"`                                                         | `debug \| info \| warn \| error`               |
+**1. `index.ts` (Environment & Runtime Config)**
+
+This module strictly schemas and parses `process.env` via Zod at startup. It fails fast if required variables are missing, applying default values and coercing types (like numbers). Everything is cleanly exported as a strongly-typed `appConfig` constant.
+
+Major categories mapped in `appConfig`:
+
+- **`app`**: Metadata (`name`, `url`), runtime environment (`APP_ENV`), and exposed network bindings (`hostname`, `port`).
+- **`db`**: Assembles the `databaseUrl` securely using _only_ the restricted application-level user credentials (not superuser), ensuring queries at runtime are sandboxed.
+- **`auth`**: Sets token lifespans (`accessTokenExpiry` to "15m", `refreshTokenExpiry` to "7d"), assigns exact cookie names, and controls security constraints (e.g., `allowSessionIpChange`).
+- **`bootstrap`**: Captures initial admin credentials and default client secrets specifically needed for the DB startup scripts.
+- **`email` & `clients` & `logging`**: Third-party resource settings.
+
+_(Note: Rather than maintaining a rigid 1:1 mirror of every granular key in markdown, rely on the IDE intellisense over `appConfig` as the ultimate source of truth)._
+
+**2. `constants.ts` (Domain Rules & Boundaries)**
+
+Holds static, non-secret system boundaries and definitions.
+
+- **Routes & Clients:** Pre-defined system paths (like `DEFAULT_VERIFY_EMAIL_PATH`).
+- **I18N:** Allowed dictionaries (`LOCALES` and `DEFAULT_LOCALE`).
+- **Domain Boundaries:** Structural limits (e.g. `PASSWORD_MIN_LENGTH`, byte entropy lengths) and arrays to prevent collisions (`RESERVED_USERNAMES`).
+- **Enums & Types:** Read-only arrays verified with `satisfies` to create unified TypeScript unions (`UserStatus`, `SystemRoleName`).
+- **Security:** Critical lists like `SENSITIVE_LOG_KEYS` that the logger automatically scrubs.
 
 > [!NOTE]
 > **Details**
