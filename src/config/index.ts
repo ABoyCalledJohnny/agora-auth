@@ -61,7 +61,9 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
 
-const env = envSchema.parse(process.env);
+const env = process.env.SKIP_ENV_VALIDATION
+  ? (process.env as unknown as z.infer<typeof envSchema>)
+  : envSchema.parse(process.env);
 
 // ---------------------------------------------------------------------------
 // 2. Derived URL — composed once from validated parts.

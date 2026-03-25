@@ -20,11 +20,14 @@ services:
   # App runs on bare metal (bun dev), not in Docker
   app:
     restart: "no"
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    user: "${UID:-1000}:${GID:-1000}" # Maps container user to host user to avoid permissions issues
     profiles: ["docker"]
-    command: bun run dev # <--- Overrides standard Next.js start command
+    command: bunx next dev # <--- Overrides standard Next.js start command
     volumes:
       - .:/app # <--- Mounts your local folder into the container
-      - /app/node_modules # <--- (Optional/Recommended) Keeps container modules isolated
     ports:
       - "3000:3000" # <--- Exposes the Next.js dev server to your host
     env_file:
