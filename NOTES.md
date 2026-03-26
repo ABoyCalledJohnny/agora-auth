@@ -577,6 +577,7 @@ _The following features are vital for enterprise hardening but are deferred to t
 
 - `page.tsx`: The unique UI content of a route segment.
 - `layout.tsx`: Shared UI wrapper that preserves state across routes (e.g., HTML/body tags, overall page skeleton).
+- `main.tsx`: Layout component wrapping `{children}` between header and footer. Provides the semantic `<main>` tag with consistent max-width, padding, and flex-grow behaviour. Avoids duplicating these styles in every `page.tsx`.
 - `header.tsx`: Top navigation and branding bar.
 - `footer.tsx`: Bottom site information and links.
 - `nav.tsx`: Auth-aware navigation component. Uses `useSession()` to conditionally render guest links (Login, Register) vs. authenticated links (Profile, Settings, Logout) and admin-only links (Admin). Can be injected into header or sidebar.
@@ -595,6 +596,7 @@ _The following features are vital for enterprise hardening but are deferred to t
 
 _Providers:_
 
+- `NextIntlClientProvider`: Wraps the app to provide `next-intl` translations to client components. Mounted in the root layout, receives server-side locale and messages.
 - `SessionProvider`: A React Context provider that wraps the app to store and share the currently authenticated user's state globally. This allows client components to check if a user is logged in without prop drilling or hitting the backend repeatedly.
 - `Toaster` (via `sonner`): Mounted in root layout alongside `SessionProvider`. Provides the toast notification container for the entire app.
 

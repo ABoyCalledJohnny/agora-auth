@@ -161,16 +161,18 @@
         - [x] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) - Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
         - [ ] **`withActionHandler`:** Implement Server Action wrapper (`src/lib/action-wrapper.ts`) - Zod input validation, structured error state, authentication/authorisation guards, cookie management, and redirect to `/login?next=…` on auth failure.
     - **Frontend Shell:**
+        - [ ] **Global styles:** Expand `globals.css` with base CSS variables, colour palette, and foundational styles.
         - [ ] **Root layout:** Set up `layout.tsx` with `NextIntlClientProvider` and `Toaster`. (`SessionProvider` is created and added later in the Auth feature.)
+        - [ ] **Main wrapper:** Implement `main.tsx` — layout component wrapping page content between header and footer (`<main>` tag, max-width, padding).
         - [ ] **Landing page:** Implement `/` route (`page.tsx`) — marketing/welcome page.
         - [ ] **Header and footer:** Implement `header.tsx` (top navigation/branding bar) and `footer.tsx` (bottom site info/links).
         - [ ] **Navigation:** Implement initial `nav.tsx` with static placeholder links. (Auth-aware rendering via `useSession()` is added in the Auth feature.)
         - [ ] **Error pages:** Implement `error.tsx`, `not-found.tsx`, `global-error.tsx`, `unauthorized.tsx`, `forbidden.tsx`.
         - [ ] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
-            - [ ] Layout/Architecture: `Container`, `Card`, `Sheet` (for mobile menus).
+            - [ ] Layout/Architecture: `Container`, `Card`, `Sheet` (slide-in panel for mobile menus and user menu).
             - [ ] Form: `Form`, `Input`, `SearchInput`, `Select`, `Label`, `InputField`, `PasswordField`.
-            - [ ] General: `Button`, `Avatar`, `Modal`, `Tabs`, `Alert`, `Pill`.
+            - [ ] General: `Button`, `Avatar`, `Modal`, `Tabs`, `Alert`, `Toast` (via `sonner`), `Pill`.
             - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
 
