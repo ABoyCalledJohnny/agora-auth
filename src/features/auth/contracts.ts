@@ -105,7 +105,7 @@ export const registerSchema = z.object({
 export type RegisterRequest = z.infer<typeof registerSchema>;
 
 export const loginSchema = z.object({
-  identifier: z.string().min(1, "Email or username is required"),
+  identifier: z.string().toLowerCase().min(1, "Email or username is required"),
   password: z.string(),
 });
 

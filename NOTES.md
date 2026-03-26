@@ -609,7 +609,7 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
 **Reusable UI Primitives (Design System)**
 
 - **Layout / Structure**
-    - `Container`: Utility wrapper to max-width and center content layouts.
+    - `Container`: Utility wrapper to max-width and centre content layouts.
     - `Card`: Presentation box container with padding, background, border (useful for wrapping Auth forms).
     - `Sheet` / `Drawer`: Slide-in mobile menu or mobile side panel overlay container.
 - **Form Components**
@@ -789,7 +789,6 @@ See `./messages/{language}.json`
 **Components / Frontend**
 
 - Was bester Weg für Anpassung von Komponenten (Farben etc.)
-- How do I set page title on `page.tsx` if `<head>` is in `layout.tsx`?
 - Usage of `revalidatePath()`
 - Brauche ich `export const dynamic = 'force-dynamic'`?
 - Use `import 'server-only'`

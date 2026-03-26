@@ -98,6 +98,7 @@ export const passwordRules = (t: ValidationTranslator) =>
 export const usernameRules = (t: ValidationTranslator) =>
   z
     .string()
+    .toLowerCase()
     .min(USERNAME_MIN_LENGTH, { message: t("usernameMinLength") })
     .max(USERNAME_MAX_LENGTH, { message: t("usernameMaxLength") })
     .regex(/^[a-z0-9_-]+$/, { message: t("usernameFormat") })

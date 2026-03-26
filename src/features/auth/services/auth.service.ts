@@ -2,7 +2,7 @@ import type { LoginRequest, RegisterRequest, ResetPasswordConfirmRequest, ResetP
 import type { AuthTokens, LoginResponse } from "../types.ts";
 import type { ApiClient, User } from "@/src/db/schema/index.ts";
 
-import { RESERVED_USERNAMES } from "@/src/config/constants.ts";
+import { RESERVED_USERNAMES, type UserStatus } from "@/src/config/constants.ts";
 import { appConfig } from "@/src/config/index.ts";
 import { hashPassword, verifyPassword } from "@/src/lib/crypto.ts";
 import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
@@ -35,25 +35,31 @@ export const AuthService = {
       // 2. Hash the user's plaintext password.
       const hashedPassword = await hashPassword(input.password);
 
-      // 3. Save the new user and their credentials to the database.
+      // 3. Determine initial account status.
+      //    Clients that skip email verification get an immediately active account;
+      //    otherwise the account stays pending until the email is verified.
+      const status: UserStatus = client.skipEmailVerification ? "active" : "pending";
+
+      // 4. Save the new user and their credentials to the database.
       const newUser = await DrizzleUserRepository.create({
         publicId: createPublicId(),
         username: input.username,
         email: input.email,
+        status,
       });
       await DrizzleUserRepository.setPasswordHash(newUser.id, hashedPassword);
 
       // TODO Implement/finalise after NotificationService creation.
 
-      // 4. If email verification is required: Create a verification token via `VerificationTokenService.create()`.
+      // 5. If email verification is required: Create a verification token via `VerificationTokenService.create()`.
       if (!client.skipEmailVerification) {
         throw new AgoraError("NOT_IMPLEMENTED");
         // const verificationToken = await VerificationTokenService.create({userId: newUser.id, type: 'email_verification'});
       }
 
-      // 5. Dispatch the welcome/verification email using the NotificationService.
+      // 6. Dispatch the welcome/verification email using the NotificationService.
 
-      // 6. Return the safely mapped user object (omit password).
+      // 7. Return the safely mapped user object (omit password).
       return newUser;
     } catch (error) {
       handleServiceError(error, "Error during user registration.");

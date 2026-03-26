@@ -239,6 +239,7 @@
         - [ ] **User hooks:** `useGetProfile`, `useUpdateProfile`, `useUpdateEmail`, `useUpdateUsername`, `useUpdatePassword`, `useDeleteAccount`, `useGetPublicProfile` in `src/features/user/hooks/`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
     - [ ] Enable email authentication for default client.
+    - [ ] Remove debug logs.
 
 ###### Feature: Admin Dashboard (Days 15-16)
 
