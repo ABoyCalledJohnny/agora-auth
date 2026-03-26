@@ -108,6 +108,7 @@ jobs:
         with:
           name: deployment-package
           path: deployment/
+          include-hidden-files: true
           retention-days: 1
 
   # ---------------------------------------------------------------------------
