@@ -206,9 +206,11 @@ jobs:
             # 1. Generate service-specific secret files (owner-only permissions)
             umask 077
 
-            # postgres service
+            # postgres service (includes app DB user creds for init-db.sh)
             echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.postgres
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.postgres
+            echo "APP_DB_USER=$APP_DB_USER" >> .env.secrets.production.postgres
+            echo "APP_DB_PASSWORD=$APP_DB_PASSWORD" >> .env.secrets.production.postgres
 
             # app service
             echo "APP_DB_USER=$APP_DB_USER" > .env.secrets.production.app
