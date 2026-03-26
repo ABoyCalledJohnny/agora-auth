@@ -38,6 +38,7 @@ services:
     env_file:
       - .env
       - .env.production
+      - .env.secrets.production.app
       - .env.secrets.production.migrator
 
 volumes:
