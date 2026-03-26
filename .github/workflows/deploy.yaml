@@ -1,0 +1,268 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+env:
+  PROJECT_PATH: "/srv/webapps/agora-auth"
+  BUN_VERSION: "1.3.11"
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+  TAG: ${{ github.sha }}
+  APP_IMAGE_NAME: "agora-auth-app"
+  MIGRATOR_IMAGE_NAME: "agora-auth-migrator"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # JOB 1: VERIFY (CI)
+  # Runs on ALL branches to ensure code quality and valid builds.
+  # ---------------------------------------------------------------------------
+  verify:
+    name: 🧪 Verify Code & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v6
+
+      - name: 📦 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: 📚 Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: 🔒 Security Audit
+        # Fails the pipeline if high or critical vulnerabilities exist in production packages
+        run: bun audit --prod --audit-level=high
+
+      - name: 💅 Format Check
+        run: bun run format:check
+
+      - name: 🧹 Run Linting
+        run: bun run lint:check
+
+      - name: 🏷️ Type Check
+        run: bun run typecheck
+
+      - name: 🏗️ Build Application
+        run: bun run build
+        env:
+          SKIP_ENV_VALIDATION: "1"
+
+  # ---------------------------------------------------------------------------
+  # JOB 2: PACKAGE (CI)
+  # Runs ONLY on main. Builds Docker images and pushes to GHCR.
+  # ---------------------------------------------------------------------------
+  package:
+    name: 🐳 Build & Push Images
+    runs-on: ubuntu-latest
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v6
+
+      - name: 🔑 Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Build and Push Docker Images
+        run: |
+          # Ensure registry is lowercase as Docker strictly requires lowercase repository names
+          LOWERCASE_REGISTRY=$(echo "${{ env.REGISTRY }}" | tr '[:upper:]' '[:lower:]')
+
+          # Build & Push App
+          docker build -t $LOWERCASE_REGISTRY/${{ env.APP_IMAGE_NAME }}:${{ env.TAG }} -f docker/app/Dockerfile .
+          docker push $LOWERCASE_REGISTRY/${{ env.APP_IMAGE_NAME }}:${{ env.TAG }}
+
+          # Build & Push Migrator
+          docker build -t $LOWERCASE_REGISTRY/${{ env.MIGRATOR_IMAGE_NAME }}:${{ env.TAG }} -f docker/migrator/Dockerfile .
+          docker push $LOWERCASE_REGISTRY/${{ env.MIGRATOR_IMAGE_NAME }}:${{ env.TAG }}
+
+      # Prepare the artifact for deployment (We only need compose files since code is inside Docker images)
+      - name: 📦 Prepare Deployment Artifact
+        run: |
+          set -euo pipefail
+          mkdir -p deployment
+
+          # Copy environment configs (so Rsync pushes them to the VPS)
+          cp .env deployment/.env
+          cp .env.production deployment/.env.production
+
+          # Copy Docker configuration
+          cp -r docker deployment/
+          cp compose.yaml deployment/
+          cp compose.production.yaml deployment/
+          cp compose.caddy.yaml deployment/
+
+      - name: 📤 Upload Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: deployment-package
+          path: deployment/
+          include-hidden-files: true
+          retention-days: 1
+
+  # ---------------------------------------------------------------------------
+  # JOB 3: DEPLOY (CD)
+  # Runs ONLY on main, after the images are packed and pushed.
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: 🚀 Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: package
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Download Artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: deployment-package
+          path: ./deployment
+
+      - name: 🚚 Transfer Files to VPS (Rsync)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SSH_HOST: ${{ secrets.VPS_HOST }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+          SSH_PORT: ${{ secrets.VPS_PORT }}
+          SSH_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+
+          # 1. Setup SSH
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # Pin the VPS host key from a stored secret (avoids TOFU / MITM risk of ssh-keyscan)
+          echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+
+          # 2. Rsync the deployment directory
+          # --delete removes files on the VPS that no longer exist in our deployment/ folder
+          # We explicitly exclude persistent folders like uploads/ so they aren't deleted remotely.
+          # Secret env files are excluded so rsync's --delete does not remove them before recreation.
+          rsync -avz --delete \
+            -e "ssh -p $SSH_PORT" \
+            --exclude '.env.secrets.production.postgres' \
+            --exclude '.env.secrets.production.app' \
+            --exclude '.env.secrets.production.migrator' \
+            --exclude 'uploads/' \
+            deployment/ $SSH_USER@$SSH_HOST:${{ env.PROJECT_PATH }}/
+
+      - name: 🚀 Start Services
+        uses: appleboy/ssh-action@v1
+        env:
+          PROJECT_PATH: ${{ env.PROJECT_PATH }}
+          REGISTRY: ${{ env.REGISTRY }}
+          TAG: ${{ env.TAG }}
+          APP_IMAGE_NAME: ${{ env.APP_IMAGE_NAME }}
+          MIGRATOR_IMAGE_NAME: ${{ env.MIGRATOR_IMAGE_NAME }}
+          # GH_CR_PAT: ${{ secrets.GH_CR_PAT }}  # Uncomment if GHCR packages are set to private
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          APP_DB_USER: ${{ secrets.APP_DB_USER }}
+          APP_DB_PASSWORD: ${{ secrets.APP_DB_PASSWORD }}
+          JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
+          JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          INITIAL_ADMIN_EMAIL: ${{ secrets.INITIAL_ADMIN_EMAIL }}
+          INITIAL_ADMIN_USERNAME: ${{ secrets.INITIAL_ADMIN_USERNAME }}
+          INITIAL_ADMIN_PASSWORD: ${{ secrets.INITIAL_ADMIN_PASSWORD }}
+          DEFAULT_CLIENT_ID: ${{ secrets.DEFAULT_CLIENT_ID }}
+          DEFAULT_CLIENT_SECRET: ${{ secrets.DEFAULT_CLIENT_SECRET }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: PROJECT_PATH,REGISTRY,TAG,APP_IMAGE_NAME,MIGRATOR_IMAGE_NAME,POSTGRES_USER,POSTGRES_PASSWORD,AUTH_SECRET,APP_DB_USER,APP_DB_PASSWORD,JWT_PRIVATE_KEY,JWT_PUBLIC_KEY,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD,INITIAL_ADMIN_EMAIL,INITIAL_ADMIN_USERNAME,INITIAL_ADMIN_PASSWORD,DEFAULT_CLIENT_ID,DEFAULT_CLIENT_SECRET
+          script: |
+            set -euo pipefail
+
+            # Ensure registry is lowercase as Docker strictly requires lowercase repository names
+            LOWERCASE_REGISTRY=$(echo "$REGISTRY" | tr '[:upper:]' '[:lower:]')
+            export IMAGE_REGISTRY=$LOWERCASE_REGISTRY
+            export IMAGE_TAG=$TAG
+
+            cd $PROJECT_PATH
+
+            # Export environment variable names to docker compose
+            export APP_IMAGE_NAME=$APP_IMAGE_NAME
+            export MIGRATOR_IMAGE_NAME=$MIGRATOR_IMAGE_NAME
+
+            # 1. Generate service-specific secret files (owner-only permissions)
+            umask 077
+
+            # postgres service (includes app DB user creds for init-db.sh)
+            echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.postgres
+            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.postgres
+            echo "APP_DB_USER=$APP_DB_USER" >> .env.secrets.production.postgres
+            echo "APP_DB_PASSWORD=$APP_DB_PASSWORD" >> .env.secrets.production.postgres
+
+            # app service
+            echo "APP_DB_USER=$APP_DB_USER" > .env.secrets.production.app
+            echo "APP_DB_PASSWORD=$APP_DB_PASSWORD" >> .env.secrets.production.app
+            printf 'JWT_PRIVATE_KEY="%s"\n' "$JWT_PRIVATE_KEY" >> .env.secrets.production.app
+            printf 'JWT_PUBLIC_KEY="%s"\n' "$JWT_PUBLIC_KEY" >> .env.secrets.production.app
+            echo "SMTP_HOST=$SMTP_HOST" >> .env.secrets.production.app
+            echo "SMTP_PORT=$SMTP_PORT" >> .env.secrets.production.app
+            echo "SMTP_USER=$SMTP_USER" >> .env.secrets.production.app
+            echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env.secrets.production.app
+            echo "AUTH_SECRET=$AUTH_SECRET" >> .env.secrets.production.app
+            echo "INITIAL_ADMIN_EMAIL=$INITIAL_ADMIN_EMAIL" >> .env.secrets.production.app
+            echo "INITIAL_ADMIN_USERNAME=$INITIAL_ADMIN_USERNAME" >> .env.secrets.production.app
+            echo "INITIAL_ADMIN_PASSWORD=$INITIAL_ADMIN_PASSWORD" >> .env.secrets.production.app
+            echo "DEFAULT_CLIENT_ID=$DEFAULT_CLIENT_ID" >> .env.secrets.production.app
+            echo "DEFAULT_CLIENT_SECRET=$DEFAULT_CLIENT_SECRET" >> .env.secrets.production.app
+
+            # migrator service
+            echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.migrator
+            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.migrator
+
+            # 2. Log in to GHCR (only needed if packages are private)
+            # echo "$GH_CR_PAT" | docker login ghcr.io --username gh --password-stdin
+
+            # 3. Network Setup
+            docker network inspect caddy_net >/dev/null 2>&1 || docker network create caddy_net
+
+            # 4. Start Caddy (independent stack — idempotent, won't restart if already running)
+            docker compose -p caddy -f compose.caddy.yaml up -d
+
+            # 5. Start app stack (project name defaults to directory name: agora-auth)
+            docker compose \
+              -f compose.yaml \
+              -f compose.production.yaml \
+              pull
+            docker compose \
+              -f compose.yaml \
+              -f compose.production.yaml \
+              up -d --no-build
+              
+            # 6. RUN MIGRATOR
+            # Since the migrator is marked with profiles: ["manual"] in production, it won't run natively on 'up -d'
+            # We explicitly start it as an ephemeral container. It connects to the postgres db, migrates, and exits.
+            docker compose \
+              -f compose.yaml \
+              -f compose.production.yaml \
+              run --rm migrator
+
+            # 7. Reload Caddy to pick up config changes (Zero Downtime)
+            docker compose -p caddy -f compose.caddy.yaml exec -w /etc/caddy caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+
+            # Clean up old images but keep the last 7 days of images for emergency rollbacks
+            docker image prune -a -f --filter "until=168h"
+            # Too aggressive
+            # docker system prune -f --volumes

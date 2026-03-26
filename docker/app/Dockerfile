@@ -30,6 +30,10 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Prevent build-time Next.js execution from requiring runtime secrets.
+ENV NEXT_SKIP_TYPECHECKING=1
+ENV SKIP_ENV_VALIDATION=1
+
 RUN bun run build
 
 # ---------------------------------------------------------------------------

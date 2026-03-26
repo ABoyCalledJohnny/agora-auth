@@ -20,11 +20,13 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 # 2. Copy the necessary modules for the database layer
-COPY drizzle.config.ts ./
+COPY tsconfig.json drizzle.config.ts ./
 COPY drizzle ./drizzle
 COPY src/config ./src/config
 COPY src/lib ./src/lib
 COPY src/db ./src/db
+COPY src/repositories ./src/repositories
+COPY src/features/auth/contracts.ts ./src/features/auth/contracts.ts
 
 # 3. Execute migrations and bootstrap scripts
-CMD ["sh", "-c", "bun run db:migrate:prod && bun run db:bootstrap:prod"]
+CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/db/bootstrap.ts"]

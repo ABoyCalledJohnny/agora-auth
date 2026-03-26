@@ -314,7 +314,7 @@ Implement a unified `AgoraError` class driven by a fixed union of `ErrorCode` ty
 > - This project only uses `development` and `production` environments. There are no dedicated test or staging environments - the staging/test columns below are included for reference and completeness only.
 > - This list serves as a comprehensive reference guide for the underlying boilerplate. Not all environment variables listed in these tables (e.g., `RATE_LIMIT_*`, `UPLOAD_DIR`, `MAX_UPLOAD_SIZE`) are actively used or strictly required by the current project scope.
 
-**Secrets - Secret Manager (Bitwarden etc. / CI/CD)**
+###### Env Vars / Files and Secrets - Secret Manager (Bitwarden etc. / CI/CD)
 
 All values in this table are **never committed** to version control. They are stored in the project's secret manager entry and injected by the CI/CD pipeline as runtime environment variables during deployment.
 
@@ -339,11 +339,12 @@ All values in this table are **never committed** to version control. They are st
 | `PROD_INITIAL_ADMIN_EMAIL`       | `INITIAL_ADMIN_EMAIL`    |  prod   | Email for the initial admin account                     |
 | `PROD_INITIAL_ADMIN_USERNAME`    | `INITIAL_ADMIN_USERNAME` |  prod   | Username for the initial admin account                  |
 | `PROD_INITIAL_ADMIN_PASSWORD`    | `INITIAL_ADMIN_PASSWORD` |  prod   | Password for the initial admin account                  |
-|                                  |                          |  prod   | Default System Client ID                                |
-|                                  |                          |  prod   | Raw API Key for the default system client               |
+| `PROD_DEFAULT_CLIENT_ID`         | `DEFAULT_CLIENT_ID`      |  prod   | Default System Client ID                                |
+| `PROD_DEFAULT_CLIENT_SECRET`     | `DEFAULT_CLIENT_SECRET`  |  prod   | Raw API Key for the default system client               |
 | `STAGING_INITIAL_ADMIN_EMAIL`    | `INITIAL_ADMIN_EMAIL`    | staging | Email for the initial admin account (staging)           |
 | `STAGING_INITIAL_ADMIN_USERNAME` | `INITIAL_ADMIN_USERNAME` | staging | Username for the initial admin account (staging)        |
 | `STAGING_INITIAL_ADMIN_PASSWORD` | `INITIAL_ADMIN_PASSWORD` | staging | Password for the initial admin account (staging)        |
+| `STAGING_DEFAULT_CLIENT_ID`      | `DEFAULT_CLIENT_ID`      | staging | Default System Client ID (staging)                      |
 | `STAGING_DEFAULT_CLIENT_SECRET`  | `DEFAULT_CLIENT_SECRET`  | staging | Raw API Key for the default system client (staging)     |
 | **Email (SMTP)**                 |                          |         |                                                         |
 | `PROD_SMTP_HOST`                 | `SMTP_HOST`              |  prod   | SMTP server hostname                                    |
@@ -354,9 +355,15 @@ All values in this table are **never committed** to version control. They are st
 | `STAGING_SMTP_PORT`              | `SMTP_PORT`              | staging | SMTP server port                                        |
 | `STAGING_SMTP_USER`              | `SMTP_USER`              | staging | SMTP authentication username                            |
 | `STAGING_SMTP_PASSWORD`          | `SMTP_PASSWORD`          | staging | SMTP authentication password                            |
-| **Infrastructure**               |                          |         |                                                         |
+| **Infrastructure (CI/CD)**       |                          |         |                                                         |
 | `PROD_CRON_SECRET`               | `CRON_SECRET`            |  prod   | Bearer token for cron / webhook endpoints               |
 | `STAGING_CRON_SECRET`            | `CRON_SECRET`            | staging | Bearer token for cron / webhook endpoints               |
+| `GH_CR_PAT`                      | `GH_CR_PAT`              |   all   | GitHub PAT (`read:packages`) — only if GHCR is private  |
+| `VPS_SSH_KEY`                    | `VPS_SSH_KEY`            |   all   | Private SSH key for CD pipeline to access VPS           |
+| `VPS_KNOWN_HOSTS`                | `VPS_KNOWN_HOSTS`        |   all   | Pinned VPS SSH host key (prevents MITM during deploy)   |
+| `VPS_HOST`                       | `VPS_HOST`               |   all   | IP/Hostname of the VPS server                           |
+| `VPS_USER`                       | `VPS_USER`               |   all   | SSH Username for VPS deployments                        |
+| `VPS_PORT`                       | `VPS_PORT`               |   all   | SSH Port for VPS deployments                            |
 
 > [!NOTE]
 > **Details**
@@ -364,8 +371,10 @@ All values in this table are **never committed** to version control. They are st
 > - `POSTGRES_DB` is **not** a secret - it stays in the committed `.env.staging` / `.env.production` files alongside the other environments. The secret manager only holds credentials that grant access.
 > - The app and superuser credentials inject into their respective env var names (`APP_DB_USER` vs. `POSTGRES_USER`). `config/index.ts` uses the **app user** creds while `drizzle.config.ts` uses the **superuser** creds.
 > - `DATABASE_URL` is composed at runtime in `config/index.ts` - no env var needed.
-> - `CRON_SECRET` is a bearer token used when an external scheduler (cron daemon, GitHub Actions, etc.) calls your app's `/api/cron/*` endpoints to prove it is a trusted caller. Not needed in project.
+> - `CRON_SECRET` is a bearer token used when an external scheduler (cron daemon, GitHub Actions, etc.) calls your app's `/api/cron/*` endpoints to prove it is a trusted caller. Not actively utilized right now but kept for overview.
 > - `AUTH_SECRET` follows the standard Next.js Auth convention for cookie/session signing. It is distinct from `JWT_PRIVATE_KEY` which signs the stateless access JWTs. Not needed in project.
+> - `GH_CR_PAT` is a GitHub Personal Access Token (classic, with `read:packages` scope) used by the VPS to pull Docker images from GHCR. Only needed if packages are **private** — public packages can be pulled without authentication. The built-in `GITHUB_TOKEN` only exists within the Actions runner context and cannot be forwarded to external servers over SSH. Create one at _GitHub → Settings → Developer settings → Personal access tokens_ if needed.
+> - `VPS_KNOWN_HOSTS` is the SSH host key entry for the VPS, pinned as a secret to avoid trust-on-first-use (TOFU) attacks. Obtain it by running `ssh-keyscan -p <PORT> <HOST>` from a trusted machine and verifying the fingerprint matches. Store the full output line as the secret value.
 > - **Bootstrapping Variables** (`INITIAL_ADMIN_*`, `DEFAULT_CLIENT_SECRET`) are only consumed once during initialization scripts, bypassing typical lifetime persistence, but should remain correctly set for infrastructure recovery.
 
 **Key generation reference:**
@@ -383,6 +392,21 @@ bun -e 'import { customAlphabet } from "nanoid"; console.log(customAlphabet("abc
 # JWT RS256 key pair
 openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 openssl rsa -in private.pem -pubout -out public.pem
+# Paste the full PEM contents into the GitHub secret (including BEGIN/END lines).
+
+# VPS_SSH_KEY — generate a dedicated deploy key (no passphrase)
+ssh-keygen -t ed25519 -C "github-actions-deploy" -f deploy_key -N ""
+# Add deploy_key.pub to ~/.ssh/authorized_keys on the VPS.
+# Paste the contents of deploy_key (the private key) into the GitHub secret.
+
+# VPS_KNOWN_HOSTS — run from a trusted machine you have already verified
+ssh-keyscan -p <PORT> <HOST>
+# Verify the fingerprint matches the VPS:  ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+# Paste the full output line(s) into the GitHub secret.
+
+# GH_CR_PAT (only needed if GHCR packages are private)
+# Create at: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+# Required scope: read:packages
 ```
 
 **Local Development Secrets (`.env.local`)**
@@ -481,34 +505,33 @@ Complete matrix of every variable across all committed `.env` files. Replace `{p
 >
 > ¹ `${PORT}` is interpolated by Bun's built-in env variable expansion. `.env` loads first and sets `PORT=3000`, so `.env.development` resolves to `http://localhost:3000`. `.env.test` overrides `PORT=3001` before `APP_URL`, so it resolves to `http://localhost:3001`.
 
-**Application Configuration (`src/config/index.ts` - committed)**
+###### Application Configuration & Constants (`src/config/`)
 
-Hardcoded, non-secret defaults that live in code. The `config/index.ts` module is the **single entry point** for all configuration - application code imports from here and never reads `process.env` directly. Environment variables override defaults where applicable; Zod validates everything at startup to fail fast on missing or invalid config.
+To prevent "magic strings" and guarantee environment variables are correctly parsed, all configuration is centralised here. Application code imports from these files and **never** reads `process.env` directly.
 
-| Category            | Key                       | Default / Source                                                                    | Notes                                          |
-| :------------------ | :------------------------ | :---------------------------------------------------------------------------------- | :--------------------------------------------- |
-| **App**             | `name`                    | `"Agora Auth"`                                                                      |                                                |
-|                     | `tagline`                 | `"A robust, secure, and modern authentication and user management system."`         | For meta tags, emails                          |
-|                     | `url`                     | `env.APP_URL \|\| "http://localhost:3000"`                                          | Server-side only                               |
-|                     | `env`                     | `env.APP_ENV \|\| "development"`                                                    | `development \| test \| staging \| production` |
-| **i18n**            | `locales`                 | `["en", "de"]`                                                                      |                                                |
-|                     | `defaultLocale`           | `"en"`                                                                              |                                                |
-| **Database**        | `url`                     | composed from `DB_HOST`, `DB_PORT`, `POSTGRES_DB`, `APP_DB_USER`, `APP_DB_PASSWORD` | Single URL used by the application at runtime  |
-| **Auth Cookies**    | `cookieName`              | `"agora_session"`                                                                   | HTTP-only refresh cookie                       |
-|                     | `cookieMaxAge`            | `7 * 24 * 60 * 60`                                                                  | 7 days (seconds)                               |
-|                     | `cookieSameSite`          | `"lax"`                                                                             |                                                |
-| **Auth Tokens**     | `accessTokenExpiry`       | `"15m"`                                                                             | Stateless JWT lifespan                         |
-|                     | `refreshTokenExpiry`      | `"7d"`                                                                              | DB-backed session lifespan                     |
-|                     | `verificationTokenExpiry` | `"24h"`                                                                             | Email verification / password reset            |
-| **Auth · Security** | `allowSessionIpChange`    | `true`                                                                              | If `false`, session is revoked on IP change    |
-|                     | `allowSessionAgentChange` | `true`                                                                              | If `false`, session is revoked on UA change    |
-| **Clients**         | `defaultClientId`         | `"agora_web_default"`                                                               | Internal app client for Server Actions         |
-| **Email**           | `mailFrom`                | `env.MAIL_FROM \|\| "noreply@localhost.com"`                                        | Sender address                                 |
-| **Rate Limiting**   | `rateLimitMax`            | `Number(env.RATE_LIMIT_MAX) \|\| 100`                                               | Per IP per window                              |
-|                     | `rateLimitWindow`         | `Number(env.RATE_LIMIT_WINDOW) \|\| 60`                                             | Seconds                                        |
-| **Files**           | `uploadDir`               | `env.UPLOAD_DIR \|\| "./uploads"`                                                   |                                                |
-|                     | `maxUploadSize`           | `Number(env.MAX_UPLOAD_SIZE) \|\| 5_242_880`                                        | Bytes (5 MB)                                   |
-| **Logging**         | `logLevel`                | `env.LOG_LEVEL \|\| "info"`                                                         | `debug \| info \| warn \| error`               |
+**1. `index.ts` (Environment & Runtime Config)**
+
+This module strictly schemas and parses `process.env` via Zod at startup. It fails fast if required variables are missing, applying default values and coercing types (like numbers). Everything is cleanly exported as a strongly-typed `appConfig` constant.
+
+Major categories mapped in `appConfig`:
+
+- **`app`**: Metadata (`name`, `url`), runtime environment (`APP_ENV`), and exposed network bindings (`hostname`, `port`).
+- **`db`**: Assembles the `databaseUrl` securely using _only_ the restricted application-level user credentials (not superuser), ensuring queries at runtime are sandboxed.
+- **`auth`**: Sets token lifespans (`accessTokenExpiry` to "15m", `refreshTokenExpiry` to "7d"), assigns exact cookie names, and controls security constraints (e.g., `allowSessionIpChange`).
+- **`bootstrap`**: Captures initial admin credentials and default client secrets specifically needed for the DB startup scripts.
+- **`email` & `clients` & `logging`**: Third-party resource settings.
+
+_(Note: Rather than maintaining a rigid 1:1 mirror of every granular key in markdown, rely on the IDE intellisense over `appConfig` as the ultimate source of truth)._
+
+**2. `constants.ts` (Domain Rules & Boundaries)**
+
+Holds static, non-secret system boundaries and definitions.
+
+- **Routes & Clients:** Pre-defined system paths (like `DEFAULT_VERIFY_EMAIL_PATH`).
+- **I18N:** Allowed dictionaries (`LOCALES` and `DEFAULT_LOCALE`).
+- **Domain Boundaries:** Structural limits (e.g. `PASSWORD_MIN_LENGTH`, byte entropy lengths) and arrays to prevent collisions (`RESERVED_USERNAMES`).
+- **Enums & Types:** Read-only arrays verified with `satisfies` to create unified TypeScript unions (`UserStatus`, `SystemRoleName`).
+- **Security:** Critical lists like `SENSITIVE_LOG_KEYS` that the logger automatically scrubs.
 
 > [!NOTE]
 > **Details**
@@ -810,6 +833,12 @@ See `./messages/{language}.json`
 - **`cache()` for Session Deduplication:** Wrap `verifySession()` in React's `cache()` to memoize the session check within a single render pass, avoiding duplicate DB queries when multiple Server Components call it.
 - **`taintUniqueValue`:** Use React's `taintUniqueValue` API to prevent sensitive session data (e.g., tokens, secrets) from accidentally leaking to Client Components via the `SessionProvider`.
 - Port remaining utilities from Turbine as needed.
+
+**Architecture / Tech Debt**
+
+- **Full Vertical Slicing Refactor:** Untangle global repositories (`src/repositories/`) and move data access layers strictly into their respective domains (`src/features/.../repositories/`) to achieve true vertical slicing.
+    - E.g., Extract `AuthUserRepository` from a global `UserRepository` to contain only authentication-specific queries.
+    - Create an `AdminUserService` and `AdminUserRepository` within the `admin` feature for specialized admin queries, avoiding massive conditional logic jumps in the standard `UserService`.
 
 **Questions**
 

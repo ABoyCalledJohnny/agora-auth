@@ -7,15 +7,10 @@
 #   Local dev:  docker compose up
 #               (auto-merges compose.yaml + compose.override.yaml)
 #
-#   Testing:    docker compose -f compose.yaml -f compose.test.yaml up
-#
-#   Staging:    docker compose -f compose.yaml -f compose.staging.yaml up -d
-#               (on VPS, via CI/CD — uses project name "staging")
-#
-#   Production: docker compose -f compose.yaml -f compose.production.yaml up -d
+#   Production: docker compose -p production -f compose.yaml -f compose.production.yaml up -d
 #               (on VPS, via CI/CD — uses project name "production")
 #
-# Caddy is shared across staging and production via an external network.
+# Caddy routes traffic via an external network.
 # Create it once on the VPS:  docker network create caddy_net
 # =============================================================================
 
@@ -24,7 +19,7 @@ services:
     image: postgres:18
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       start_period: 30s
@@ -38,36 +33,39 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # app:
-  #   image: ${IMAGE_REGISTRY:-local}/agora-auth-app:${IMAGE_TAG:-latest}
-  #   build:
-  #     context: .
-  #     dockerfile: docker/app/Dockerfile
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD-SHELL", 'bun -e "try{const r=await fetch(''http://localhost:3000/api/live'');if(!r.ok)process.exit(1)}catch{process.exit(1)}"']
-  #     interval: 30s
-  #     timeout: 5s
-  #     start_period: 10s
-  #     retries: 3
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+  app:
+    image: ${IMAGE_REGISTRY:-local}/${APP_IMAGE_NAME:-agora-auth-app}:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'bun -e "try{const r=await fetch(''http://localhost:3000/api/live'');if(!r.ok)process.exit(1)}catch{process.exit(1)}"',
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-  # migrator:
-  #   image: ${IMAGE_REGISTRY:-local}/agora-auth-migrator:${IMAGE_TAG:-latest}
-  #   build:
-  #     context: .
-  #     dockerfile: docker/migrator/Dockerfile
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   restart: "no"
+  migrator:
+    image: ${IMAGE_REGISTRY:-local}/${MIGRATOR_IMAGE_NAME:-agora-auth-migrator}:${IMAGE_TAG:-latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   postgres_data:

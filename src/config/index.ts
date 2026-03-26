@@ -61,7 +61,9 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
 
-const env = envSchema.parse(process.env);
+const env = process.env.SKIP_ENV_VALIDATION
+  ? (process.env as unknown as z.infer<typeof envSchema>)
+  : envSchema.parse(process.env);
 
 // ---------------------------------------------------------------------------
 // 2. Derived URL — composed once from validated parts.
@@ -69,7 +71,7 @@ const env = envSchema.parse(process.env);
 //    for the migration step. Same env var names, different values per step.
 // ---------------------------------------------------------------------------
 
-const databaseUrl = `postgres://${env.APP_DB_USER}:${env.APP_DB_PASSWORD}@${env.DB_HOST}:${env.DB_PORT}/${env.POSTGRES_DB}`;
+const databaseUrl = `postgres://${encodeURIComponent(env.APP_DB_USER)}:${encodeURIComponent(env.APP_DB_PASSWORD)}@${env.DB_HOST}:${env.DB_PORT}/${env.POSTGRES_DB}`;
 
 // ---------------------------------------------------------------------------
 // 3. Application configuration — single source of truth.

@@ -3,9 +3,9 @@
 ![Badge: Latest Release](https://img.shields.io/github/v/release/ABoyCalledJohnny/agora-auth)
 ![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
 
-> [!WARNING]
+> [!NOTE]
 > **Active Development**
-> The **core authentication logic** (API routes, server actions, Zod schemas, database models, and strict type-safe wrappers) is heavily implemented. The project is currently focusing on frontend UI completion and hooking up external notification services.
+> The core authentication logic, CI/CD pipeline, and production deployment are fully operational. The project is currently focusing on frontend UI completion, admin flows, and external notification services.
 
 A robust, secure, and modern authentication and user management system built with Next.js, Drizzle ORM, and PostgreSQL.
 
@@ -17,9 +17,12 @@ A robust, secure, and modern authentication and user management system built wit
         - [Key Features (Planned)](#key-features-planned)
     - [Tech Stack](#tech-stack)
     - [Prerequisites](#prerequisites)
-    - [Getting Started (WIP)](#getting-started-wip)
+    - [Getting Started](#getting-started)
     - [Configuration](#configuration)
     - [Deployment](#deployment)
+        - [CI/CD Pipeline](#cicd-pipeline)
+        - [Infrastructure](#infrastructure)
+        - [VPS Layout](#vps-layout)
     - [Project Structure](#project-structure)
     - [Development Workflow](#development-workflow)
         - [Useful Commands](#useful-commands)
@@ -52,6 +55,10 @@ It aims to provide a solid foundation for user registration, login, profile mana
 - **Database:** PostgreSQL
 - **ORM:** Drizzle ORM
 - **Validation:** Zod
+- **Reverse Proxy:** Caddy (auto-TLS)
+- **CI/CD:** GitHub Actions
+- **Container Registry:** GitHub Container Registry (GHCR)
+- **Containerisation:** Docker & Docker Compose
 
 ---
 
@@ -63,12 +70,9 @@ It aims to provide a solid foundation for user registration, login, profile mana
 
 ---
 
-## Getting Started (WIP)
+## Getting Started
 
-> [!WARNING]
-> **Project Status:** While the core authentication endpoints (Login, Register, Refresh, Verify, Reset) are functional, frontend UI integrations, admin flows, and email notifications are still under active implementation.
-
-Minimum local setup currently used in this repository:
+Minimum local setup:
 
 ```bash
 bun install
@@ -99,9 +103,39 @@ Key environment variables include:
 ## Deployment
 
 > [!IMPORTANT]
-> This application is built with a highly specific CI/CD pipeline and infrastructure setup tailored to a custom VPS environment using Caddy and Docker.
->
-> **It is not designed to be deployed by others out-of-the-box.** Deploying this system independently would require extensive modifications to the Docker setup, configuration files, and deployment pipelines, which are currently active works in progress.
+> This application uses a CI/CD pipeline tailored to a specific VPS environment. Deploying independently would require modifications to the Docker setup, configuration files, and pipeline.
+
+### CI/CD Pipeline
+
+The project uses a three-stage GitHub Actions pipeline (`.github/workflows/deploy.yaml`):
+
+| Stage       | Trigger      | Description                                                                          |
+| ----------- | ------------ | ------------------------------------------------------------------------------------ |
+| **Verify**  | All branches | Lint, typecheck, format check, security audit, build                                 |
+| **Package** | `main` only  | Build Docker images and push to GHCR                                                 |
+| **Deploy**  | `main` only  | Rsync artifacts to VPS, generate secrets, start services, run migrations & bootstrap |
+
+### Infrastructure
+
+- **Caddy** runs as an independent Docker Compose stack with automatic TLS
+- **App** (2 replicas) + **Postgres** run as the main stack, pulling pre-built images from GHCR
+- **Migrator** runs as an ephemeral container after deployment to apply schema changes and seed data
+- Secrets are generated on the VPS at deploy time from GitHub repository secrets
+
+### VPS Layout
+
+```text
+/srv/webapps/agora-auth/
+├── compose.yaml               # Base service definitions
+├── compose.production.yaml    # Production overrides (env_file, replicas, networks)
+├── compose.caddy.yaml         # Independent Caddy reverse proxy stack
+├── docker/
+│   ├── caddy/Caddyfile
+│   └── postgres/init-db.sh
+├── .env                       # Shared non-secret config
+├── .env.production            # Production-specific config
+├── .env.secrets.production.*  # Generated per-service secret files (CI/CD)
+```
 
 ---
 

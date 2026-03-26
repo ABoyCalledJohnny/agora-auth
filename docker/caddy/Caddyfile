@@ -33,7 +33,7 @@ agora-auth.de, www.agora-auth.de {
 		# removes it from the pool and stops sending it traffic. It keeps
 		# probing on the same interval and re-adds the replica once it
 		# responds with 2xx again.
-		health_uri /api/up
+		health_uri /api/live
 		health_interval 30s
 		health_timeout 5s
 	}
