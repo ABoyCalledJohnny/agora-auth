@@ -358,7 +358,9 @@ All values in this table are **never committed** to version control. They are st
 | **Infrastructure (CI/CD)**       |                          |         |                                                         |
 | `PROD_CRON_SECRET`               | `CRON_SECRET`            |  prod   | Bearer token for cron / webhook endpoints               |
 | `STAGING_CRON_SECRET`            | `CRON_SECRET`            | staging | Bearer token for cron / webhook endpoints               |
+| `GH_CR_PAT`                      | `GH_CR_PAT`              |   all   | GitHub PAT (`read:packages`) — only if GHCR is private  |
 | `VPS_SSH_KEY`                    | `VPS_SSH_KEY`            |   all   | Private SSH key for CD pipeline to access VPS           |
+| `VPS_KNOWN_HOSTS`                | `VPS_KNOWN_HOSTS`        |   all   | Pinned VPS SSH host key (prevents MITM during deploy)   |
 | `VPS_HOST`                       | `VPS_HOST`               |   all   | IP/Hostname of the VPS server                           |
 | `VPS_USER`                       | `VPS_USER`               |   all   | SSH Username for VPS deployments                        |
 | `VPS_PORT`                       | `VPS_PORT`               |   all   | SSH Port for VPS deployments                            |
@@ -371,6 +373,8 @@ All values in this table are **never committed** to version control. They are st
 > - `DATABASE_URL` is composed at runtime in `config/index.ts` - no env var needed.
 > - `CRON_SECRET` is a bearer token used when an external scheduler (cron daemon, GitHub Actions, etc.) calls your app's `/api/cron/*` endpoints to prove it is a trusted caller. Not actively utilized right now but kept for overview.
 > - `AUTH_SECRET` follows the standard Next.js Auth convention for cookie/session signing. It is distinct from `JWT_PRIVATE_KEY` which signs the stateless access JWTs. Not needed in project.
+> - `GH_CR_PAT` is a GitHub Personal Access Token (classic, with `read:packages` scope) used by the VPS to pull Docker images from GHCR. Only needed if packages are **private** — public packages can be pulled without authentication. The built-in `GITHUB_TOKEN` only exists within the Actions runner context and cannot be forwarded to external servers over SSH. Create one at _GitHub → Settings → Developer settings → Personal access tokens_ if needed.
+> - `VPS_KNOWN_HOSTS` is the SSH host key entry for the VPS, pinned as a secret to avoid trust-on-first-use (TOFU) attacks. Obtain it by running `ssh-keyscan -p <PORT> <HOST>` from a trusted machine and verifying the fingerprint matches. Store the full output line as the secret value.
 > - **Bootstrapping Variables** (`INITIAL_ADMIN_*`, `DEFAULT_CLIENT_SECRET`) are only consumed once during initialization scripts, bypassing typical lifetime persistence, but should remain correctly set for infrastructure recovery.
 
 **Key generation reference:**
@@ -388,6 +392,21 @@ bun -e 'import { customAlphabet } from "nanoid"; console.log(customAlphabet("abc
 # JWT RS256 key pair
 openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 openssl rsa -in private.pem -pubout -out public.pem
+# Paste the full PEM contents into the GitHub secret (including BEGIN/END lines).
+
+# VPS_SSH_KEY — generate a dedicated deploy key (no passphrase)
+ssh-keygen -t ed25519 -C "github-actions-deploy" -f deploy_key -N ""
+# Add deploy_key.pub to ~/.ssh/authorized_keys on the VPS.
+# Paste the contents of deploy_key (the private key) into the GitHub secret.
+
+# VPS_KNOWN_HOSTS — run from a trusted machine you have already verified
+ssh-keyscan -p <PORT> <HOST>
+# Verify the fingerprint matches the VPS:  ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+# Paste the full output line(s) into the GitHub secret.
+
+# GH_CR_PAT (only needed if GHCR packages are private)
+# Create at: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+# Required scope: read:packages
 ```
 
 **Local Development Secrets (`.env.local`)**
@@ -814,6 +833,12 @@ See `./messages/{language}.json`
 - **`cache()` for Session Deduplication:** Wrap `verifySession()` in React's `cache()` to memoize the session check within a single render pass, avoiding duplicate DB queries when multiple Server Components call it.
 - **`taintUniqueValue`:** Use React's `taintUniqueValue` API to prevent sensitive session data (e.g., tokens, secrets) from accidentally leaking to Client Components via the `SessionProvider`.
 - Port remaining utilities from Turbine as needed.
+
+**Architecture / Tech Debt**
+
+- **Full Vertical Slicing Refactor:** Untangle global repositories (`src/repositories/`) and move data access layers strictly into their respective domains (`src/features/.../repositories/`) to achieve true vertical slicing.
+    - E.g., Extract `AuthUserRepository` from a global `UserRepository` to contain only authentication-specific queries.
+    - Create an `AdminUserService` and `AdminUserRepository` within the `admin` feature for specialized admin queries, avoiding massive conditional logic jumps in the standard `UserService`.
 
 **Questions**
 

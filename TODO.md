@@ -135,7 +135,7 @@
 
 ##### 3.1 Infrastructure and Core Setup (Days 1-6)
 
-- [ ] **Preparation:** Do pre-development checks before starting work.
+- [x] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Shared Validation and Domain Rules:**
         - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains.
@@ -178,7 +178,7 @@
 
 ###### Feature: Auth (Days 7-12)
 
-- [ ] **Preparation:** Do pre-development checks before starting work.
+- [x] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
         - [x] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
@@ -221,8 +221,7 @@
         - [ ] Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
-        - [ ] **`RoleService`:** Handle user role retrieval and assignments, encapsulating authorization queries.
-        - [ ] **`AuthService` Refactor:** Update `AuthService` to use `UserService` and `RoleService` instead of directly calling `DrizzleUserRepository` and `DrizzleRoleRepository`.
+        - [ ] **`RoleService`:** Handle user role retrieval and assignments, encapsulating authorisation queries.
     - **API Routes and Server Actions:**
         - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
         - [ ] 🔒 `GET /api/user/profile` - Authenticated user's full profile.
@@ -276,7 +275,7 @@ _Out of scope for this project._
 
 ##### Configuration as Code
 
-- [ ] **Preparation:** Do pre-development checks before starting work.
+- [x] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Application Runtime (Docker and Compose)**
         - [x] Finalise the production/staging `Dockerfile`s and `compose.{environment}.yaml` to configure necessary services, custom networks, and persistent volumes.
@@ -295,12 +294,11 @@ _Out of scope for this project._
     - [x] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
 - **CI/CD Pipeline Setup**
     - [ ] Inject all required production environment variables into your repository's CI/CD secret manager.
+    - [ ] Create GitHub Personal Access Token for pulling the build artifact from GitHub to the VPS (if registry not public).
     - [x] Set read/write permissions for GitHub workflows in repository `Actions` settings.
 - **Production Server**
     - [x] Clean old Docker infrastructure.
     - [ ] Enable continuous deployment.
     - [ ] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -p 53345 -L 5433:127.0.0.1:5432 admin@server.meeplelabs.de`) and run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
-
 - **Client Integration and Seeding**
     - [ ] Create client entry for classmate in db and share access data (`name`, `domain_name`, `verify_email_path`, `reset_password_path`. `client_id`, `api_key_hash`).
-    - [ ] Add dummy users needed for project presentation.

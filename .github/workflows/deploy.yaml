@@ -133,16 +133,17 @@ jobs:
           SSH_HOST: ${{ secrets.VPS_HOST }}
           SSH_USER: ${{ secrets.VPS_USER }}
           SSH_PORT: ${{ secrets.VPS_PORT }}
+          SSH_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
 
-          # 1. Setup SSH agent
+          # 1. Setup SSH
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          # Add VPS to known hosts to prevent interactive prompt
-          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+          # Pin the VPS host key from a stored secret (avoids TOFU / MITM risk of ssh-keyscan)
+          echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
 
           # 2. Rsync the deployment directory
           # --delete removes files on the VPS that no longer exist in our deployment/ folder
@@ -164,6 +165,7 @@ jobs:
           TAG: ${{ env.TAG }}
           APP_IMAGE_NAME: ${{ env.APP_IMAGE_NAME }}
           MIGRATOR_IMAGE_NAME: ${{ env.MIGRATOR_IMAGE_NAME }}
+          # GH_CR_PAT: ${{ secrets.GH_CR_PAT }}  # Uncomment if GHCR packages are set to private
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
@@ -200,7 +202,9 @@ jobs:
             export APP_IMAGE_NAME=$APP_IMAGE_NAME
             export MIGRATOR_IMAGE_NAME=$MIGRATOR_IMAGE_NAME
 
-            # 1. Generate service-specific secret files
+            # 1. Generate service-specific secret files (owner-only permissions)
+            umask 077
+
             # postgres service
             echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.postgres
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.postgres
@@ -225,18 +229,22 @@ jobs:
             echo "POSTGRES_USER=$POSTGRES_USER" > .env.secrets.production.migrator
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env.secrets.production.migrator
 
-            # 2. Network Setup
+            # 2. Log in to GHCR (only needed if packages are private)
+            # echo "$GH_CR_PAT" | docker login ghcr.io --username gh --password-stdin
+
+            # 3. Network Setup
             docker network inspect caddy_net >/dev/null 2>&1 || docker network create caddy_net
 
-            # 3. START EVERYTHING IN ONE GO
-            # Combining the files prevents "--remove-orphans" from killing Caddy.
+            # 4. Start Caddy (independent stack — idempotent, won't restart if already running)
+            docker compose -p caddy -f compose.caddy.yaml up -d
+
+            # 5. Start app stack (project name defaults to directory name: agora-auth)
             docker compose \
-              -f compose.caddy.yaml \
               -f compose.yaml \
               -f compose.production.yaml \
-              up -d --build --remove-orphans
+              up -d
               
-            # 4. RUN MIGRATOR
+            # 6. RUN MIGRATOR
             # Since the migrator is marked with profiles: ["manual"] in production, it won't run natively on 'up -d'
             # We explicitly start it as an ephemeral container. It connects to the postgres db, migrates, and exits.
             docker compose \
@@ -244,9 +252,8 @@ jobs:
               -f compose.production.yaml \
               run --rm migrator
 
-            # 5. Reload Caddy to pick up config changes (Zero Downtime)
-            # We explicitly tell Caddy to reload using the API to ensure the new config is applied.
-            docker compose -f compose.caddy.yaml exec -w /etc/caddy caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+            # 7. Reload Caddy to pick up config changes (Zero Downtime)
+            docker compose -p caddy -f compose.caddy.yaml exec -w /etc/caddy caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
 
             # Clean up old images but keep the last 7 days of images for emergency rollbacks
             docker image prune -a -f --filter "until=168h"
