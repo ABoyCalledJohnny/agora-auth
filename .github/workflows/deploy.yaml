@@ -245,7 +245,11 @@ jobs:
             docker compose \
               -f compose.yaml \
               -f compose.production.yaml \
-              up -d
+              pull
+            docker compose \
+              -f compose.yaml \
+              -f compose.production.yaml \
+              up -d --no-build
               
             # 6. RUN MIGRATOR
             # Since the migrator is marked with profiles: ["manual"] in production, it won't run natively on 'up -d'
