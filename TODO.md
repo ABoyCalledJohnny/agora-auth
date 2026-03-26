@@ -297,7 +297,7 @@ _Out of scope for this project._
     - [x] Set read/write permissions for GitHub workflows in repository `Actions` settings.
 - **Production Server**
     - [x] Clean old Docker infrastructure.
-    - [ ] Enable continuous deployment.
+    - [x] Enable continuous deployment.
     - [x] Establish a secure SSH port forwarding tunnel to verify database connection (`ssh -p 53345 -L 5433:127.0.0.1:5432 admin@server.meeplelabs.de`) and run `bunx drizzle-kit studio` locally to verify introspection and remote connection.
 - **Client Integration and Seeding**
-    - [ ] Create client entry for classmate in db and share access data (`name`, `domain_name`, `verify_email_path`, `reset_password_path`. `client_id`, `api_key_hash`).
+    - [x] Create client entry for classmate in db and share access data (`name`, `domain_name`, `verify_email_path`, `reset_password_path`. `client_id`, `api_key_hash`).
