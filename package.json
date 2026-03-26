@@ -47,6 +47,9 @@
     "reinstall": "bun run cleanup && bun install",
     "prepare": "husky"
   },
+  "overrides": {
+    "picomatch": "^4.0.4"
+  },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,json,md,yaml,yml}": [
       "prettier --write",
