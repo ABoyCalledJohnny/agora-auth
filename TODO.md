@@ -283,13 +283,13 @@ _Out of scope for this project._
             - Bind the PostgreSQL container port to the VPS localhost in `compose.production.yaml` (for port tunnelling).
             - Add the database superuser credentials to `.env.local` to permanently override development environment variables (or set up a dedicated script/command to specify which DB to access).
     - **CI/CD Pipeline**
-        - [ ] Build full `deploy.yaml` with CI and CD build needs (not activated yet) and remove `ci.yaml`.
-- [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
+        - [x] Build full `deploy.yaml` with CI and CD build needs (not activated yet) and remove `ci.yaml`.
+- [x] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
 
 ##### DevOps and Deployment
 
 - **DNS and Domain Management**
-    - [ ] Integrate domain into Dogado mail hosting provider, create email account and add config data to `env.local`.
+    - [x] Integrate domain into Dogado mail hosting provider, create email account and add config data to `env.local`.
     - [x] Configure DNS records (A/AAAA) to point your domain(s) to the production IP addresses.
     - [x] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
 - **CI/CD Pipeline Setup**
