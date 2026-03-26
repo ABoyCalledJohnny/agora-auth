@@ -62,7 +62,7 @@ jobs:
     name: 🐳 Build & Push Images
     runs-on: ubuntu-latest
     needs: verify
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v6
@@ -119,7 +119,7 @@ jobs:
     name: 🚀 Deploy to VPS
     runs-on: ubuntu-latest
     needs: package
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: 📥 Download Artifact
