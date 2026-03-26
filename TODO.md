@@ -293,8 +293,7 @@ _Out of scope for this project._
     - [x] Configure DNS records (A/AAAA) to point your domain(s) to the production IP addresses.
     - [x] Set up DNS records for email delivery (SPF, DKIM, DMARC, MX) if applicable.
 - **CI/CD Pipeline Setup**
-    - [ ] Inject all required production environment variables into your repository's CI/CD secret manager.
-    - [ ] Create GitHub Personal Access Token for pulling the build artifact from GitHub to the VPS (if registry not public).
+    - [x] Inject all required production environment variables into your repository's CI/CD secret manager.
     - [x] Set read/write permissions for GitHub workflows in repository `Actions` settings.
 - **Production Server**
     - [x] Clean old Docker infrastructure.
