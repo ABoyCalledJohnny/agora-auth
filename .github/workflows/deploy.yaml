@@ -213,8 +213,8 @@ jobs:
             # app service
             echo "APP_DB_USER=$APP_DB_USER" > .env.secrets.production.app
             echo "APP_DB_PASSWORD=$APP_DB_PASSWORD" >> .env.secrets.production.app
-            echo "JWT_PRIVATE_KEY=$JWT_PRIVATE_KEY" >> .env.secrets.production.app
-            echo "JWT_PUBLIC_KEY=$JWT_PUBLIC_KEY" >> .env.secrets.production.app
+            printf 'JWT_PRIVATE_KEY="%s"\n' "$JWT_PRIVATE_KEY" >> .env.secrets.production.app
+            printf 'JWT_PUBLIC_KEY="%s"\n' "$JWT_PUBLIC_KEY" >> .env.secrets.production.app
             echo "SMTP_HOST=$SMTP_HOST" >> .env.secrets.production.app
             echo "SMTP_PORT=$SMTP_PORT" >> .env.secrets.production.app
             echo "SMTP_USER=$SMTP_USER" >> .env.secrets.production.app
