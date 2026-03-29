@@ -627,7 +627,37 @@ if (logoutRes.status === 200) {
 }
 ```
 
-## 7. Implementation Status
+## 7. Route Overview
+
+| Method     | Endpoint                           | Auth   | Description                                   | Status      |
+| :--------- | :--------------------------------- | :----- | :-------------------------------------------- | :---------- |
+| **Auth**   |                                    |        |                                               |             |
+| `POST`     | `/api/auth/register`               | Public | Register a new user account                   | Implemented |
+| `POST`     | `/api/auth/login`                  | Public | Authenticate and establish session            | Implemented |
+| `POST`     | `/api/auth/logout`                 | 🔒     | Invalidate session and clear cookies          | Implemented |
+| `POST`     | `/api/auth/refresh`                | Cookie | Rotate tokens using valid refresh cookie      | Implemented |
+| `GET`      | `/api/auth/jwks`                   | Public | Public JWKS endpoint (RS256 public key)       | Implemented |
+| `POST`     | `/api/auth/verify-email/request`   | Public | Request / resend email verification link      | Implemented |
+| `POST`     | `/api/auth/verify-email/confirm`   | Public | Confirm email via token                       | Implemented |
+| `POST`     | `/api/auth/reset-password/request` | Public | Request password reset email                  | Implemented |
+| `POST`     | `/api/auth/reset-password/confirm` | Public | Set new password via reset token              | Implemented |
+| **User**   |                                    |        |                                               |             |
+| `GET`      | `/api/user/profile`                | 🔒     | Get authenticated user's full profile         | Planned     |
+| `PATCH`    | `/api/user/profile`                | 🔒     | Update profile details                        | Planned     |
+| `PATCH`    | `/api/user/email`                  | 🔒     | Initiate email change (triggers verification) | Planned     |
+| `PATCH`    | `/api/user/username`               | 🔒     | Change username                               | Planned     |
+| `PATCH`    | `/api/user/password`               | 🔒     | Change password (requires current password)   | Planned     |
+| `DELETE`   | `/api/user`                        | 🔒     | Self-serve account deletion                   | Planned     |
+| `GET`      | `/api/users/:username`             | 🔒     | Get public user profile                       | Planned     |
+| **Admin**  |                                    |        |                                               |             |
+| `GET`      | `/api/admin/users`                 | Admin  | List all users (paginated)                    | Planned     |
+| `PATCH`    | `/api/admin/users/:id/status`      | Admin  | Suspend or activate a user                    | Planned     |
+| `DELETE`   | `/api/admin/users/:id`             | Admin  | Delete a user account                         | Planned     |
+| **System** |                                    |        |                                               |             |
+| `GET`      | `/api/health`                      | Public | Database and application health check         | Implemented |
+| `GET`      | `/api/live`                        | Public | Liveness probe                                | Implemented |
+
+## 8. Implementation Status
 
 This is still a draft spec.
 Current route handlers may return `501 Not Implemented` until services are fully connected.

@@ -627,7 +627,37 @@ if (logoutRes.status === 200) {
 }
 ```
 
-## 7. Implementierungsstatus
+## 7. Routenübersicht
+
+| Methode    | Endpunkt                           | Auth   | Beschreibung                                       | Status        |
+| :--------- | :--------------------------------- | :----- | :------------------------------------------------- | :------------ |
+| **Auth**   |                                    |        |                                                    |               |
+| `POST`     | `/api/auth/register`               | Public | Neues Benutzerkonto registrieren                   | Implementiert |
+| `POST`     | `/api/auth/login`                  | Public | Authentifizieren und Sitzung erstellen             | Implementiert |
+| `POST`     | `/api/auth/logout`                 | 🔒     | Sitzung beenden und Cookies löschen                | Implementiert |
+| `POST`     | `/api/auth/refresh`                | Cookie | Token-Rotation über gültiges Refresh-Cookie        | Implementiert |
+| `GET`      | `/api/auth/jwks`                   | Public | Öffentlicher JWKS-Endpunkt (RS256 Public Key)      | Implementiert |
+| `POST`     | `/api/auth/verify-email/request`   | Public | E-Mail-Bestätigungslink anfordern / erneut senden  | Implementiert |
+| `POST`     | `/api/auth/verify-email/confirm`   | Public | E-Mail per Token bestätigen                        | Implementiert |
+| `POST`     | `/api/auth/reset-password/request` | Public | Passwort-Zurücksetzung per E-Mail anfordern        | Implementiert |
+| `POST`     | `/api/auth/reset-password/confirm` | Public | Neues Passwort per Reset-Token setzen              | Implementiert |
+| **User**   |                                    |        |                                                    |               |
+| `GET`      | `/api/user/profile`                | 🔒     | Vollständiges Profil des authentifizierten Nutzers | Geplant       |
+| `PATCH`    | `/api/user/profile`                | 🔒     | Profildetails aktualisieren                        | Geplant       |
+| `PATCH`    | `/api/user/email`                  | 🔒     | E-Mail-Änderung einleiten (löst Verifizierung aus) | Geplant       |
+| `PATCH`    | `/api/user/username`               | 🔒     | Benutzernamen ändern                               | Geplant       |
+| `PATCH`    | `/api/user/password`               | 🔒     | Passwort ändern (aktuelles Passwort erforderlich)  | Geplant       |
+| `DELETE`   | `/api/user`                        | 🔒     | Selbstständige Kontolöschung                       | Geplant       |
+| `GET`      | `/api/users/:username`             | 🔒     | Öffentliches Nutzerprofil abrufen                  | Geplant       |
+| **Admin**  |                                    |        |                                                    |               |
+| `GET`      | `/api/admin/users`                 | Admin  | Alle Nutzer auflisten (paginiert)                  | Geplant       |
+| `PATCH`    | `/api/admin/users/:id/status`      | Admin  | Nutzer sperren oder aktivieren                     | Geplant       |
+| `DELETE`   | `/api/admin/users/:id`             | Admin  | Nutzerkonto löschen                                | Geplant       |
+| **System** |                                    |        |                                                    |               |
+| `GET`      | `/api/health`                      | Public | Datenbank- und Anwendungs-Healthcheck              | Implementiert |
+| `GET`      | `/api/live`                        | Public | Liveness-Probe                                     | Implementiert |
+
+## 8. Implementierungsstatus
 
 Das ist weiterhin ein Draft/Entwurf.
 Aktuelle Route-Handler können `501 Not Implemented` zurückgeben, bis die Services komplett verbunden sind.

@@ -164,14 +164,17 @@
         - [ ] **Root layout:** Set up `layout.tsx` with `NextIntlClientProvider` and `Toaster`. (`SessionProvider` is created and added later in the Auth feature.)
         - [ ] **Landing page:** Implement `/` route (`page.tsx`) — marketing/welcome page.
         - [ ] **Header and footer:** Implement `header.tsx` (top navigation/branding bar) and `footer.tsx` (bottom site info/links).
-        - [ ] **Navigation:** Implement initial `nav.tsx` with static placeholder links. (Auth-aware rendering via `useSession()` is added in the Auth feature.)
+        - [ ] **Navigation:** Implement `nav.tsx` with static placeholder links and two navigation patterns (desktop-only MVP):
+            - [ ] **Desktop nav:** Horizontal link bar in the header.
+            - [ ] **User menu:** `Sheet` slide-in panel triggered by a user/avatar button (placeholder for now — auth-aware content is added in the Auth feature).
         - [ ] **Error pages:** Implement `error.tsx`, `not-found.tsx`, `global-error.tsx`, `unauthorized.tsx`, `forbidden.tsx`.
         - [ ] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
-            - [ ] Layout/Architecture: `Container`, `Card`, `Sheet` (for mobile menus).
-            - [ ] Form: `Form`, `Input`, `SearchInput`, `Select`, `Label`, `InputField`, `PasswordField`.
-            - [ ] General: `Button`, `Avatar`, `Modal`, `Tabs`, `Alert`, `Pill`.
+            - [ ] Layout/Architecture: `Container`, `Card`, `Sheet` (slide-in panel for user menu).
+            - [ ] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`.
+            - [ ] General: `Button`, `Alert`, `Toast` (via `sonner`).
             - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`.
+            - _Deferred to respective features or backlog:_ `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
 
 ##### 3.2 Features
@@ -189,7 +192,7 @@
         - [x] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
         - [ ] **`NotificationService`:** Email abstraction using `nodemailer`.
             - [ ] Create HTML templates (welcome/verification, password reset).
-            - [ ] Implement service in `AuthService`.
+            - [ ] Implement service in `AuthService` etc.
         - [x] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
     - **API Routes and Server Actions:**
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
@@ -207,7 +210,7 @@
         - [ ] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
     - **Frontend:**
         - [ ] **`SessionProvider`:** Create in `src/providers/` - React Context with `useSession()` hook. Hydrate from `layout.tsx` via server-side `getSession()`. Add to root layout.
-        - [ ] **`nav.tsx`:** Update with auth-aware rendering - guest links (Login, Register) vs. authenticated (Profile, Settings, Logout) vs. admin (Admin) - using `useSession()`.
+        - [ ] **`nav.tsx`:** Update with auth-aware rendering — guest links (Login, Register) vs. authenticated (Profile, Settings, Logout) vs. admin (Admin) using `useSession()`. Populate user menu `Sheet` with authenticated links.
         - [ ] **Auth forms:** Build `LoginForm` (reads and validates `?next=` param - must start with `/` - passes to login action for post-login redirect), `RegisterForm`, `ForgotPasswordForm`, `ResetPasswordForm`, `VerifyEmailPrompt`. Use `useActionState` for pending/error states.
         - [ ] **Auth hooks:** `useRegister`, `useLogin`, `useLogout`, `useVerifyEmail`, `useResetPassword` in `src/features/auth/hooks/`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `auth`).
@@ -221,6 +224,7 @@
         - [ ] Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
+            - Set `username` as `display_name`?
         - [ ] **`RoleService`:** Handle user role retrieval and assignments, encapsulating authorisation queries.
     - **API Routes and Server Actions:**
         - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
@@ -251,7 +255,7 @@
         - [ ] 🔒 `PATCH /api/admin/users/:id/status` - Suspend/activate a user.
         - [ ] 🔒 `DELETE /api/admin/users/:id` - Delete a user account.
     - **Frontend:**
-        - [ ] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives.
+        - [ ] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog).
         - [ ] **Admin hooks:** `useAdminUsers` (for list/pagination), `useUpdateUserStatus`, `useDeleteUser` in `src/features/admin/hooks/`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `admin`).
 
