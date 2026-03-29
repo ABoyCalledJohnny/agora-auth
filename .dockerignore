@@ -17,6 +17,7 @@ public/build/
 .output/
 coverage/
 *.d.ts
+!src/types/*.d.ts
 
 # ===================================================================
 # Environment Secrets
