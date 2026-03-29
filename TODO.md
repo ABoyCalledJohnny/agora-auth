@@ -226,7 +226,7 @@
         - [ ] Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
-	        - Set `username` as `display_name`?
+            - Set `username` as `display_name`?
         - [ ] **`RoleService`:** Handle user role retrieval and assignments, encapsulating authorisation queries.
     - **API Routes and Server Actions:**
         - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
