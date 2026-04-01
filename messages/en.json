@@ -190,6 +190,9 @@
   },
   "Nav": {
     "home": "Home",
+    "docs": "Docs",
+    "about": "About",
+    "status": "Status",
     "login": "Log in",
     "register": "Sign up",
     "profile": "Profile",

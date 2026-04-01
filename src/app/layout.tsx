@@ -2,13 +2,17 @@ import type { Metadata, Viewport } from "next";
 
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { Inter } from "next/font/google";
 
 import { Footer } from "@/src/components/layout/footer.tsx";
 import { Header } from "@/src/components/layout/header.tsx";
 import { Main } from "@/src/components/layout/main.tsx";
+import { Toaster } from "@/src/components/ui/Toaster.tsx";
 import { appConfig } from "@/src/config/index.ts";
 
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
@@ -21,13 +25,13 @@ export const metadata: Metadata = {
   icons: {
     icon: { url: "/icon.svg", type: "image/svg" },
   },
-  themeColor: "#ffffff",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   interactiveWidget: "resizes-content",
+  themeColor: "#ffffff",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -36,10 +40,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale}>
-      <body id="top">
+      <body id="top" className={inter.className}>
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:shadow-lg"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
         >
           Skip to content
         </a>
@@ -49,6 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Main>{children}</Main>
             <Footer />
           </div>
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>

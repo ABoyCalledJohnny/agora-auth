@@ -190,6 +190,9 @@
   },
   "Nav": {
     "home": "Startseite",
+    "docs": "Dokumentation",
+    "about": "Über uns",
+    "status": "Status",
     "login": "Anmelden",
     "register": "Registrieren",
     "profile": "Profil",

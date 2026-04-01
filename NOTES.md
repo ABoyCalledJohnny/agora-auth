@@ -601,7 +601,6 @@ _Providers:_
 
 - `NextIntlClientProvider`: Wraps the app to provide `next-intl` translations to client components. Mounted in the root layout, receives server-side locale and messages.
 - `SessionProvider`: A React Context provider that wraps the app to store and share the currently authenticated user's state globally. This allows client components to check if a user is logged in without prop drilling or hitting the backend repeatedly.
-- `Toaster` (via `sonner`): Mounted in root layout alongside `SessionProvider`. Provides the toast notification container for the entire app.
 
 _Data/Action Hooks:_
 These hooks wrap Server Actions via `useActionState` (React 19), which returns `[state, formAction, isPending]`. Each hook calls a Server Action, manages `isPending`/`error` state, and returns a `formAction` compatible with `<form action={…}>`. (`useTransition` is only needed for imperative Server Action calls outside of forms.)
@@ -640,7 +639,7 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
     - `Avatar`: Displays a styled user image `avatarUrl` or fallback initials (useful in nav/User Table).
     - `Modal` / `Dialog`: Central overlay for confirming dangerous actions like "Delete/Suspend User" in the admin panel.
     - `Tabs` (or `TabGroup`/`TabPanel`): For navigating sections without page reloads (e.g., in Settings).
-    - `Toast` (via `sonner`): For asynchronous notifications (e.g., "Settings saved", "Check your email"). No need to build from scratch; just map the `Toaster` provider.
+    - `Toaster` (via `sonner`): Toast notification container (`src/components/ui/Toaster.tsx`) mounted in root layout. Toasts are triggered imperatively via `toast()` — no dedicated component needed.
     - `Alert`: For inline page-level alerts (e.g., static error messages at the top of a form).
     - `Pill` / `Badge`: Minimal inline status indicator (useful for showing roles or active/suspended statuses in tables).
 
@@ -768,7 +767,7 @@ See `./messages/{language}.json`
 | **3.2 Auth - Frontend**                            | ~2             | 07/04 - 09/04 | Minimal forms, `SessionProvider`, `nav` update, form, hooks.                                                                                                                                                                                                                                    |
 | **3.2 Admin Dashboard**                            | ~2.5<br>(2.75) | 10/04 - 14/04 | 3 endpoints, Admin Dashboard and UserTable (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                                                     |
 | **5. Docs + Presentation**                         | ~0.5           | 14/04         | `README.md`, `api.md`, presentation prep.                                                                                                                                                                                                                                                       |
-| _Buffer_                                           | ~1             | 15/04         | Overflow, bug fixes. **Finish User Mgmt (backend + profile/settings UI) & Admin Table enhancements (search, filters, batch).**                                                                                                                                                                  |
+| _Buffer_                                           | ~1             | 15/04         | Overflow, bug fixes. **Mobile Menu. Finish User Mgmt (backend + profile/settings UI) & Admin Table enhancements (search, filters, batch).**                                                                                                                                                     |
 
 ---
 
@@ -779,25 +778,20 @@ See `./messages/{language}.json`
 **Frontend Shell**
 
 - Meta / head
-    - Fonts
-    - Logo
     - Intl Einbindung verstehen
-    - Fehlermeldung Browser-Konsole
 - Body
     - Header
         - Struktur
-        - Icon
-        - Sticky
-        - Schatten / Abgrenzung
     - Main
-        - Headlines, Components, base layer
-        - Padding zusätzlich zu font rem?
     - Images
-        - Maße Bilder, SVGs, Ausrichtung
 - Components
     - Was bester Weg für Anpassung von Komponenten (Farben etc.)
 - Sachen aus Mini-Portfolio
 - Accessibility
+
+Toast
+Gute Pseudolinks
+Source of truth for links?
 
 ### 3.2 Features
 
@@ -838,6 +832,7 @@ See `./messages/{language}.json`
 
 **UX**
 
+- **Full Responsiveness:** Implement complete mobile-first responsive design across all pages and components (navigation, forms, tables, modals, etc.).
 - **Shake Effect:** Animation for failed login attempts.
 - **Real-Time Password Feedback:** Per-rule checklist UI during password entry (using `createPasswordRules` with i18n).
 
