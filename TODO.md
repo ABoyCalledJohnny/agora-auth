@@ -251,17 +251,17 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling. 
+        - [ ] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling.
     - **Services:**
-        - [ ] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account. 
+        - [ ] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account.
     - **API Routes and Server Actions:**
         - Implement admin endpoints (dual-channel). All routes require authentication and admin role via `{ auth: true, roles: ['admin'] }`:
-        - [ ] 🔒 `GET /api/admin/users` - List all users (paginated). 
-        - [ ] 🔒 `PATCH /api/admin/users/:id/status` - Suspend/activate a user. 
-        - [ ] 🔒 `DELETE /api/admin/users/:id` - Delete a user account. 
+        - [ ] 🔒 `GET /api/admin/users` - List all users (paginated).
+        - [ ] 🔒 `PATCH /api/admin/users/:id/status` - Suspend/activate a user.
+        - [ ] 🔒 `DELETE /api/admin/users/:id` - Delete a user account.
     - **Frontend:**
-        - [ ] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog). 
-        - [ ] **Admin hooks:** `useAdminUsers` (for list/pagination), `useUpdateUserStatus`, `useDeleteUser` in `src/features/admin/hooks/`. 
+        - [ ] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog).
+        - [ ] **Admin hooks:** `useAdminUsers` (for list/pagination), `useUpdateUserStatus`, `useDeleteUser` in `src/features/admin/hooks/`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `admin`).
 
 ---
