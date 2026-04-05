@@ -26,6 +26,7 @@
     "verify": "bun run lint && bun run typecheck && bun run format:check",
     "verify:build": "bun run lint && bun run typecheck && bun run format:check && bun run build",
     "db:studio": "bun --env-file=.env --env-file=.env.development --env-file=.env.local drizzle-kit studio",
+    "db:tunnel": "ssh -L 5434:127.0.0.1:5432 -N meeplelabs",
     "db:studio:prod": "bun --env-file=.env.tunnel drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun --env-file=.env --env-file=.env.development --env-file=.env.local drizzle-kit migrate",

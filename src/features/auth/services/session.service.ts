@@ -13,7 +13,8 @@ export type CreateSessionResult = {
 
 import { appConfig } from "@/src/config/index.ts";
 import { createToken, hashToken } from "@/src/lib/crypto.ts";
-import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
+import { handleServiceError } from "@/src/lib/service-error.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleSessionRepository } from "@/src/repositories/session.repository.ts";
 

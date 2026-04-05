@@ -545,7 +545,7 @@ Holds static, non-secret system boundaries and definitions.
 
 - **Strict Input Validation:** Complete boundary validation on all inputs (using Zod to enforce rigid schemas), prevent SQL/XSS injections (Drizzle), and apply strong password rules (stored centrally in `src/lib/validation.ts`).
 - **Token Architecture:** Utilising a secure, separated token lifecycle:
-    - _Access Tokens:_ Fast, stateless JWTs with short lifespans (e.g., 15 minutes).
+    - _Access Tokens:_ Fast, stateless JWTs with short lifespans (e.g., 5 minutes).
     - _Refresh Tokens:_ Opaque, DB-backed hashes stored purely in `HttpOnly`, `Secure`, `SameSite=Lax` cookies to prevent JavaScript access.
     - _Verification Tokens:_ Single-use, hashed hashes used strictly for email/password resets, rendering useless upon first consumption.
 - **Refresh Token Rotation:** Moving from static refresh tokens to rolling ones, enabling the system to immediately detect token theft and automatically revoke the compromised session.
@@ -729,79 +729,62 @@ See `./messages/{language}.json`
 | **Week**         | **Date** | **Time (Days)** |               |
 | ---------------- | -------- | --------------- | ------------- |
 |                  |          |                 |               |
-| **2**            | 29/03/26 | 0.25            |               |
-|                  |          |                 |               |
-| **3**            | 30/03/26 | 1               |               |
-|                  | 31/03/26 | 1               |               |
-|                  | 01/04/26 | 1               |               |
-|                  | 02/04/26 | 0.5             | Rehearsal     |
-|                  | 03/04/26 | 1               | Karfreitag    |
-|                  | 05/04/26 | 0.25            | Ostersonntag  |
-|                  |          |                 |               |
 | **4 (holidays)** | 06/04/26 | 0.5             | Ostermontag   |
 |                  | 07/04/26 | 1               |               |
 |                  | 08/04/26 | 0.5             | Familientag   |
 |                  | 09/04/26 | 1               |               |
 |                  | 10/04/26 | 1               |               |
-|                  | 12/04/26 | 0.25            |               |
 |                  |          |                 |               |
 | **5**            | 13/04/26 | 1               |               |
 |                  | 14/04/26 | 1               |               |
 |                  | 15/04/26 | 1               |               |
 |                  | 16/04/26 | 0               | Präsentation  |
 |                  |          |                 |               |
-|                  |          | **12.25**       | **Days left** |
+|                  |          | **7**           | **Days left** |
 
 #### Schedule
 
-| Task                                               | Est.           | Dates         | Notes                                                                                                                                                                                                                                                                                           |
-| :------------------------------------------------- | :------------- | :------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1. Preparation and Planning** ✅                 | Pre            | before 16/03  | Completed before development starts.                                                                                                                                                                                                                                                            |
-| **2. Setup** ✅                                    | Pre            | before 16/03  | Mostly pre-development. 2.3 (Project Identity) spills into Day 1.                                                                                                                                                                                                                               |
-| **3.1 Infrastructure & Core Setup** ✅             | ~3.5           | 16/03 - 20/03 | Validation, DB, repos, `api-wrapper.ts`.                                                                                                                                                                                                                                                        |
-| **3.2 Auth - Backend**<br>**5. API Docs** ✅       | ~3             | 20/03 - 24/03 | 5 services, API endpoints, `auth.ts`. <br>Final `api.md`                                                                                                                                                                                                                                        |
-| **6. Deploy**<br>**External connection** ✅        | ~2             | 25/03 - 26/03 | Docker, Pipeline, DNS, client and seeding<br>External client hookup.                                                                                                                                                                                                                            |
-| **Rehearsal Prep** ✅                              | ~0.25          | 29/03         | Prepare a rough outline for the project presentation rehearsal on 02/04.                                                                                                                                                                                                                        |
-| **3.1 Frontend Shell**                             | ~3             | 30/03 - 01/04 | Root layout, landing page, header/footer, desktop nav + user `Sheet` menu. Core UI primitives (Container, Card, Table, Button, Forms). Desktop-only MVP — no mobile hamburger menu. _Defer `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill` to their respective features or backlog._ |
-| **3.1 & 3.2: Misc**<br>**3.2 User Mgmt - Backend** | ~3<br>(2.75)   | 02/04 - 07/04 | `action-wrapper`, `proxy`, `Notification`, minimal User. Easter break (03-06/04).                                                                                                                                                                                                               |
-| **3.2 Auth - Frontend**                            | ~2             | 07/04 - 09/04 | Minimal forms, `SessionProvider`, `nav` update, form, hooks.                                                                                                                                                                                                                                    |
-| **3.2 Admin Dashboard**                            | ~2.5<br>(2.75) | 10/04 - 14/04 | 3 endpoints, Admin Dashboard and UserTable (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                                                     |
-| **5. Docs + Presentation**                         | ~0.5           | 14/04         | `README.md`, `api.md`, presentation prep.                                                                                                                                                                                                                                                       |
-| _Buffer_                                           | ~1             | 15/04         | Overflow, bug fixes. **Mobile Menu. Finish User Mgmt (backend + profile/settings UI) & Admin Table enhancements (search, filters, batch).**                                                                                                                                                     |
+| Task                       | Dates         | Notes                                                                                                                                                                                                                                                                       |
+| :------------------------- | :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **3.1 Frontend Shell**     | 06/04 - 08/04 | Root layout, landing page, header/footer, desktop nav. Core UI primitives (Container, Card, Table, Button, Forms). Desktop-only MVP — no mobile hamburger menu. _Defer `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill` to their respective features or backlog._ |
+| **3.2 Auth - Frontend**    | 09/04         | Login form, `SessionProvider`, `nav` update, hooks.                                                                                                                                                                                                                         |
+| **3.2 Admin Dashboard**    | 10/04 - 13/04 | 3 endpoints, admin dashboard and `UserTable` (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                               |
+| **5. Docs + Presentation** | 14/04         | `README.md`, `api.md`, `TODO.md`, `NOTES.md`, presentation prep.                                                                                                                                                                                                            |
+| **Buffer**                 | 15/04         | ???                                                                                                                                                                                                                                                                         |
 
 ---
 
 ## 3. Development
 
-### 3.1 Infrastructure and Core Setup
+### 3.1 + 3.2
 
-**Frontend Shell**
+\*\*Mini additions
 
-- Meta / head
-    - Intl Einbindung verstehen
-- Body
-    - Header
-        - Struktur
-    - Main
-    - Images
-- Components
-    - Was bester Weg für Anpassung von Komponenten (Farben etc.)
-- Sachen aus Mini-Portfolio
 - Accessibility
-
-Toast
-Gute Pseudolinks
-Source of truth for links?
-
-### 3.2 Features
-
-**Auth**
-
-**Components / Frontend**
-
-- Usage of `revalidatePath()`
-- Brauche ich `export const dynamic = 'force-dynamic'`?
 - Use `import 'server-only'`
+
+**Misc questions / fixes:**
+
+- Forms
+    - Farben Outline
+    - Hover-Effekt
+    - Label + placeholder identifier
+    - Position password vergessen
+    - FA icons, Spinner-Icon
+- Seitenstruktur (Layout, Container, centring element)
+    - Link-Element wiederverwenden?
+    - Passwort- und Input-Komponenten kombinieren?
+- Auth
+    - `useFormAction`
+    - Zusammenarbeit von Wrapper, Action, `auth.ts` und Login-Formular, `AuthService`
+- Cache, Suspense
+    - Brauche ich `export const dynamic = 'force-dynamic'`?
+    - Loading, use client, suspense
+    - Page cache
+
+Settings
+Types
+Dev branch name
 
 ### 3.3 Backlog
 
@@ -877,22 +860,20 @@ Source of truth for links?
 
 ## 5. Documentation
 
-- Exact time for presentation(s)
-- Questions part of that time frame?
+- Elevator Pitch
+- Postman-Demo, API-Routen früher
+- Refresh token, access token
+- API + Error Handling
+- Struktur, Datenfluss
+    - Zweigleisigkeit
+- Umstellung Sprache
+- Was noch aus Notizen?
+- Live Update
+- refresh and access token pattern Vorteile
 
-**Topics**
+- Dateien/Todos updaten
+- Dateien synchronisieren
 
-| #   | Topic                                                                | ~Min | Source                                               |
-| --- | -------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
-| 1   | Project intro + goals                                                | 2    | NOTES §1.1 (description, MVP scope)                  |
-| 2   | Priorities / approach                                                | 2    | NOTES §1.1 (considerations)                          |
-| 3   | Tech stack                                                           | 2    | README "Tech Stack"                                  |
-| 4   | Architecture + project layout<br> + error handling, config, and i18n | 4    | README "Project Structure", NOTES §1.2 (services)    |
-| 5   | Database schema (ERD)                                                | 3    | dbdiagram.io live                                    |
-| 6   | Security deep-dive                                                   | 3    | NOTES (JWT, Argon2, cookie strategy, token rotation) |
-| 7   | API design + external clients                                        | 2    | API docs, NOTES §1.2                                 |
-| 8   | CI/CD + deployment                                                   | 3    | README "Deployment", pipeline diagram                |
-| 9   | Live demo (landing page -> register → login → admin)                 | 4    | Live app                                             |
-| 10  | Reflection + Q&A                                                     | 5    | -                                                    |
+Passwort Account
 
 ## 6. Initial Major Release and Deployment

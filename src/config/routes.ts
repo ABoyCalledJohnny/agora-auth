@@ -1,43 +1,22 @@
-import type { SystemRoleName } from "./constants.ts";
-
-/**
- * Visibility determines who can see a navigation link:
- * - "public"  → everyone (logged-in or not)
- * - "guest"   → only unauthenticated visitors
- * - "auth"    → any authenticated user
- * - "admin"   → authenticated users with the "admin" role
- */
-type NavVisibility = "public" | "guest" | "auth" | SystemRoleName;
-
-export interface NavRoute {
+export type NavRoute = {
   /** URL path — must correspond to an existing page.tsx route. */
   href: string;
   /** Key inside the "Nav" i18n namespace (messages/en.json → Nav.*). */
   labelKey: string;
-  /** Who should see this link. */
-  visibility: NavVisibility;
-}
+};
 
 /**
- * Central navigation link registry.
+ * Desktop navigation links displayed in the header.
+ *
+ * Auth-related links (login, register, settings, admin, logout) are handled
+ * by their own components (header auth button, user menu Sheet) and do not
+ * belong here. The logo serves as the home link.
  *
  * Every entry must have a matching `src/app/.../page.tsx`.
- * `nav.tsx` maps over this array; update here to add/remove links.
  */
 export const navRoutes: NavRoute[] = [
-  // ── Public (always visible) ──────────────────────────────────────────
-  { href: "/", labelKey: "home", visibility: "public" },
-  { href: "/docs", labelKey: "docs", visibility: "public" },
-  { href: "/about", labelKey: "about", visibility: "public" },
-  { href: "/status", labelKey: "status", visibility: "public" },
-
-  // ── Guest only (unauthenticated) ─────────────────────────────────────
-  { href: "/login", labelKey: "login", visibility: "guest" },
-  { href: "/register", labelKey: "register", visibility: "guest" },
-
-  // ── Authenticated ────────────────────────────────────────────────────
-  { href: "/settings", labelKey: "settings", visibility: "auth" },
-
-  // ── Admin ────────────────────────────────────────────────────────────
-  { href: "/admin", labelKey: "admin", visibility: "admin" },
+  { href: "/about", labelKey: "about" },
+  { href: "/users", labelKey: "users" },
+  { href: "/docs", labelKey: "docs" },
+  { href: "/api/health", labelKey: "status" },
 ];

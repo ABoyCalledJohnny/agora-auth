@@ -1,6 +1,8 @@
+import type { SystemRoleName } from "../config/constants.ts";
 import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { appConfig } from "@/src/config/index.ts";
 import { JwtService } from "@/src/features/auth/services/jwt.service.ts";
@@ -167,24 +169,31 @@ export function authorize(session: AppSession, requiredRoles: string[]): void {
  * Authenticates and (optionally) authorises the current user.
  * Intended for use at the top of protected `page.tsx` files.
  *
+ * Redirects unauthenticated users to `/login` (with optional `?next=` path).
+ * Throws `FORBIDDEN` if the user lacks required roles.
+ *
  * @example
  * ```ts
- * // app/(protected)/dashboard/page.tsx
- * export default async function DashboardPage() {
- *   const session = await assertAuth();
+ * // app/settings/page.tsx
+ * export default async function SettingsPage() {
+ *   const session = await assertAuth({ redirectTo: "/settings" });
  *   // …
  * }
  *
- * // app/(protected)/admin/page.tsx
+ * // app/admin/page.tsx
  * export default async function AdminPage() {
- *   const session = await assertAuth({ roles: ["admin"] });
+ *   const session = await assertAuth({ roles: ["admin"], redirectTo: "/admin" });
  *   // …
  * }
  * ```
  */
-export async function assertAuth(options?: { roles?: string[] }): Promise<AppSession> {
-  const session = await authenticate();
-  if (options?.roles) {
+export async function assertAuth(options: { roles?: SystemRoleName[]; redirectTo?: string } = {}): Promise<AppSession> {
+  const session = await getSession();
+  if (!session) {
+    const loginUrl = options.redirectTo ? `/login?next=${encodeURIComponent(options.redirectTo)}` : "/login";
+    redirect(loginUrl);
+  }
+  if (options.roles) {
     authorize(session, options.roles);
   }
   return session;
@@ -241,4 +250,17 @@ export async function clearSessionCookies() {
   const cookieStore = await cookies();
   cookieStore.delete(appConfig.auth.accessCookieName);
   cookieStore.delete(appConfig.auth.refreshCookieName);
+}
+
+/**
+ * Extracts the IP address and User Agent from the current request headers.
+ * Works identically in Next.js Route Handlers and Server Actions.
+ */
+export async function getRequestMetadata(): Promise<{ ipAddress: string; userAgent: string }> {
+  const headersList = await headers();
+  const ipAddress =
+    headersList.get("x-forwarded-for")?.split(",")[0]?.trim() || headersList.get("x-real-ip") || "unknown";
+  const userAgent = headersList.get("user-agent") || "unknown";
+
+  return { ipAddress, userAgent };
 }

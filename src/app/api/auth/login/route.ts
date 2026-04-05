@@ -7,7 +7,7 @@ import enTranslations from "@/messages/en.json";
 import { loginSchema } from "@/src/features/auth/contracts.ts";
 import { AuthService } from "@/src/features/auth/services/auth.service.ts";
 import { withApiHandler } from "@/src/lib/api-wrapper.ts";
-import { getRequestMetadata } from "@/src/lib/utils.ts";
+import { getRequestMetadata } from "@/src/lib/auth.ts";
 
 export const POST = withApiHandler({ bodySchema: loginSchema }, async ({ data: { identifier, password } }) => {
   // Step 1: Extract request metadata for the session

@@ -9,6 +9,8 @@ export function Footer() {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 640 640"
+            width="16"
+            height="16"
             aria-hidden="true"
             className="size-4 fill-red-500"
           >

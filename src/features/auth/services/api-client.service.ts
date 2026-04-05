@@ -3,7 +3,8 @@ import type { ApiClient } from "@/src/db/schema/index.ts";
 
 import { appConfig } from "@/src/config/index.ts";
 import { hashToken, verifyToken } from "@/src/lib/crypto.ts";
-import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
+import { handleServiceError } from "@/src/lib/service-error.ts";
 import { createPublicId, isSafeRedirect, stripUndefined } from "@/src/lib/utils.ts";
 import { DrizzleApiClientRepository } from "@/src/repositories/api-client.repository.ts";
 

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Inter } from "next/font/google";
 
 import { Footer } from "@/src/components/layout/footer.tsx";
@@ -14,18 +14,21 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: {
-    default: appConfig.app.name,
-    template: `%s | ${appConfig.app.name}`,
-  },
-  description: appConfig.app.tagline,
-  metadataBase: new URL(appConfig.app.url),
-  robots: { index: false, follow: false },
-  icons: {
-    icon: { url: "/icon.svg", type: "image/svg" },
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Landing");
+  return {
+    title: {
+      default: appConfig.app.name,
+      template: `%s | ${appConfig.app.name}`,
+    },
+    description: t("description"),
+    metadataBase: new URL(appConfig.app.url),
+    robots: { index: false, follow: false },
+    icons: {
+      icon: { url: "/icon.svg", type: "image/svg" },
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",

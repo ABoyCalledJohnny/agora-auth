@@ -1,8 +1,9 @@
-export default function Forbidden() {
-  return (
-    <div>
-      <h2>Forbidden</h2>
-      <p>You are not authorized to access this resource.</p>
-    </div>
-  );
+import { getTranslations } from "next-intl/server";
+
+import { ErrorPage } from "@/src/components/ui/ErrorPage.tsx";
+
+export default async function Forbidden() {
+  const t = await getTranslations("ErrorPages.forbidden");
+
+  return <ErrorPage statusCode={403} heading={t("heading")} description={t("description")} backHome={t("backHome")} />;
 }

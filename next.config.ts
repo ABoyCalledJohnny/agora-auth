@@ -149,6 +149,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  experimental: {
+    authInterrupts: true,
+  },
+
   /**
    * Emit a standalone build (server.js + node_modules subset).
    * Required for the Docker production image.
