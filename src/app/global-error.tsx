@@ -10,13 +10,10 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
           <h2 className="mt-4 text-xl font-semibold text-neutral-800">Something went wrong</h2>
           <p className="mt-2 text-sm text-neutral-500">An unexpected error occurred. Please try again later.</p>
           <div className="mt-6 flex gap-4">
-            <button
-              onClick={() => reset()}
-              className="cursor-pointer text-sm font-medium text-teal-500 transition-colors hover:text-teal-600"
-            >
+            <button onClick={() => reset()} className="link-accent cursor-pointer text-sm font-medium">
               Try again
             </button>
-            <a href="/" className="text-sm font-medium text-teal-500 transition-colors hover:text-teal-600">
+            <a href="/" className="link-accent text-sm font-medium">
               Back to home
             </a>
           </div>

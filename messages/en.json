@@ -61,8 +61,8 @@
     "Login": {
       "metaDescription": "Log in to your Agora Auth account.",
       "heading": "Log in",
-      "emailLabel": "Email address",
-      "emailPlaceholder": "you@example.com",
+      "identifierLabel": "Email or username",
+      "identifierPlaceholder": "Email or username",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Enter your password",
       "rememberMe": "Remember me",

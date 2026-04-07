@@ -6,7 +6,7 @@ type InputFieldProps = React.ComponentProps<"input"> & {
   error?: string | undefined;
 };
 
-export function InputField({ label, error, id, name, ...rest }: InputFieldProps) {
+export function InputField({ label, error, id, name, className, ...rest }: InputFieldProps) {
   const fieldId = id ?? name ?? label.toLowerCase().replace(/\s+/g, "-");
   const errorId = `${fieldId}-error`;
 
@@ -18,6 +18,7 @@ export function InputField({ label, error, id, name, ...rest }: InputFieldProps)
         name={name ?? fieldId}
         aria-invalid={!!error}
         aria-describedby={error ? errorId : undefined}
+        className={className}
         {...rest}
       />
       {error && (

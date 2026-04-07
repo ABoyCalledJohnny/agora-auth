@@ -23,15 +23,8 @@ import { sanitizeInput } from "@/src/lib/utils.ts";
  * 3. Client Resolution: Resolves the default internal API client (since this is a server action originating from our own frontend).
  * 4. Validation: If `bodySchema` is provided, it normalizes (handles FormData or plain objects), sanitizes, and validates the input against the Zod schema.
  * 5. Execution: Runs your specific server action handler with the strongly-typed `data`, `session`, and `client`.
- * 6. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ActionResult` union, preventing untyped exceptions from crashing the frontend.
+ * 6. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ApiResponse` union, preventing untyped exceptions from crashing the frontend.
  */
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-/** Discriminated union returned by every wrapped server action. */
-export type ActionResult<TData> = ApiResponse<TData>;
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
 // TypeScript still types it as `Session | null` — use `session!` or a guard.
@@ -40,7 +33,7 @@ export type ActionResult<TData> = ApiResponse<TData>;
 // Internals
 // ---------------------------------------------------------------------------
 
-function formatActionError(error: unknown): ActionResult<never> {
+function formatActionError(error: unknown): ApiErrorResponse {
   if (error instanceof AgoraError) {
     const response: ApiErrorResponse = {
       success: false,
@@ -74,13 +67,13 @@ function parseFormData(input: unknown): unknown {
 export function withActionHandler<TSchema extends z.ZodType, TResult>(
   config: HandlerConfig & { bodySchema: TSchema },
   handler: (context: { data: z.infer<TSchema>; session: AppSession | null; client: ApiClient }) => Promise<TResult>,
-): (rawInput: z.input<TSchema> | FormData) => Promise<ActionResult<TResult>>;
+): (rawInput: FormData) => Promise<ApiResponse<TResult>>;
 
 /** Without schema — handler receives `{ session, client }`. */
 export function withActionHandler<TResult>(
   config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: { session: AppSession | null; client: ApiClient }) => Promise<TResult>,
-): () => Promise<ActionResult<TResult>>;
+): () => Promise<ApiResponse<TResult>>;
 
 // Implementation
 export function withActionHandler(
@@ -88,7 +81,7 @@ export function withActionHandler(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required to satisfy varied generic overload signatures
   handler: (context: any) => Promise<unknown>,
 ) {
-  return async (rawInput?: unknown) => {
+  return async (rawInput?: FormData | undefined) => {
     try {
       // 1. Authentication
       let session: AppSession | null = null;

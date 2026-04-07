@@ -9,10 +9,7 @@ export default function Error({ reset }: { error: Error & { digest?: string }; r
 
   return (
     <ErrorPage statusCode={500} heading={t("heading")} description={t("description")} backHome={t("backHome")}>
-      <button
-        onClick={() => reset()}
-        className="cursor-pointer text-sm font-medium text-teal-500 transition-colors hover:text-teal-600"
-      >
+      <button onClick={() => reset()} className="link-accent cursor-pointer text-sm font-medium">
         {t("tryAgain")}
       </button>
     </ErrorPage>

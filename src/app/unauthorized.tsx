@@ -8,7 +8,7 @@ export default async function Unauthorized() {
 
   return (
     <ErrorPage statusCode={401} heading={t("heading")} description={t("description")} backHome={t("backHome")}>
-      <Link href="/login" className="text-sm font-medium text-teal-500 transition-colors hover:text-teal-600">
+      <Link href="/login" className="link-accent text-sm font-medium">
         {t("logIn")}
       </Link>
     </ErrorPage>

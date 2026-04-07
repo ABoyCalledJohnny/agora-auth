@@ -1,4 +1,4 @@
-import type { ActionResult } from "@/src/lib/action-wrapper.ts";
+import type { ApiResponse } from "@/src/types.ts";
 
 import { useActionState } from "react";
 
@@ -8,9 +8,9 @@ function hasFieldErrors(details: unknown): details is { fieldErrors: ZodFieldErr
   return typeof details === "object" && details !== null && "fieldErrors" in details;
 }
 
-export function useFormAction<TData>(action: (formData: FormData) => Promise<ActionResult<TData>>) {
+export function useFormAction<TData>(action: (formData: FormData) => Promise<ApiResponse<TData>>) {
   const [state, formAction, isPending] = useActionState(
-    (_prev: ActionResult<TData> | null, formData: FormData) => action(formData),
+    (_prev: ApiResponse<TData> | null, formData: FormData) => action(formData),
     null,
   );
 
@@ -20,7 +20,7 @@ export function useFormAction<TData>(action: (formData: FormData) => Promise<Act
     state,
     formAction,
     isPending,
-    formError: errorState?.error,
+    errorCode: errorState?.code,
     fieldErrors: errorState && hasFieldErrors(errorState.details) ? errorState.details.fieldErrors : undefined,
   };
 }

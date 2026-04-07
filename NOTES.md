@@ -746,10 +746,10 @@ See `./messages/{language}.json`
 
 | Task                       | Dates         | Notes                                                                                                                                                                                                                                                                       |
 | :------------------------- | :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **3.1 Frontend Shell**     | 06/04 - 08/04 | Root layout, landing page, header/footer, desktop nav. Core UI primitives (Container, Card, Table, Button, Forms). Desktop-only MVP — no mobile hamburger menu. _Defer `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill` to their respective features or backlog._ |
-| **3.2 Auth - Frontend**    | 09/04         | Login form, `SessionProvider`, `nav` update, hooks.                                                                                                                                                                                                                         |
-| **3.2 Admin Dashboard**    | 10/04 - 13/04 | 3 endpoints, admin dashboard and `UserTable` (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                               |
-| **5. Docs + Presentation** | 14/04         | `README.md`, `api.md`, `TODO.md`, `NOTES.md`, presentation prep.                                                                                                                                                                                                            |
+| **3.2 Auth - Frontend**    | 06/04 - 08/04 | Login form, `SessionProvider`, `nav` update, hooks                                                                                                                                                                                                                          |
+| **3.1 Frontend Shell**     | 09/04 - 10/04 | Root layout, landing page, header/footer, desktop nav. Core UI primitives (Container, Card, Table, Button, Forms). Desktop-only MVP — no mobile hamburger menu. _Defer `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill` to their respective features or backlog._ |
+| **3.2 Admin Dashboard**    | 13/04 - 14/04 | 3 endpoints, admin dashboard and `UserTable` (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                               |
+| **5. Docs + Presentation** | 15/04         | `README.md`, `api.md`, `TODO.md`, `NOTES.md`, presentation prep.                                                                                                                                                                                                            |
 | **Buffer**                 | 15/04         | ???                                                                                                                                                                                                                                                                         |
 
 ---
@@ -766,25 +766,18 @@ See `./messages/{language}.json`
 **Misc questions / fixes:**
 
 - Forms
-    - Farben Outline
-    - Hover-Effekt
-    - Label + placeholder identifier
-    - Position password vergessen
     - FA icons, Spinner-Icon
+    - aria invalid
 - Seitenstruktur (Layout, Container, centring element)
-    - Link-Element wiederverwenden?
-    - Passwort- und Input-Komponenten kombinieren?
+    - Width Cards
 - Auth
-    - `useFormAction`
-    - Zusammenarbeit von Wrapper, Action, `auth.ts` und Login-Formular, `AuthService`
+    - Zusammenarbeit von Wrapper, Action, `auth.ts` und Login-Formular, `AuthService`, `useFormAction`
+    - Action API
+        - Never
 - Cache, Suspense
     - Brauche ich `export const dynamic = 'force-dynamic'`?
     - Loading, use client, suspense
     - Page cache
-
-Settings
-Types
-Dev branch name
 
 ### 3.3 Backlog
 
@@ -818,6 +811,7 @@ Dev branch name
 - **Full Responsiveness:** Implement complete mobile-first responsive design across all pages and components (navigation, forms, tables, modals, etc.).
 - **Shake Effect:** Animation for failed login attempts.
 - **Real-Time Password Feedback:** Per-rule checklist UI during password entry (using `createPasswordRules` with i18n).
+- **Translated Field Validation:** Zod schemas currently emit translation keys (e.g. `passwordMinLength`) or hardcoded English strings as error messages. Integrate `react-hook-form` with Zod (`@hookform/resolvers/zod`) for instant client-side validation, and translate field errors in the component layer via `useTranslations("Validation")`. This enables per-field feedback before submission and ensures all validation messages respect the active locale.
 
 **Infrastructure**
 
@@ -825,6 +819,7 @@ Dev branch name
 - **Security Hardening:** See [Production-Ready Roadmap (Post-MVP Enhancements)](#production-ready-roadmap-post-mvp-enhancements).
 - **`cache()` for Session Deduplication:** Wrap `verifySession()` in React's `cache()` to memoize the session check within a single render pass, avoiding duplicate DB queries when multiple Server Components call it.
 - **`taintUniqueValue`:** Use React's `taintUniqueValue` API to prevent sensitive session data (e.g., tokens, secrets) from accidentally leaking to Client Components via the `SessionProvider`.
+- **Stale Session Revalidation:** The `SessionProvider` is hydrated once from the root layout and not refreshed on client-side navigations. If a user's session expires while the tab is inactive, the header still shows them as logged in until they hit a server action or protected page. Add a `visibilitychange` listener that calls `router.refresh()` when the user returns to the tab after prolonged inactivity, forcing the root layout to re-render and re-hydrate the session.
 - Port remaining utilities from Turbine as needed.
 
 **Architecture / Tech Debt**
@@ -832,6 +827,7 @@ Dev branch name
 - **Full Vertical Slicing Refactor:** Untangle global repositories (`src/repositories/`) and move data access layers strictly into their respective domains (`src/features/.../repositories/`) to achieve true vertical slicing.
     - E.g., Extract `AuthUserRepository` from a global `UserRepository` to contain only authentication-specific queries.
     - Create an `AdminUserService` and `AdminUserRepository` within the `admin` feature for specialized admin queries, avoiding massive conditional logic jumps in the standard `UserService`.
+- **Typed `session` in `withActionHandler`/`withApiHandler`:** Use a conditional generic type (e.g. `TAuth extends boolean`) so that `auth: true` narrows `session` to `AppSession` (non-null) and `auth: false` omits it or types it as `null`. This removes the need for `session!` in handlers. Requires additional overloads or a conditional type mapping in the handler context.
 
 **Questions**
 

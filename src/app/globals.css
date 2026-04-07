@@ -34,6 +34,15 @@
     }
   }
 
+  .link-accent {
+    color: theme(--color-teal-500);
+    transition: color 150ms;
+
+    &:hover {
+      color: theme(--color-teal-600);
+    }
+  }
+
   h1,
   h2,
   h3,

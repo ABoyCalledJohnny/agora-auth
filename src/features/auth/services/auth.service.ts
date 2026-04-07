@@ -115,7 +115,7 @@ export const AuthService = {
         sub: user.id,
         sid: refreshTokenWrapper.session.id,
         username: user.username,
-        roles: userRoles,
+        roles: userRoles.map((role) => role.name),
       });
 
       // Calculate exact expiration ISO string to align with the JWT `exp` claim.
@@ -154,7 +154,7 @@ export const AuthService = {
         sub: user.id,
         sid: refreshTokenWrapper.session.id,
         username: user.username,
-        roles: userRoles,
+        roles: userRoles.map((role) => role.name),
       });
 
       const expiresAt = new Date(Date.now() + parseDuration(appConfig.auth.accessTokenExpiry)).toISOString();

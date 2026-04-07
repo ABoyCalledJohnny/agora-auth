@@ -18,7 +18,7 @@ export function ErrorPage({ statusCode, heading, description, backHome, children
       <p className="mt-2 text-sm text-neutral-500">{description}</p>
       <div className="mt-6 flex gap-4">
         {children}
-        <Link href="/" className="text-sm font-medium text-teal-500 transition-colors hover:text-teal-600">
+        <Link href="/" className="link-accent text-sm font-medium">
           {backHome}
         </Link>
       </div>

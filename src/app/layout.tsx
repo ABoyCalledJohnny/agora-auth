@@ -9,6 +9,8 @@ import { Header } from "@/src/components/layout/header.tsx";
 import { Main } from "@/src/components/layout/main.tsx";
 import { Toaster } from "@/src/components/ui/Toaster.tsx";
 import { appConfig } from "@/src/config/index.ts";
+import { getSession } from "@/src/lib/auth.ts";
+import { SessionProvider } from "@/src/providers/SessionProvider.tsx";
 
 import "./globals.css";
 
@@ -40,6 +42,7 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const session = await getSession();
 
   return (
     <html lang={locale}>
@@ -51,12 +54,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Skip to content
         </a>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <div id="root" className="flex min-h-dvh flex-col">
-            <Header />
-            <Main>{children}</Main>
-            <Footer />
-          </div>
-          <Toaster />
+          <SessionProvider session={session}>
+            <div id="root" className="flex min-h-dvh flex-col">
+              <Header />
+              <Main>{children}</Main>
+              <Footer />
+            </div>
+            <Toaster />
+          </SessionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

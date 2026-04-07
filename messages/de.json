@@ -61,8 +61,8 @@
     "Login": {
       "metaDescription": "Melde dich bei deinem Agora Auth Konto an.",
       "heading": "Anmelden",
-      "emailLabel": "E-Mail-Adresse",
-      "emailPlaceholder": "name@beispiel.de",
+      "identifierLabel": "E-Mail oder Benutzername",
+      "identifierPlaceholder": "E-Mail oder Benutzername",
       "passwordLabel": "Passwort",
       "passwordPlaceholder": "Passwort eingeben",
       "rememberMe": "Angemeldet bleiben",
