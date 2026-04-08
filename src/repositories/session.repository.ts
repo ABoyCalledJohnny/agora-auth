@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { SessionRepository } from "@/src/features/auth/contracts.ts";
 
 import { and, eq, gt, isNull, lt } from "drizzle-orm";

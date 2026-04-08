@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { LoginRequest, RegisterRequest, ResetPasswordConfirmRequest, ResetPasswordRequest } from "../contracts.ts";
 import type { AuthTokens, LoginResponse } from "../types.ts";
 import type { ApiClient, User } from "@/src/db/schema/index.ts";

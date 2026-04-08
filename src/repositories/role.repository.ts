@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { RoleRepository } from "@/src/features/auth/contracts.ts";
 
 import { and, eq } from "drizzle-orm";

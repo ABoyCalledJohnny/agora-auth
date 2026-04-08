@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { VerificationTokenType } from "@/src/config/constants.ts";
 import type { VerificationToken } from "@/src/db/schema/index.ts";
 

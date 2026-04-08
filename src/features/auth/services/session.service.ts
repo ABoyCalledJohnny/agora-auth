@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Session } from "@/src/db/schema/index.ts";
 
 export type CreateSessionInput = {

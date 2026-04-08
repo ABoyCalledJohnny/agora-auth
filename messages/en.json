@@ -51,6 +51,8 @@
     "loading": "Loading…",
     "or": "or",
     "back": "Back",
+    "close": "Close",
+    "irreversible": "This action cannot be undone.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "areYouSure": "Are you sure?",

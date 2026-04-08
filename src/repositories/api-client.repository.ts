@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { ApiClientRepository } from "@/src/features/auth/contracts.ts";
 
 import { eq } from "drizzle-orm";

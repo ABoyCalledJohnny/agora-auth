@@ -1,3 +1,5 @@
+import "server-only";
+
 import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 

@@ -1,3 +1,5 @@
+// import "server-only";
+
 // The Service (UserService.changeStatus(userId, newStatus)) is exactly where this logic belongs. That is where you enforce business rules, such as:
 
 // Preventing an admin from suspending themselves.

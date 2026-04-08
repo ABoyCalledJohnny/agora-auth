@@ -45,12 +45,12 @@ export function LoginForm() {
           error={fieldErrors?.password?.[0]}
         />
 
-        <Button type="submit" pending={isPending}>
+        <Button type="submit" pending={isPending} className="mt-1.5">
           {isPending ? t("submitting") : t("submit")}
         </Button>
       </Form>
 
-      <div className="mt-4 flex flex-col gap-1.5 text-center text-sm text-neutral-500">
+      <div className="mt-3 flex flex-col gap-1.5 text-center text-sm text-neutral-500">
         <p className="">
           <Link href="/forgot-password" className="link-accent">
             {t("forgotPassword")}

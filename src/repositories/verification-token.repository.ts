@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { VerificationTokenType } from "../config/constants.ts";
 import type { VerificationTokenRepository } from "@/src/features/auth/contracts.ts";
 

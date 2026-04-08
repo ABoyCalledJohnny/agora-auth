@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { AccessTokenPayload } from "../types.ts";
 
 import { calculateJwkThumbprint, exportJWK, importPKCS8, importSPKI, type JWK, jwtVerify, SignJWT } from "jose";

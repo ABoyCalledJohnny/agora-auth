@@ -51,6 +51,8 @@
     "loading": "Lädt…",
     "or": "oder",
     "back": "Zurück",
+    "close": "Schließen",
+    "irreversible": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort verbergen",
     "areYouSure": "Bist du sicher?",

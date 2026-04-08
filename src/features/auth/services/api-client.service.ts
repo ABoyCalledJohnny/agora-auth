@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { CreateClientRequest, UpdateClientRequest } from "../contracts.ts";
 import type { ApiClient } from "@/src/db/schema/index.ts";
 

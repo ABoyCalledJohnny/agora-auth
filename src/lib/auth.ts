@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { SystemRoleName } from "../config/constants.ts";
 import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 

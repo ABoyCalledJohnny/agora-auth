@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { ApiClient } from "@/src/db/schema/index.ts";
 import type { HandlerConfig } from "@/src/lib/wrapper-types.ts";
 import type { ApiErrorResponse, ApiResponse } from "@/src/types.ts";
