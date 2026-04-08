@@ -28,8 +28,6 @@ export function AuthStatus() {
     );
   }
 
-  console.log(session);
-
   const isAdmin = session.user.roles.includes("admin");
 
   return (

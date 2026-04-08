@@ -81,7 +81,7 @@ export function withActionHandler(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required to satisfy varied generic overload signatures
   handler: (context: any) => Promise<unknown>,
 ) {
-  return async (rawInput?: FormData | undefined) => {
+  return async (rawInput?: FormData) => {
     try {
       // 1. Authentication
       let session: AppSession | null = null;

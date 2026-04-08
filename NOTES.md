@@ -758,7 +758,7 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
-\*\*Mini additions
+**Mini additions**
 
 - Accessibility
 - Use `import 'server-only'`
@@ -770,14 +770,6 @@ See `./messages/{language}.json`
     - aria invalid
 - Seitenstruktur (Layout, Container, centring element)
     - Width Cards
-- Auth
-    - Zusammenarbeit von Wrapper, Action, `auth.ts` und Login-Formular, `AuthService`, `useFormAction`
-    - Action API
-        - Never
-- Cache, Suspense
-    - Brauche ich `export const dynamic = 'force-dynamic'`?
-    - Loading, use client, suspense
-    - Page cache
 
 ### 3.3 Backlog
 
