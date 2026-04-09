@@ -44,6 +44,7 @@ export function Modal({ open, onClose, title, children, actions, className }: Mo
   return (
     <dialog
       ref={dialogRef}
+      aria-labelledby="modal-title"
       onClose={onClose}
       onClick={handleBackdropClick}
       className={cn(
@@ -52,7 +53,9 @@ export function Modal({ open, onClose, title, children, actions, className }: Mo
       )}
     >
       <div className="flex flex-col gap-3">
-        <h2 className="text-lg text-neutral-800">{title}</h2>
+        <h2 id="modal-title" className="text-lg text-neutral-800">
+          {title}
+        </h2>
 
         <div className="text-sm text-neutral-600">{children}</div>
 

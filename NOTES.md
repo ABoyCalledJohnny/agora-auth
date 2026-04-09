@@ -761,15 +761,12 @@ See `./messages/{language}.json`
 **Mini additions**
 
 - Accessibility
-- Use `import 'server-only'`
 
 **Misc questions / fixes:**
 
-- Forms
-    - FA icons, Spinner-Icon
-    - aria invalid
-- Seitenstruktur (Layout, Container, centring element)
-    - Width Cards
+- Tabelle
+    - Suspense?
+    -
 
 ### 3.3 Backlog
 
@@ -864,6 +861,8 @@ See `./messages/{language}.json`
 
 Passwort Account
 
-learnings, pipeline nervt zwar, aber ist auch super wi
+learnings, pipeline nervt zwar, aber ist auch super wichtig
+
+project specifics in README
 
 ## 6. Initial Major Release and Deployment

@@ -13,7 +13,11 @@ export function AuthStatus() {
 
   if (!session) {
     return (
-      <Link href="/login" className="text-neutral-600 transition-colors duration-200 ease-in-out hover:text-teal-500">
+      <Link
+        href="/login"
+        aria-label={t("login")}
+        className="text-neutral-600 transition-colors duration-200 ease-in-out hover:text-teal-500"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 640"

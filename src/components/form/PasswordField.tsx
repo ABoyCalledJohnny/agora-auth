@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Input } from "@/src/components/form/Input.tsx";
@@ -11,6 +12,7 @@ type PasswordFieldProps = Omit<React.ComponentProps<"input">, "type"> & {
 };
 
 export function PasswordField({ label, error, id, name, ...rest }: PasswordFieldProps) {
+  const t = useTranslations("Common");
   const [visible, setVisible] = useState(false);
   const fieldId = id ?? name ?? label.toLowerCase().replace(/\s+/g, "-");
   const errorId = `${fieldId}-error`;
@@ -33,7 +35,7 @@ export function PasswordField({ label, error, id, name, ...rest }: PasswordField
           onClick={() => setVisible((isVisible) => !isVisible)}
           className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-neutral-400 hover:text-neutral-600"
           tabIndex={-1}
-          aria-label={visible ? "Hide password" : "Show password"}
+          aria-label={visible ? t("hidePassword") : t("showPassword")}
         >
           {visible ? (
             <svg

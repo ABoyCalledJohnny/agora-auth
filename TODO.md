@@ -173,8 +173,8 @@
         - [x] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
             - [x] Layout/Architecture: `Container`, `Card`.
-            - [ ] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`. 🟢
-            - [ ] General: `Button`, `Alert`, `Avatar`, `Modal`, `Pill`. 🟢
+            - [x] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`.
+            - [x] General: `Button`, `Alert`, `Avatar`, `Modal`, `Pill`.
             - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`. 🟢
             - [x] Hooks: `useFormAction`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
