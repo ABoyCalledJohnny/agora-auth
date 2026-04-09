@@ -25,7 +25,7 @@ type TableHeadProps = React.ComponentProps<"thead">;
 export function TableHead({ children, className, ...rest }: TableHeadProps) {
   return (
     <thead
-      className={cn("border-b border-neutral-200 bg-neutral-50 text-xs font-medium text-neutral-500", className)}
+      className={cn("border-b border-neutral-200 bg-neutral-50 text-xs font-medium text-neutral-700", className)}
       {...rest}
     >
       {children}
@@ -69,7 +69,7 @@ type TableHeaderCellProps = React.ComponentProps<"th">;
 
 export function TableHeaderCell({ children, className, ...rest }: TableHeaderCellProps) {
   return (
-    <th scope="col" className={cn("px-4 py-3 whitespace-nowrap", className)} {...rest}>
+    <th scope="col" className={cn("px-3 py-4 whitespace-nowrap", className)} {...rest}>
       {children}
     </th>
   );
@@ -83,7 +83,7 @@ type TableCellProps = React.ComponentProps<"td">;
 
 export function TableCell({ children, className, ...rest }: TableCellProps) {
   return (
-    <td className={cn("px-4 py-3 whitespace-nowrap text-neutral-700", className)} {...rest}>
+    <td className={cn("px-3 py-4 whitespace-nowrap text-neutral-700", className)} {...rest}>
       {children}
     </td>
   );

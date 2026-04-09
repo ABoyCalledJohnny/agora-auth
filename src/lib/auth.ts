@@ -5,6 +5,7 @@ import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { appConfig } from "@/src/config/index.ts";
 import { JwtService } from "@/src/features/auth/services/jwt.service.ts";
@@ -60,7 +61,9 @@ export type AppSession = {
  *
  * Returns `null` if no tokens are present or the refresh fails.
  */
-export async function getSession(): Promise<AppSession | null> {
+export const getSession = cache(_getSession);
+
+async function _getSession(): Promise<AppSession | null> {
   // 1. Grab both cookies
   const { accessCookie, refreshCookie } = await getSessionCookies();
 
@@ -101,7 +104,7 @@ export async function getSession(): Promise<AppSession | null> {
     const authTokens = await AuthService.refresh(refreshCookie.value);
 
     // 6. Write the new tokens strictly back to the headers
-    setSessionCookies(authTokens.accessToken, authTokens.refreshToken);
+    await setSessionCookies(authTokens.accessToken, authTokens.refreshToken);
 
     // 7. Map the newly generated parameters into `AppSession` and cleanly return it.
     const decodedNewToken = await JwtService.verify(authTokens.accessToken);

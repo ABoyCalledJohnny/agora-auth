@@ -2,7 +2,7 @@
 
 @layer base {
   html {
-    font-size: clamp(1rem, 0.875rem + 0.5vw, 1.2rem);
+    font-size: clamp(1rem, 0.875rem + 0.5vw, 1.1rem);
     data-scroll-behavior: smooth;
     scrollbar-gutter: stable;
   }

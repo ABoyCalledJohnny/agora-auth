@@ -758,16 +758,6 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
-**Mini additions**
-
-- Accessibility
-
-**Misc questions / fixes:**
-
-- Tabelle
-    - Suspense?
-    -
-
 ### 3.3 Backlog
 
 **Deferred MVP Features**
@@ -797,6 +787,7 @@ See `./messages/{language}.json`
 
 **UX**
 
+- **Pagination Page Input:** Add an editable page number input field to the `Pagination` component so users can jump directly to a specific page.
 - **Full Responsiveness:** Implement complete mobile-first responsive design across all pages and components (navigation, forms, tables, modals, etc.).
 - **Shake Effect:** Animation for failed login attempts.
 - **Real-Time Password Feedback:** Per-rule checklist UI during password entry (using `createPasswordRules` with i18n).

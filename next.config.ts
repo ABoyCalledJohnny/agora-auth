@@ -31,7 +31,7 @@ const csp = `
   style-src 'self' 'unsafe-inline';
 
   /* Images via <Image>, data URLs, and blobs (e.g. avatars, uploads) */
-  img-src 'self' data: blob:;
+  img-src 'self' data: blob: https://i.pravatar.cc;
 
   /* Fonts served locally */
   font-src 'self';
@@ -151,6 +151,15 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
+  },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.pravatar.cc",
+      },
+    ],
   },
 
   /**

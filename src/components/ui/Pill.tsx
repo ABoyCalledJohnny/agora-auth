@@ -44,7 +44,7 @@ const roleVariants = {
     icon: ShieldIcon,
   },
   user: {
-    classes: "border-neutral-200 bg-neutral-50 text-neutral-600",
+    classes: "border-blue-200 bg-blue-50 text-blue-600",
     icon: UserIcon,
   },
 };
@@ -61,13 +61,13 @@ export function StatusPill({ variant, children, className, ...rest }: StatusPill
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex min-w-21 items-center justify-center rounded-full border px-2 py-1 text-xs font-medium select-none",
         statusVariants[variant],
         className,
       )}
       {...rest}
     >
-      {children ?? variant}
+      {children ?? variant.charAt(0).toUpperCase() + variant.slice(1)}
     </span>
   );
 }
@@ -82,14 +82,14 @@ export function RolePill({ variant, children, className, ...rest }: RolePillProp
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex min-w-18 items-center justify-center gap-1 rounded-full border px-2 py-1 text-xs font-medium select-none",
         classes,
         className,
       )}
       {...rest}
     >
       <Icon />
-      {children ?? variant}
+      {children ?? variant.charAt(0).toUpperCase() + variant.slice(1)}
     </span>
   );
 }

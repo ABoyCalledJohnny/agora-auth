@@ -3,12 +3,12 @@ import Image from "next/image";
 import { cn } from "@/src/lib/utils.ts";
 
 const sizes = {
-  sm: "size-8 text-xs",
-  md: "size-10 text-sm",
-  lg: "size-12 text-base",
+  sm: "size-8 min-w-8 min-h-8 text-xs",
+  md: "size-10 min-w-10 min-h-10 text-sm",
+  lg: "size-12 min-w-12 min-h-12 text-base",
 };
 
-type AvatarProps = Omit<React.ComponentProps<typeof Image>, "alt" | "width" | "height"> & {
+type AvatarProps = Omit<React.ComponentProps<typeof Image>, "src" | "alt" | "width" | "height"> & {
   src?: string | null;
   alt: string;
   size?: keyof typeof sizes;
