@@ -1,4 +1,4 @@
-import type { VerificationTokenType } from "@/src/config/constants.ts";
+import type { SystemRoleName, VerificationTokenType } from "@/src/config/constants.ts";
 import type {
   ApiClient,
   NewApiClient,
@@ -23,7 +23,7 @@ export interface RoleRepository extends CrudRepository<
   Partial<Omit<NewRole, "id" | "createdAt" | "updatedAt">>
 > {
   // Read
-  findByName(name: string): Promise<Role | null>;
+  findByName(name: SystemRoleName): Promise<Role | null>;
   getUserRoles(userId: string): Promise<Role[]>;
 
   // Update

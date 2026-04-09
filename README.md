@@ -5,7 +5,7 @@
 
 > [!NOTE]
 > **Active Development**
-> The core authentication logic, CI/CD pipeline, and production deployment are fully operational. The project is currently focusing on frontend UI completion, admin flows, and external notification services.
+> The core authentication logic (API routes, Server Actions, Zod schemas, database models, and type-safe wrappers), CI/CD pipeline, and production deployment are fully operational. The project is currently focusing on frontend UI completion (user management, admin dashboard), and external notification service integration.
 
 A robust, secure, and modern authentication and user management system built with Next.js, Drizzle ORM, and PostgreSQL.
 
