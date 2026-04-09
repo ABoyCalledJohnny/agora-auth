@@ -73,7 +73,9 @@
       "forgotPassword": "Passwort vergessen?",
       "noAccount": "Noch kein Konto?",
       "noAccountLink": "Registrieren",
-      "success": "Anmeldung erfolgreich."
+      "success": "Anmeldung erfolgreich.",
+      "alreadyLoggedIn": "Du bist bereits angemeldet.",
+      "logout": "Abmelden"
     },
     "Register": {
       "heading": "Konto erstellen",

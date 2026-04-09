@@ -48,82 +48,40 @@ export type AppSession = {
 };
 
 // ---------------------------------------------------------------------------
-// Session retrieval
+// Session retrieval (read-only — safe for Server Components)
 // ---------------------------------------------------------------------------
 
 /**
- * Reads the Access JWT from the cookie and decodes it.
+ * Reads the Access JWT from the cookie and verifies it.
  *
- * If the Access JWT is expired but a valid Refresh token cookie is present,
- * silently rotates the Refresh token via `SessionService`, issues a new
- * Access JWT via `JwtService`, updates both cookies, and returns the
- * decoded payload.
+ * This is a **read-only** check: it never writes cookies, so it is safe to
+ * call from Server Components, Server Actions, and Route Handlers alike.
  *
- * Returns `null` if no tokens are present or the refresh fails.
+ * If the Access JWT is expired or missing, returns `null` without attempting
+ * a refresh. Silent token refresh is handled by:
+ * - `authenticate()` — for Server Actions / Route Handlers
+ * - `GET /api/auth/refresh` — for Server Component navigations (via `assertAuth`)
  */
 export const getSession = cache(_getSession);
 
 async function _getSession(): Promise<AppSession | null> {
-  // 1. Grab both cookies
-  const { accessCookie, refreshCookie } = await getSessionCookies();
+  const { accessCookie } = await getSessionCookies();
 
-  // 2. Gatekeeper Check: If neither exists, user is a guest.
-  if (!accessCookie && !refreshCookie) {
+  if (!accessCookie) {
     return null;
   }
 
-  // 3. Access Cookie Strategy
-  if (accessCookie) {
-    try {
-      // Verify signature & expiration. If valid, we are done!
-      const payload = await JwtService.verify(accessCookie.value);
-      return {
-        sessionId: payload.sid,
-        user: {
-          id: payload.sub,
-          username: payload.username,
-          roles: payload.roles,
-        },
-      };
-    } catch (error) {
-      // If error is NOT an expiration error (e.g. tampering, invalid signature), reject immediately
-      if (!(error instanceof AgoraError && error.code === "TOKEN_EXPIRED")) {
-        return null;
-      }
-      // If it IS expired, swallow the error and fall through to the Refresh Flow.
-    }
-  }
-
-  // 4. Refresh Strategy (Reached if access token is missing or expired)
-  if (!refreshCookie) {
-    return null; // Cannot refresh without a refresh token.
-  }
-
   try {
-    // 5. Call `AuthService.refresh(refreshToken)` to securely rotate the DB session
-    const authTokens = await AuthService.refresh(refreshCookie.value);
-
-    // 6. Write the new tokens strictly back to the headers
-    await setSessionCookies(authTokens.accessToken, authTokens.refreshToken);
-
-    // 7. Map the newly generated parameters into `AppSession` and cleanly return it.
-    const decodedNewToken = await JwtService.verify(authTokens.accessToken);
+    const payload = await JwtService.verify(accessCookie.value);
     return {
-      sessionId: decodedNewToken.sid,
+      sessionId: payload.sid,
       user: {
-        id: decodedNewToken.sub,
-        username: decodedNewToken.username,
-        roles: decodedNewToken.roles,
+        id: payload.sub,
+        username: payload.username,
+        roles: payload.roles,
       },
     };
-  } catch (error) {
-    // The database rejected the refresh token!
-    if (error instanceof AgoraError) {
-      // If they are suspended/pending/revoked, actively delete the cookies
-      if (["ACCOUNT_SUSPENDED", "ACCOUNT_PENDING", "UNAUTHORIZED"].includes(error.code)) {
-        clearSessionCookies();
-      }
-    }
+  } catch {
     return null;
   }
 }
@@ -134,15 +92,47 @@ async function _getSession(): Promise<AppSession | null> {
 
 /**
  * Verifies a valid Access JWT exists and returns the decoded payload.
- * Triggers a silent token refresh if the Access JWT is expired.
+ * If the access token is expired but a valid refresh cookie is present,
+ * silently rotates the session and updates the cookies.
+ *
+ * **Only safe in Server Actions and Route Handlers** (contexts that can
+ * write cookies). For Server Components, use `getSession()` / `assertAuth()`.
+ *
  * Throws `UNAUTHORIZED` if no valid session can be established.
  */
 export async function authenticate(): Promise<AppSession> {
+  // Fast path: valid access token (uses the cached read-only check)
   const session = await getSession();
-  if (!session) {
+  if (session) return session;
+
+  // Slow path: attempt silent refresh
+  const { refreshCookie } = await getSessionCookies();
+  if (!refreshCookie) {
     throw new AgoraError("UNAUTHORIZED");
   }
-  return session;
+
+  try {
+    const { ipAddress } = await getRequestMetadata();
+    const authTokens = await AuthService.refresh(refreshCookie.value, ipAddress);
+    await setSessionCookies(authTokens.accessToken, authTokens.refreshToken);
+
+    const payload = await JwtService.verify(authTokens.accessToken);
+    return {
+      sessionId: payload.sid,
+      user: {
+        id: payload.sub,
+        username: payload.username,
+        roles: payload.roles,
+      },
+    };
+  } catch (error) {
+    if (error instanceof AgoraError) {
+      if (["ACCOUNT_SUSPENDED", "ACCOUNT_PENDING", "UNAUTHORIZED"].includes(error.code)) {
+        await clearSessionCookies();
+      }
+    }
+    throw new AgoraError("UNAUTHORIZED");
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -195,7 +185,16 @@ export function authorize(session: AppSession, requiredRoles: string[]): void {
 export async function assertAuth(options: { roles?: SystemRoleName[]; redirectTo?: string } = {}): Promise<AppSession> {
   const session = await getSession();
   if (!session) {
-    const loginUrl = options.redirectTo ? `/login?next=${encodeURIComponent(options.redirectTo)}` : "/login";
+    const destination = options.redirectTo ?? "/";
+
+    // If a refresh cookie exists, redirect through the refresh Route Handler
+    // which can write cookies, then bounce back to the original page.
+    const { refreshCookie } = await getSessionCookies();
+    if (refreshCookie) {
+      redirect(`/api/auth/refresh?next=${encodeURIComponent(destination)}`);
+    }
+
+    const loginUrl = `/login?next=${encodeURIComponent(destination)}`;
     redirect(loginUrl);
   }
   if (options.roles) {
@@ -232,19 +231,22 @@ export async function getSessionCookies(): Promise<{
  */
 export async function setSessionCookies(accessToken: string, refreshToken: string) {
   const cookieStore = await cookies();
+  const isProd = appConfig.app.env === "production";
+  const cookiePrefix = isProd ? "__Secure-" : "";
+
   const shared = {
     httpOnly: true,
-    secure: appConfig.app.env === "production",
+    secure: isProd,
     sameSite: appConfig.auth.cookieSameSite,
     path: "/",
   } as const;
 
-  cookieStore.set(appConfig.auth.accessCookieName, accessToken, {
+  cookieStore.set(`${cookiePrefix}${appConfig.auth.accessCookieName}`, accessToken, {
     ...shared,
     maxAge: parseDuration(appConfig.auth.accessTokenExpiry) / 1000,
   });
 
-  cookieStore.set(appConfig.auth.refreshCookieName, refreshToken, {
+  cookieStore.set(`${cookiePrefix}${appConfig.auth.refreshCookieName}`, refreshToken, {
     ...shared,
     maxAge: parseDuration(appConfig.auth.refreshTokenExpiry) / 1000,
   });
@@ -253,8 +255,11 @@ export async function setSessionCookies(accessToken: string, refreshToken: strin
 /** Clears both session cookies. */
 export async function clearSessionCookies() {
   const cookieStore = await cookies();
-  cookieStore.delete(appConfig.auth.accessCookieName);
-  cookieStore.delete(appConfig.auth.refreshCookieName);
+  const isProd = appConfig.app.env === "production";
+  const cookiePrefix = isProd ? "__Secure-" : "";
+
+  cookieStore.delete(`${cookiePrefix}${appConfig.auth.accessCookieName}`);
+  cookieStore.delete(`${cookiePrefix}${appConfig.auth.refreshCookieName}`);
 }
 
 /**

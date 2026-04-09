@@ -73,7 +73,9 @@
       "forgotPassword": "Forgot your password?",
       "noAccount": "Don't have an account?",
       "noAccountLink": "Register",
-      "success": "Login successful"
+      "success": "Login successful",
+      "alreadyLoggedIn": "You are already logged in.",
+      "logout": "Log out"
     },
     "Register": {
       "heading": "Create an account",

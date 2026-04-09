@@ -91,7 +91,7 @@ export const SessionService = {
    * @returns The newly rotated plaintext token and the updated session entity.
    * @throws {AgoraError} INVALID_CREDENTIALS on failure or suspected theft.
    */
-  async rotate(plainToken: string): Promise<CreateSessionResult> {
+  async rotate(plainToken: string, ipAddress?: string): Promise<CreateSessionResult> {
     try {
       const tokenHash = hashToken(plainToken);
       let session = await DrizzleSessionRepository.findActiveByToken(tokenHash);
@@ -101,7 +101,15 @@ export const SessionService = {
         const stolenSession = await DrizzleSessionRepository.findByPreviousToken(tokenHash);
 
         if (stolenSession) {
-          await DrizzleSessionRepository.revokeAllForUser(stolenSession.userId);
+          // Grace period: if the token was rotated very recently AND the IP matches,
+          // this is a concurrent request (e.g. parallel page loads), not theft.
+          // Skip revocation — the first request already rotated successfully.
+          const elapsed = Date.now() - stolenSession.lastActiveAt.getTime();
+          const sameIp = ipAddress != null && stolenSession.ipAddress === ipAddress;
+
+          if (elapsed >= 2000 || !sameIp) {
+            await DrizzleSessionRepository.revokeAllForUser(stolenSession.userId);
+          }
         }
 
         throw new AgoraError("INVALID_CREDENTIALS", "Session invalid, expired, or compromised.");

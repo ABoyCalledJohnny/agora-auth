@@ -758,6 +758,8 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
+auth, cookies and routes
+
 ### 3.3 Backlog
 
 **Deferred MVP Features**

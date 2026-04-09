@@ -138,11 +138,11 @@ export const AuthService = {
   /**
    * 3. Refresh Flow
    */
-  async refresh(plainSessionToken: string): Promise<AuthTokens> {
+  async refresh(plainSessionToken: string, ipAddress?: string): Promise<AuthTokens> {
     try {
       // 1. Call `SessionService.rotate(plainSessionToken)` to invalidate the old refresh token and get a new one.
       //    (This inherently checks for Token Reuse and triggers full revocation if stolen).
-      const refreshTokenWrapper = await SessionService.rotate(plainSessionToken);
+      const refreshTokenWrapper = await SessionService.rotate(plainSessionToken, ipAddress);
 
       // 2. Lookup the user from the rotated session's `userId` to ensure they are still active (not suspended/deleted).
       const user = await DrizzleUserRepository.findById(refreshTokenWrapper.session.userId);
