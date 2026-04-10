@@ -1,5 +1,3 @@
-import "server-only";
-
 import type { SystemRoleName } from "@/src/config/constants.ts";
 import type { RoleRepository } from "@/src/features/auth/contracts.ts";
 
