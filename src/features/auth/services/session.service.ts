@@ -103,13 +103,23 @@ export const SessionService = {
         if (stolenSession) {
           // Grace period: if the token was rotated very recently AND the IP matches,
           // this is a concurrent request (e.g. parallel page loads), not theft.
-          // Skip revocation — the first request already rotated successfully.
+          // Re-rotate from the current session instead of rejecting.
           const elapsed = Date.now() - stolenSession.lastActiveAt.getTime();
           const sameIp = ipAddress != null && stolenSession.ipAddress === ipAddress;
 
-          if (elapsed >= 2000 || !sameIp) {
-            await DrizzleSessionRepository.revokeAllForUser(stolenSession.userId);
+          if (elapsed < 2000 && sameIp) {
+            const newPlainToken = createToken();
+            const newTokenHash = hashToken(newPlainToken);
+            const rotated = await DrizzleSessionRepository.updateToken(
+              stolenSession.id,
+              newTokenHash,
+              stolenSession.sessionTokenHash,
+            );
+
+            return { plainToken: newPlainToken, session: rotated };
           }
+
+          await DrizzleSessionRepository.revokeAllForUser(stolenSession.userId);
         }
 
         throw new AgoraError("INVALID_CREDENTIALS", "Session invalid, expired, or compromised.");

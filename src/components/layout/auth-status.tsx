@@ -38,6 +38,7 @@ export function AuthStatus() {
     <div className="flex items-center gap-2">
       {isAdmin && (
         <Link href="/admin" className={buttonVariants({ variant: "primary", className: "px-3 py-1.5 text-xs" })}>
+          {" "}
           {t("admin")}
         </Link>
       )}

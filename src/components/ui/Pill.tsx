@@ -61,7 +61,7 @@ export function StatusPill({ variant, children, className, ...rest }: StatusPill
   return (
     <span
       className={cn(
-        "inline-flex min-w-21 items-center justify-center rounded-full border px-2 py-1 text-xs font-medium select-none",
+        "inline-flex items-center justify-center rounded-full border px-2 py-1 text-xs font-medium select-none",
         statusVariants[variant],
         className,
       )}
@@ -82,7 +82,7 @@ export function RolePill({ variant, children, className, ...rest }: RolePillProp
   return (
     <span
       className={cn(
-        "inline-flex min-w-18 items-center justify-center gap-1 rounded-full border px-2 py-1 text-xs font-medium select-none",
+        "inline-flex items-center justify-center gap-1 rounded-full border px-2 py-1 text-xs font-medium select-none",
         classes,
         className,
       )}

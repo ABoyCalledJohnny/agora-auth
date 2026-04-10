@@ -116,18 +116,19 @@ export function AdminUsersTable() {
         const highest = user.roles
           .map((r) => r.role.name)
           .sort((a, b) => (ROLE_HIERARCHY[b] ?? 0) - (ROLE_HIERARCHY[a] ?? 0))[0];
-        return highest ? <RolePill variant={highest} className="px-1.5 py-0.5" /> : null;
+        return highest ? <RolePill variant={highest} className="min-w-18 py-0.5" /> : null;
       },
     },
     {
       key: "status",
       header: t("columnStatus"),
-      render: (user) => <StatusPill variant={user.status} className="px-1.5 py-0.5" />,
+      render: (user) => <StatusPill variant={user.status} className="min-w-21 py-0.5" />,
     },
     {
       key: "createdAt",
       header: t("columnCreated"),
       render: (user) => format.dateTime(user.createdAt, { dateStyle: "medium" }),
+      className: "min-w-28",
     },
     {
       key: "lastSignInAt",
@@ -138,6 +139,7 @@ export function AdminUsersTable() {
         ) : (
           <span className="block text-center">-</span>
         ),
+      className: "min-w-28",
     },
     {
       key: "actions",

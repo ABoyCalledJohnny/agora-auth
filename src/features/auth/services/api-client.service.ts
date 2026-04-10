@@ -80,6 +80,10 @@ export const ApiClientService = {
    * Useful for enforcing that requests or post-login redirects actually originate from
    * or lead to the allowed client domain, preventing Open Redirect attacks.
    *
+   * NOTE: Currently unused. Intended for a future multi-tenant OAuth flow where
+   * external clients redirect through this auth server and their redirect URLs
+   * need to be validated against their registered `baseUrl`.
+   *
    * @param client The validated ApiClient.
    * @param urlToVerify The requested redirect URL or origin.
    * @returns True if the URL is allowed.

@@ -23,7 +23,7 @@ export default async function Page() {
 
   return (
     <CenteredLayout className="flex-1">
-      <Card className={cn("w-full max-w-md", session ? "text-center" : "")}>
+      <Card className={cn("w-full max-w-xs", session ? "text-center" : "")}>
         {session ? <AlreadyLoggedIn /> : <LoginForm />}
       </Card>
     </CenteredLayout>

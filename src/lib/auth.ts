@@ -59,8 +59,8 @@ export type AppSession = {
  *
  * If the Access JWT is expired or missing, returns `null` without attempting
  * a refresh. Silent token refresh is handled by:
+ * - `proxy.ts` — for page navigations (runs before the render)
  * - `authenticate()` — for Server Actions / Route Handlers
- * - `GET /api/auth/refresh` — for Server Component navigations (via `assertAuth`)
  */
 export const getSession = cache(_getSession);
 
@@ -101,12 +101,31 @@ async function _getSession(): Promise<AppSession | null> {
  * Throws `UNAUTHORIZED` if no valid session can be established.
  */
 export async function authenticate(): Promise<AppSession> {
-  // Fast path: valid access token (uses the cached read-only check)
-  const session = await getSession();
-  if (session) return session;
+  const { accessCookie, refreshCookie } = await getSessionCookies();
+
+  // No tokens at all — nothing to do
+  if (!accessCookie && !refreshCookie) {
+    throw new AgoraError("UNAUTHORIZED");
+  }
+
+  // Fast path: verify access token directly
+  if (accessCookie) {
+    try {
+      const payload = await JwtService.verify(accessCookie.value);
+      return {
+        sessionId: payload.sid,
+        user: {
+          id: payload.sub,
+          username: payload.username,
+          roles: payload.roles,
+        },
+      };
+    } catch {
+      // Expired or invalid — fall through to refresh attempt
+    }
+  }
 
   // Slow path: attempt silent refresh
-  const { refreshCookie } = await getSessionCookies();
   if (!refreshCookie) {
     throw new AgoraError("UNAUTHORIZED");
   }
@@ -185,17 +204,10 @@ export function authorize(session: AppSession, requiredRoles: string[]): void {
 export async function assertAuth(options: { roles?: SystemRoleName[]; redirectTo?: string } = {}): Promise<AppSession> {
   const session = await getSession();
   if (!session) {
+    // By the time we reach here, proxy.ts has already attempted a silent
+    // refresh. If there's still no session the user must log in.
     const destination = options.redirectTo ?? "/";
-
-    // If a refresh cookie exists, redirect through the refresh Route Handler
-    // which can write cookies, then bounce back to the original page.
-    const { refreshCookie } = await getSessionCookies();
-    if (refreshCookie) {
-      redirect(`/api/auth/refresh?next=${encodeURIComponent(destination)}`);
-    }
-
-    const loginUrl = `/login?next=${encodeURIComponent(destination)}`;
-    redirect(loginUrl);
+    redirect(`/login?next=${encodeURIComponent(destination)}`);
   }
   if (options.roles) {
     authorize(session, options.roles);

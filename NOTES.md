@@ -758,8 +758,6 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
-auth, cookies and routes
-
 ### 3.3 Backlog
 
 **Deferred MVP Features**
@@ -836,6 +834,8 @@ auth, cookies and routes
 - **API Client Management:** UI form to register and manage additional API clients (beyond the default `agora_web_default` in config).
 - **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
 
+client interceptor for old tabs (still locked in? update layout.tsx)
+
 ## 5. Documentation
 
 - Elevator Pitch
@@ -857,5 +857,9 @@ Passwort Account
 learnings, pipeline nervt zwar, aber ist auch super wichtig
 
 project specifics in README
+
+Doppelrequests
+Cookies, wo kann man sie setzen
+Caching
 
 ## 6. Initial Major Release and Deployment
