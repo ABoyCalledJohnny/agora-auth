@@ -4,7 +4,7 @@ type CenteredLayoutProps = React.ComponentProps<"div">;
 
 export function CenteredLayout({ children, className, ...rest }: CenteredLayoutProps) {
   return (
-    <div className={cn("flex items-start justify-center pt-[20dvh]", className)} {...rest}>
+    <div className={cn("flex -translate-y-2 items-center justify-center sm:-translate-y-10", className)} {...rest}>
       {children}
     </div>
   );
