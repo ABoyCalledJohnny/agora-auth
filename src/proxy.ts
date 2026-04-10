@@ -1,9 +1,9 @@
 import type { NextRequest } from "next/server";
 
+import { importSPKI, jwtVerify } from "jose";
 import { NextResponse } from "next/server";
 
 import { appConfig } from "@/src/config/index.ts";
-import { JwtService } from "@/src/features/auth/services/jwt.service.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 
 // ---------------------------------------------------------------------------
@@ -16,6 +16,20 @@ const ACCESS_COOKIE = `${COOKIE_PREFIX}${appConfig.auth.accessCookieName}`;
 const REFRESH_COOKIE = `${COOKIE_PREFIX}${appConfig.auth.refreshCookieName}`;
 const ACCESS_MAX_AGE = parseDuration(appConfig.auth.accessTokenExpiry) / 1000;
 const REFRESH_MAX_AGE = parseDuration(appConfig.auth.refreshTokenExpiry) / 1000;
+
+// JWT verification — uses jose directly instead of JwtService because
+// proxy.ts is bundled separately by Next.js and cannot import `server-only`.
+let cachedPublicKey: Awaited<ReturnType<typeof importSPKI>> | null = null;
+
+async function verifyAccessToken(token: string) {
+  if (!cachedPublicKey) {
+    cachedPublicKey = await importSPKI(appConfig.auth.jwtPublicKey, "RS256");
+  }
+  await jwtVerify(token, cachedPublicKey, {
+    issuer: appConfig.app.url,
+    audience: appConfig.app.url,
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Proxy — Silent Token Refresh
@@ -41,7 +55,7 @@ export async function proxy(request: NextRequest) {
   // Access token present — verify it
   if (accessToken) {
     try {
-      await JwtService.verify(accessToken);
+      await verifyAccessToken(accessToken);
       // Still valid — proceed normally
       return NextResponse.next();
     } catch {
