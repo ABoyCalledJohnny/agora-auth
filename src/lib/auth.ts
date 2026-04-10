@@ -270,8 +270,14 @@ export async function clearSessionCookies() {
   const isProd = appConfig.app.env === "production";
   const cookiePrefix = isProd ? "__Secure-" : "";
 
-  cookieStore.delete(`${cookiePrefix}${appConfig.auth.accessCookieName}`);
-  cookieStore.delete(`${cookiePrefix}${appConfig.auth.refreshCookieName}`);
+  const deleteOptions = {
+    path: "/",
+    secure: isProd,
+    sameSite: appConfig.auth.cookieSameSite,
+  } as const;
+
+  cookieStore.delete({ name: `${cookiePrefix}${appConfig.auth.accessCookieName}`, ...deleteOptions });
+  cookieStore.delete({ name: `${cookiePrefix}${appConfig.auth.refreshCookieName}`, ...deleteOptions });
 }
 
 /**
