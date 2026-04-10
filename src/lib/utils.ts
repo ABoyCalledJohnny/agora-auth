@@ -11,7 +11,6 @@
 
 import { type ClassValue, clsx } from "clsx";
 import { customAlphabet } from "nanoid";
-import { headers } from "next/headers";
 import { twMerge } from "tailwind-merge";
 
 import { PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH } from "@/src/config/constants.ts";
@@ -119,17 +118,4 @@ export function isSafeRedirect(allowedBaseUrl: string, urlToVerify: string): boo
     // Rejects malformed URLs securely
     return false;
   }
-}
-
-/**
- * Extracts the IP address and User Agent from the current request headers.
- * Works identically in Next.js Route Handlers and Server Actions.
- */
-export async function getRequestMetadata(): Promise<{ ipAddress: string; userAgent: string }> {
-  const headersList = await headers();
-  const ipAddress =
-    headersList.get("x-forwarded-for")?.split(",")[0]?.trim() || headersList.get("x-real-ip") || "unknown";
-  const userAgent = headersList.get("user-agent") || "unknown";
-
-  return { ipAddress, userAgent };
 }

@@ -1,9 +1,11 @@
+import "server-only";
+
 import type { ApiClient } from "@/src/db/schema/index.ts";
 import type { HandlerConfig } from "@/src/lib/wrapper-types.ts";
 import type { ApiErrorResponse, ApiResponse } from "@/src/types.ts";
-import type { z } from "zod";
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { z } from "zod";
 
 import { ApiClientService } from "@/src/features/auth/services/api-client.service.ts";
 import { type AppSession, authenticate, authorize } from "@/src/lib/auth.ts";
@@ -23,15 +25,8 @@ import { sanitizeInput } from "@/src/lib/utils.ts";
  * 3. Client Resolution: Resolves the default internal API client (since this is a server action originating from our own frontend).
  * 4. Validation: If `bodySchema` is provided, it normalizes (handles FormData or plain objects), sanitizes, and validates the input against the Zod schema.
  * 5. Execution: Runs your specific server action handler with the strongly-typed `data`, `session`, and `client`.
- * 6. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ActionResult` union, preventing untyped exceptions from crashing the frontend.
+ * 6. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ApiResponse` union, preventing untyped exceptions from crashing the frontend.
  */
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-/** Discriminated union returned by every wrapped server action. */
-export type ActionResult<T = void> = ApiResponse<T>;
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
 // TypeScript still types it as `Session | null` — use `session!` or a guard.
@@ -40,7 +35,7 @@ export type ActionResult<T = void> = ApiResponse<T>;
 // Internals
 // ---------------------------------------------------------------------------
 
-function formatActionError(error: unknown): ActionResult<never> {
+function formatActionError(error: unknown): ApiErrorResponse {
   if (error instanceof AgoraError) {
     const response: ApiErrorResponse = {
       success: false,
@@ -72,15 +67,15 @@ function parseFormData(input: unknown): unknown {
 
 /** With schema — handler receives `{ data, session, client }`. */
 export function withActionHandler<TSchema extends z.ZodType, TResult>(
-  config: HandlerConfig<TSchema> & { bodySchema: TSchema },
+  config: HandlerConfig & { bodySchema: TSchema },
   handler: (context: { data: z.infer<TSchema>; session: AppSession | null; client: ApiClient }) => Promise<TResult>,
-): (rawInput: z.input<TSchema> | FormData) => Promise<ActionResult<TResult>>;
+): (rawInput: FormData) => Promise<ApiResponse<TResult>>;
 
 /** Without schema — handler receives `{ session, client }`. */
 export function withActionHandler<TResult>(
   config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: { session: AppSession | null; client: ApiClient }) => Promise<TResult>,
-): () => Promise<ActionResult<TResult>>;
+): () => Promise<ApiResponse<TResult>>;
 
 // Implementation
 export function withActionHandler(
@@ -88,7 +83,7 @@ export function withActionHandler(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required to satisfy varied generic overload signatures
   handler: (context: any) => Promise<unknown>,
 ) {
-  return async (rawInput?: unknown) => {
+  return async (rawInput?: FormData) => {
     try {
       // 1. Authentication
       let session: AppSession | null = null;
@@ -114,7 +109,7 @@ export function withActionHandler(
         const result = config.bodySchema.safeParse(sanitised);
         if (!result.success) {
           throw new AgoraError("VALIDATION_ERROR", "Validation failed.", {
-            details: result.error.flatten(),
+            details: z.flattenError(result.error),
           });
         }
         data = result.data;
@@ -124,7 +119,7 @@ export function withActionHandler(
       const context = config.bodySchema ? { data, session, client } : { session, client };
       const result = await handler(context);
 
-      return { success: true as const, data: result };
+      return { success: true as const, data: result, message: "Success" };
     } catch (error) {
       // 6. Error Handling
 

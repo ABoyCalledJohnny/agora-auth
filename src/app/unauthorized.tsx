@@ -1,8 +1,16 @@
-export default function Unauthorized() {
+import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+
+import { ErrorPage } from "@/src/components/ui/ErrorPage.tsx";
+
+export default async function Unauthorized() {
+  const t = await getTranslations("ErrorPages.unauthorized");
+
   return (
-    <div>
-      <h2>Unauthorized</h2>
-      <p>Please log in to access this page.</p>
-    </div>
+    <ErrorPage statusCode={401} heading={t("heading")} description={t("description")} backHome={t("backHome")}>
+      <Link href="/login" className="link-accent text-sm font-medium">
+        {t("logIn")}
+      </Link>
+    </ErrorPage>
   );
 }

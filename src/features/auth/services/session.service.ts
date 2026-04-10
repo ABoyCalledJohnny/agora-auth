@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Session } from "@/src/db/schema/index.ts";
 
 export type CreateSessionInput = {
@@ -13,7 +15,8 @@ export type CreateSessionResult = {
 
 import { appConfig } from "@/src/config/index.ts";
 import { createToken, hashToken } from "@/src/lib/crypto.ts";
-import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
+import { handleServiceError } from "@/src/lib/service-error.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleSessionRepository } from "@/src/repositories/session.repository.ts";
 
@@ -88,7 +91,7 @@ export const SessionService = {
    * @returns The newly rotated plaintext token and the updated session entity.
    * @throws {AgoraError} INVALID_CREDENTIALS on failure or suspected theft.
    */
-  async rotate(plainToken: string): Promise<CreateSessionResult> {
+  async rotate(plainToken: string, ipAddress?: string): Promise<CreateSessionResult> {
     try {
       const tokenHash = hashToken(plainToken);
       let session = await DrizzleSessionRepository.findActiveByToken(tokenHash);
@@ -98,6 +101,24 @@ export const SessionService = {
         const stolenSession = await DrizzleSessionRepository.findByPreviousToken(tokenHash);
 
         if (stolenSession) {
+          // Grace period: if the token was rotated very recently AND the IP matches,
+          // this is a concurrent request (e.g. parallel page loads), not theft.
+          // Re-rotate from the current session instead of rejecting.
+          const elapsed = Date.now() - stolenSession.lastActiveAt.getTime();
+          const sameIp = ipAddress != null && stolenSession.ipAddress === ipAddress;
+
+          if (elapsed < 2000 && sameIp) {
+            const newPlainToken = createToken();
+            const newTokenHash = hashToken(newPlainToken);
+            const rotated = await DrizzleSessionRepository.updateToken(
+              stolenSession.id,
+              newTokenHash,
+              stolenSession.sessionTokenHash,
+            );
+
+            return { plainToken: newPlainToken, session: rotated };
+          }
+
           await DrizzleSessionRepository.revokeAllForUser(stolenSession.userId);
         }
 

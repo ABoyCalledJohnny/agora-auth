@@ -1,12 +1,16 @@
 import { type InferInsertModel, type InferSelectModel, relations } from "drizzle-orm";
-import { index, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTable, primaryKey, uuid } from "drizzle-orm/pg-core";
+
+import { SYSTEM_ROLE_NAMES } from "@/src/config/constants.ts";
 
 import { createdAtColumn, idColumn, updatedAtColumn } from "./_helpers.ts";
 import { users } from "./users.ts";
 
+export const roleNameEnum = pgEnum("role_name", SYSTEM_ROLE_NAMES);
+
 export const roles = pgTable("roles", {
   id: idColumn(),
-  name: text().notNull().unique(),
+  name: roleNameEnum().notNull().unique(),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
 });

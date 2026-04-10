@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { LoginRequest, RegisterRequest, ResetPasswordConfirmRequest, ResetPasswordRequest } from "../contracts.ts";
 import type { AuthTokens, LoginResponse } from "../types.ts";
 import type { ApiClient, User } from "@/src/db/schema/index.ts";
@@ -5,7 +7,8 @@ import type { ApiClient, User } from "@/src/db/schema/index.ts";
 import { RESERVED_USERNAMES, type UserStatus } from "@/src/config/constants.ts";
 import { appConfig } from "@/src/config/index.ts";
 import { hashPassword, verifyPassword } from "@/src/lib/crypto.ts";
-import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
+import { handleServiceError } from "@/src/lib/service-error.ts";
 import { createPublicId, parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleRoleRepository } from "@/src/repositories/role.repository.ts";
 import { DrizzleUserRepository } from "@/src/repositories/user.repository.ts";
@@ -114,7 +117,7 @@ export const AuthService = {
         sub: user.id,
         sid: refreshTokenWrapper.session.id,
         username: user.username,
-        roles: userRoles,
+        roles: userRoles.map((role) => role.name),
       });
 
       // Calculate exact expiration ISO string to align with the JWT `exp` claim.
@@ -135,11 +138,11 @@ export const AuthService = {
   /**
    * 3. Refresh Flow
    */
-  async refresh(plainSessionToken: string): Promise<AuthTokens> {
+  async refresh(plainSessionToken: string, ipAddress?: string): Promise<AuthTokens> {
     try {
       // 1. Call `SessionService.rotate(plainSessionToken)` to invalidate the old refresh token and get a new one.
       //    (This inherently checks for Token Reuse and triggers full revocation if stolen).
-      const refreshTokenWrapper = await SessionService.rotate(plainSessionToken);
+      const refreshTokenWrapper = await SessionService.rotate(plainSessionToken, ipAddress);
 
       // 2. Lookup the user from the rotated session's `userId` to ensure they are still active (not suspended/deleted).
       const user = await DrizzleUserRepository.findById(refreshTokenWrapper.session.userId);
@@ -153,7 +156,7 @@ export const AuthService = {
         sub: user.id,
         sid: refreshTokenWrapper.session.id,
         username: user.username,
-        roles: userRoles,
+        roles: userRoles.map((role) => role.name),
       });
 
       const expiresAt = new Date(Date.now() + parseDuration(appConfig.auth.accessTokenExpiry)).toISOString();

@@ -38,10 +38,8 @@
     // - "NodeNext": Strictly follows Node.js resolution (requires file extensions in imports, etc.).
     // We use "bundler" because Next.js handles the resolution logic and we want flexible imports.
     "moduleResolution": "bundler",
-    // "baseUrl" and "paths" allow using absolute aliases (like `@/db/index`).
-    // baseUrl: "." means the root of the project.
-    // paths: maps "@/*" to look inside the root "./*" folder.
-    "baseUrl": ".",
+    // "paths" allows using absolute aliases (like `@/src/db/index`).
+    // Maps "@/*" to look inside the root "./*" folder, resolved relative to this tsconfig.json.
     "paths": {
       "@/*": ["./*"]
     },

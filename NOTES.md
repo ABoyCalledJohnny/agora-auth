@@ -545,7 +545,7 @@ Holds static, non-secret system boundaries and definitions.
 
 - **Strict Input Validation:** Complete boundary validation on all inputs (using Zod to enforce rigid schemas), prevent SQL/XSS injections (Drizzle), and apply strong password rules (stored centrally in `src/lib/validation.ts`).
 - **Token Architecture:** Utilising a secure, separated token lifecycle:
-    - _Access Tokens:_ Fast, stateless JWTs with short lifespans (e.g., 15 minutes).
+    - _Access Tokens:_ Fast, stateless JWTs with short lifespans (e.g., 5 minutes).
     - _Refresh Tokens:_ Opaque, DB-backed hashes stored purely in `HttpOnly`, `Secure`, `SameSite=Lax` cookies to prevent JavaScript access.
     - _Verification Tokens:_ Single-use, hashed hashes used strictly for email/password resets, rendering useless upon first consumption.
 - **Refresh Token Rotation:** Moving from static refresh tokens to rolling ones, enabling the system to immediately detect token theft and automatically revoke the compromised session.
@@ -578,6 +578,7 @@ _The following features are vital for enterprise hardening but are deferred to t
 
 - `page.tsx`: The unique UI content of a route segment.
 - `layout.tsx`: Shared UI wrapper that preserves state across routes (e.g., HTML/body tags, overall page skeleton).
+- `main.tsx`: Layout component wrapping `{children}` between header and footer. Provides the semantic `<main>` tag with consistent max-width, padding, and flex-grow behaviour. Avoids duplicating these styles in every `page.tsx`.
 - `header.tsx`: Top navigation and branding bar.
 - `footer.tsx`: Bottom site information and links.
 - `nav.tsx`: Auth-aware navigation component. Uses `useSession()` to conditionally render guest links (Login, Register) vs. authenticated links (Profile, Settings, Logout) and admin-only links (Admin). Houses two navigation patterns (desktop-only MVP — no dedicated mobile hamburger menu):
@@ -598,8 +599,8 @@ _The following features are vital for enterprise hardening but are deferred to t
 
 _Providers:_
 
+- `NextIntlClientProvider`: Wraps the app to provide `next-intl` translations to client components. Mounted in the root layout, receives server-side locale and messages.
 - `SessionProvider`: A React Context provider that wraps the app to store and share the currently authenticated user's state globally. This allows client components to check if a user is logged in without prop drilling or hitting the backend repeatedly.
-- `Toaster` (via `sonner`): Mounted in root layout alongside `SessionProvider`. Provides the toast notification container for the entire app.
 
 _Data/Action Hooks:_
 These hooks wrap Server Actions via `useActionState` (React 19), which returns `[state, formAction, isPending]`. Each hook calls a Server Action, manages `isPending`/`error` state, and returns a `formAction` compatible with `<form action={…}>`. (`useTransition` is only needed for imperative Server Action calls outside of forms.)
@@ -638,7 +639,7 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
     - `Avatar`: Displays a styled user image `avatarUrl` or fallback initials (useful in nav/User Table).
     - `Modal` / `Dialog`: Central overlay for confirming dangerous actions like "Delete/Suspend User" in the admin panel.
     - `Tabs` (or `TabGroup`/`TabPanel`): For navigating sections without page reloads (e.g., in Settings).
-    - `Toast` (via `sonner`): For asynchronous notifications (e.g., "Settings saved", "Check your email"). No need to build from scratch; just map the `Toaster` provider.
+    - `Toaster` (via `sonner`): Toast notification container (`src/components/ui/Toaster.tsx`) mounted in root layout. Toasts are triggered imperatively via `toast()` — no dedicated component needed.
     - `Alert`: For inline page-level alerts (e.g., static error messages at the top of a form).
     - `Pill` / `Badge`: Minimal inline status indicator (useful for showing roles or active/suspended statuses in tables).
 
@@ -728,84 +729,34 @@ See `./messages/{language}.json`
 | **Week**         | **Date** | **Time (Days)** |               |
 | ---------------- | -------- | --------------- | ------------- |
 |                  |          |                 |               |
-| **2**            | 29/03/26 | 0.25            |               |
-|                  |          |                 |               |
-| **3**            | 30/03/26 | 1               |               |
-|                  | 31/03/26 | 1               |               |
-|                  | 01/04/26 | 1               |               |
-|                  | 02/04/26 | 0.5             | Rehearsal     |
-|                  | 03/04/26 | 1               | Karfreitag    |
-|                  | 05/04/26 | 0.25            | Ostersonntag  |
-|                  |          |                 |               |
 | **4 (holidays)** | 06/04/26 | 0.5             | Ostermontag   |
 |                  | 07/04/26 | 1               |               |
 |                  | 08/04/26 | 0.5             | Familientag   |
 |                  | 09/04/26 | 1               |               |
 |                  | 10/04/26 | 1               |               |
-|                  | 12/04/26 | 0.25            |               |
 |                  |          |                 |               |
 | **5**            | 13/04/26 | 1               |               |
 |                  | 14/04/26 | 1               |               |
 |                  | 15/04/26 | 1               |               |
 |                  | 16/04/26 | 0               | Präsentation  |
 |                  |          |                 |               |
-|                  |          | **12.25**       | **Days left** |
+|                  |          | **7**           | **Days left** |
 
 #### Schedule
 
-| Task                                               | Est.           | Dates         | Notes                                                                                                                                                                                                                                                                                           |
-| :------------------------------------------------- | :------------- | :------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1. Preparation and Planning** ✅                 | Pre            | before 16/03  | Completed before development starts.                                                                                                                                                                                                                                                            |
-| **2. Setup** ✅                                    | Pre            | before 16/03  | Mostly pre-development. 2.3 (Project Identity) spills into Day 1.                                                                                                                                                                                                                               |
-| **3.1 Infrastructure & Core Setup** ✅             | ~3.5           | 16/03 - 20/03 | Validation, DB, repos, `api-wrapper.ts`.                                                                                                                                                                                                                                                        |
-| **3.2 Auth - Backend**<br>**5. API Docs** ✅       | ~3             | 20/03 - 24/03 | 5 services, API endpoints, `auth.ts`. <br>Final `api.md`                                                                                                                                                                                                                                        |
-| **6. Deploy**<br>**External connection** ✅        | ~2             | 25/03 - 26/03 | Docker, Pipeline, DNS, client and seeding<br>External client hookup.                                                                                                                                                                                                                            |
-| **Rehearsal Prep** ✅                              | ~0.25          | 29/03         | Prepare a rough outline for the project presentation rehearsal on 02/04.                                                                                                                                                                                                                        |
-| **3.1 Frontend Shell**                             | ~3             | 30/03 - 01/04 | Root layout, landing page, header/footer, desktop nav + user `Sheet` menu. Core UI primitives (Container, Card, Table, Button, Forms). Desktop-only MVP — no mobile hamburger menu. _Defer `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill` to their respective features or backlog._ |
-| **3.1 & 3.2: Misc**<br>**3.2 User Mgmt - Backend** | ~3<br>(2.75)   | 02/04 - 07/04 | `action-wrapper`, `proxy`, `Notification`, minimal User. Easter break (03-06/04).                                                                                                                                                                                                               |
-| **3.2 Auth - Frontend**                            | ~2             | 07/04 - 09/04 | Minimal forms, `SessionProvider`, `nav` update, form, hooks.                                                                                                                                                                                                                                    |
-| **3.2 Admin Dashboard**                            | ~2.5<br>(2.75) | 10/04 - 14/04 | 3 endpoints, Admin Dashboard and UserTable (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                                                     |
-| **5. Docs + Presentation**                         | ~0.5           | 14/04         | `README.md`, `api.md`, presentation prep.                                                                                                                                                                                                                                                       |
-| _Buffer_                                           | ~1             | 15/04         | Overflow, bug fixes. **Finish User Mgmt (backend + profile/settings UI) & Admin Table enhancements (search, filters, batch).**                                                                                                                                                                  |
+| Task                       | Dates         | Notes                                                                                                                                                                                                                                                                       |
+| :------------------------- | :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **3.2 Auth - Frontend**    | 06/04 - 08/04 | Login form, `SessionProvider`, `nav` update, hooks                                                                                                                                                                                                                          |
+| **3.1 Frontend Shell**     | 09/04 - 10/04 | Root layout, landing page, header/footer, desktop nav. Core UI primitives (Container, Card, Table, Button, Forms). Desktop-only MVP — no mobile hamburger menu. _Defer `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill` to their respective features or backlog._ |
+| **3.2 Admin Dashboard**    | 13/04 - 14/04 | 3 endpoints, admin dashboard and `UserTable` (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                               |
+| **5. Docs + Presentation** | 15/04         | `README.md`, `api.md`, `TODO.md`, `NOTES.md`, presentation prep.                                                                                                                                                                                                            |
+| **Buffer**                 | 15/04         | ???                                                                                                                                                                                                                                                                         |
 
 ---
 
 ## 3. Development
 
-### 3.1 Infrastructure and Core Setup
-
-**Frontend Shell**
-
-- Meta / head
-    - Fonts
-    - Logo
-    - Intl Einbindung verstehen
-    - Fehlermeldung Browser-Konsole
-- Body
-    - Header
-        - Struktur
-        - Icon
-        - Sticky
-        - Schatten / Abgrenzung
-    - Main
-        - Headlines, Components, base layer
-        - Padding zusätzlich zu font rem?
-    - Images
-        - Maße Bilder, SVGs, Ausrichtung
-- Components
-    - Was bester Weg für Anpassung von Komponenten (Farben etc.)
-- Sachen aus Mini-Portfolio
-- Accessibility
-
-### 3.2 Features
-
-**Auth**
-
-**Components / Frontend**
-
-- Usage of `revalidatePath()`
-- Brauche ich `export const dynamic = 'force-dynamic'`?
-- Use `import 'server-only'`
+### 3.1 + 3.2
 
 ### 3.3 Backlog
 
@@ -836,8 +787,11 @@ See `./messages/{language}.json`
 
 **UX**
 
+- **Pagination Page Input:** Add an editable page number input field to the `Pagination` component so users can jump directly to a specific page.
+- **Full Responsiveness:** Implement complete mobile-first responsive design across all pages and components (navigation, forms, tables, modals, etc.).
 - **Shake Effect:** Animation for failed login attempts.
 - **Real-Time Password Feedback:** Per-rule checklist UI during password entry (using `createPasswordRules` with i18n).
+- **Translated Field Validation:** Zod schemas currently emit translation keys (e.g. `passwordMinLength`) or hardcoded English strings as error messages. Integrate `react-hook-form` with Zod (`@hookform/resolvers/zod`) for instant client-side validation, and translate field errors in the component layer via `useTranslations("Validation")`. This enables per-field feedback before submission and ensures all validation messages respect the active locale.
 
 **Infrastructure**
 
@@ -845,6 +799,7 @@ See `./messages/{language}.json`
 - **Security Hardening:** See [Production-Ready Roadmap (Post-MVP Enhancements)](#production-ready-roadmap-post-mvp-enhancements).
 - **`cache()` for Session Deduplication:** Wrap `verifySession()` in React's `cache()` to memoize the session check within a single render pass, avoiding duplicate DB queries when multiple Server Components call it.
 - **`taintUniqueValue`:** Use React's `taintUniqueValue` API to prevent sensitive session data (e.g., tokens, secrets) from accidentally leaking to Client Components via the `SessionProvider`.
+- **Stale Session Revalidation:** The `SessionProvider` is hydrated once from the root layout and not refreshed on client-side navigations. If a user's session expires while the tab is inactive, the header still shows them as logged in until they hit a server action or protected page. Add a `visibilitychange` listener that calls `router.refresh()` when the user returns to the tab after prolonged inactivity, forcing the root layout to re-render and re-hydrate the session.
 - Port remaining utilities from Turbine as needed.
 
 **Architecture / Tech Debt**
@@ -852,6 +807,7 @@ See `./messages/{language}.json`
 - **Full Vertical Slicing Refactor:** Untangle global repositories (`src/repositories/`) and move data access layers strictly into their respective domains (`src/features/.../repositories/`) to achieve true vertical slicing.
     - E.g., Extract `AuthUserRepository` from a global `UserRepository` to contain only authentication-specific queries.
     - Create an `AdminUserService` and `AdminUserRepository` within the `admin` feature for specialized admin queries, avoiding massive conditional logic jumps in the standard `UserService`.
+- **Typed `session` in `withActionHandler`/`withApiHandler`:** Use a conditional generic type (e.g. `TAuth extends boolean`) so that `auth: true` narrows `session` to `AppSession` (non-null) and `auth: false` omits it or types it as `null`. This removes the need for `session!` in handlers. Requires additional overloads or a conditional type mapping in the handler context.
 
 **Questions**
 
@@ -878,24 +834,32 @@ See `./messages/{language}.json`
 - **API Client Management:** UI form to register and manage additional API clients (beyond the default `agora_web_default` in config).
 - **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
 
+client interceptor for old tabs (still locked in? update layout.tsx)
+
 ## 5. Documentation
 
-- Exact time for presentation(s)
-- Questions part of that time frame?
+- Elevator Pitch
+- Postman-Demo, API-Routen früher
+- Refresh token, access token
+- API + Error Handling
+- Struktur, Datenfluss
+    - Zweigleisigkeit
+- Umstellung Sprache
+- Was noch aus Notizen?
+- Live Update
+- refresh and access token pattern Vorteile
 
-**Topics**
+- Dateien/Todos updaten
+- Dateien synchronisieren
 
-| #   | Topic                                                                | ~Min | Source                                               |
-| --- | -------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
-| 1   | Project intro + goals                                                | 2    | NOTES §1.1 (description, MVP scope)                  |
-| 2   | Priorities / approach                                                | 2    | NOTES §1.1 (considerations)                          |
-| 3   | Tech stack                                                           | 2    | README "Tech Stack"                                  |
-| 4   | Architecture + project layout<br> + error handling, config, and i18n | 4    | README "Project Structure", NOTES §1.2 (services)    |
-| 5   | Database schema (ERD)                                                | 3    | dbdiagram.io live                                    |
-| 6   | Security deep-dive                                                   | 3    | NOTES (JWT, Argon2, cookie strategy, token rotation) |
-| 7   | API design + external clients                                        | 2    | API docs, NOTES §1.2                                 |
-| 8   | CI/CD + deployment                                                   | 3    | README "Deployment", pipeline diagram                |
-| 9   | Live demo (landing page -> register → login → admin)                 | 4    | Live app                                             |
-| 10  | Reflection + Q&A                                                     | 5    | -                                                    |
+Passwort Account
+
+learnings, pipeline nervt zwar, aber ist auch super wichtig
+
+project specifics in README
+
+Doppelrequests
+Cookies, wo kann man sie setzen
+Caching
 
 ## 6. Initial Major Release and Deployment

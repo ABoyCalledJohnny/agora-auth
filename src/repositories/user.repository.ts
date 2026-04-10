@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { UserStatus } from "@/src/config/constants.ts";
 import type { UserRepository } from "@/src/features/user/contracts.ts";
 

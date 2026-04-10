@@ -1,3 +1,6 @@
+import "server-only";
+
+import type { SystemRoleName } from "@/src/config/constants.ts";
 import type { RoleRepository } from "@/src/features/auth/contracts.ts";
 
 import { and, eq } from "drizzle-orm";
@@ -35,7 +38,7 @@ export const DrizzleRoleRepository: RoleRepository = {
     return role ?? null;
   },
 
-  async findByName(name: string): Promise<Role | null> {
+  async findByName(name: SystemRoleName): Promise<Role | null> {
     const [role] = await db.select().from(roles).where(eq(roles.name, name)).limit(1);
     return role ?? null;
   },

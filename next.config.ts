@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n.ts");
+
 const isProd = process.env.NODE_ENV === "production";
 
 /**
@@ -27,7 +31,7 @@ const csp = `
   style-src 'self' 'unsafe-inline';
 
   /* Images via <Image>, data URLs, and blobs (e.g. avatars, uploads) */
-  img-src 'self' data: blob:;
+  img-src 'self' data: blob: https://i.pravatar.cc;
 
   /* Fonts served locally */
   font-src 'self';
@@ -145,6 +149,19 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  experimental: {
+    authInterrupts: true,
+  },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.pravatar.cc",
+      },
+    ],
+  },
+
   /**
    * Emit a standalone build (server.js + node_modules subset).
    * Required for the Docker production image.
@@ -168,4 +185,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

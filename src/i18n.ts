@@ -1,4 +1,3 @@
-// src/i18n.ts
 import { getRequestConfig } from "next-intl/server";
 import { headers } from "next/headers";
 

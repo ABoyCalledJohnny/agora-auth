@@ -3,9 +3,9 @@
 ![Badge: Latest Release](https://img.shields.io/github/v/release/ABoyCalledJohnny/agora-auth)
 ![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
 
-> [!WARNING]
+> [!NOTE]
 > **Aktive Entwicklung**
-> Die **Kern-Authentifizierungslogik** (API-Routen, Server Actions, Zod-Schemas, Datenbankmodelle und typsichere Wrapper) ist weitgehend implementiert. Das Projekt konzentriert sich derzeit auf die Fertigstellung der Frontend-UI und die Anbindung von externen Benachrichtigungs-Diensten.
+> Die Kern-Authentifizierungslogik (API-Routen, Server Actions, Zod-Schemas, Datenbankmodelle und typsichere Wrapper), die CI/CD-Pipeline und das Produktions-Deployment sind voll funktionsfähig. Das Projekt konzentriert sich derzeit auf die Fertigstellung der Frontend-UI (Benutzerverwaltung, Admin-Dashboard) und die Anbindung von externen Benachrichtigungs-Diensten.
 
 Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-Lösung, die mit Next.js, Drizzle ORM und PostgreSQL entwickelt wurde.
 
@@ -17,9 +17,12 @@ Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-L�
         - [Hauptfunktionen (Geplant)](#hauptfunktionen-geplant)
     - [Tech-Stack](#tech-stack)
     - [Voraussetzungen](#voraussetzungen)
-    - [Erste Schritte (In Arbeit)](#erste-schritte-in-arbeit)
+    - [Erste Schritte](#erste-schritte)
     - [Konfiguration](#konfiguration)
     - [Deployment](#deployment)
+        - [CI/CD-Pipeline](#cicd-pipeline)
+        - [Infrastruktur](#infrastruktur)
+        - [VPS-Layout](#vps-layout)
     - [Projektstruktur](#projektstruktur)
     - [Entwicklungs-Workflow](#entwicklungs-workflow)
         - [Nützliche Befehle](#nützliche-befehle)
@@ -52,6 +55,10 @@ Das Ziel ist es, eine solide Grundlage für Benutzerregistrierung, Login, Profil
 - **Datenbank:** PostgreSQL
 - **ORM:** Drizzle ORM
 - **Validierung:** Zod
+- **Reverse Proxy:** Caddy (Auto-TLS)
+- **CI/CD:** GitHub Actions
+- **Container Registry:** GitHub Container Registry (GHCR)
+- **Containerisierung:** Docker & Docker Compose
 
 ---
 
@@ -63,12 +70,9 @@ Das Ziel ist es, eine solide Grundlage für Benutzerregistrierung, Login, Profil
 
 ---
 
-## Erste Schritte (In Arbeit)
+## Erste Schritte
 
-> [!WARNING]
-> **Projektstatus:** Während die wichtigsten Authentifizierungs-Endpunkte (Login, Registrierung, Refresh, Verifizierung, Passwort-Reset) funktionsfähig sind, befinden sich Frontend-UI-Integrationen, Admin-Abläufe und E-Mail-Benachrichtigungen noch in der aktiven Implementierung.
-
-Aktuell verwendetes Mindest-Setup für die lokale Entwicklung in diesem Repository:
+Mindest-Setup für die lokale Entwicklung:
 
 ```bash
 bun install
@@ -99,48 +103,38 @@ Wichtige Umgebungsvariablen umfassen:
 ## Deployment
 
 > [!IMPORTANT]
-> Diese Anwendung ist mit einer hochspezifischen CI/CD-Pipeline und Infrastruktur ausgestattet, die auf eine benutzerdefinierte VPS-Umgebung mit Caddy und Docker zugeschnitten ist.
->
-> **Sie ist nicht darauf ausgelegt, out-of-the-box von anderen bereitgestellt zu werden.** Ein unabhängiges Deployment dieses Systems würde umfangreiche Änderungen am Docker-Setup, an den Konfigurationsdateien und an den Bereitstellungspipelines erfordern, an denen derzeit aktiv gearbeitet wird.
+> Diese Anwendung nutzt eine CI/CD-Pipeline, die auf eine spezifische VPS-Umgebung zugeschnitten ist. Ein eigenständiges Deployment würde Anpassungen am Docker-Setup, an den Konfigurationsdateien und an der Pipeline erfordern.
 
-Aktuelle Struktur des VPS-Deployment-Artefakts (vereinfacht):
+### CI/CD-Pipeline
+
+Das Projekt nutzt eine dreistufige GitHub-Actions-Pipeline (`.github/workflows/deploy.yaml`):
+
+| Phase       | Auslöser      | Beschreibung                                                                                                     |
+| ----------- | ------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Verify**  | Alle Branches | Lint, Typecheck, Format-Check, Security-Audit, Build                                                             |
+| **Package** | Nur `main`    | Docker-Images bauen und zu GHCR pushen                                                                           |
+| **Deploy**  | Nur `main`    | Artefakte per Rsync auf VPS übertragen, Secrets generieren, Dienste starten, Migrationen und Bootstrap ausführen |
+
+### Infrastruktur
+
+- **Caddy** läuft als unabhängiger Docker-Compose-Stack mit automatischem TLS
+- **App** (2 Replikas) + **Postgres** laufen als Haupt-Stack und beziehen fertige Images von GHCR
+- **Migrator** läuft als kurzlebiger Container nach dem Deployment, um Schema-Änderungen und Seed-Daten anzuwenden
+- Secrets werden zum Deployment-Zeitpunkt auf dem VPS aus GitHub-Repository-Secrets generiert
+
+### VPS-Layout
 
 ```text
-deployment/
-    app_build/
-        server.js
-        package.json
-        node_modules/
-        .next/
-            server/
-            static/
-            BUILD_ID
-            app-path-routes-manifest.json
-            build-manifest.json
-            package.json
-            prerender-manifest.json
-            required-server-files.json
-            routes-manifest.json
-        public/
-            robots.txt
-            ...
-    docker/
-        app/
-            Dockerfile
-        migrator/
-            Dockerfile
-        postgres/
-            init-db.sh
-        caddy/
-            Caddyfile
-    compose.yaml
-    compose.production.yaml
-    compose.caddy.yaml
-    .env
-    .env.production
-    .env.secrets.production.app
-    .env.secrets.production.postgres
-    .env.secrets.production.migrator
+/srv/webapps/agora-auth/
+├── compose.yaml               # Basis-Dienst-Definitionen
+├── compose.production.yaml    # Produktions-Overrides (env_file, Replikas, Netzwerke)
+├── compose.caddy.yaml         # Unabhängiger Caddy-Reverse-Proxy-Stack
+├── docker/
+│   ├── caddy/Caddyfile
+│   └── postgres/init-db.sh
+├── .env                       # Gemeinsame, nicht-geheime Konfiguration
+├── .env.production            # Produktionsspezifische Konfiguration
+├── .env.secrets.production.*  # Generierte, dienstspezifische Secret-Dateien (CI/CD)
 ```
 
 ---

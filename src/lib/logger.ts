@@ -1,3 +1,5 @@
+import "server-only";
+
 import { SENSITIVE_LOG_KEYS } from "../config/constants.ts";
 import { appConfig } from "../config/index.ts";
 

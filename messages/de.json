@@ -51,6 +51,8 @@
     "loading": "Lädt…",
     "or": "oder",
     "back": "Zurück",
+    "close": "Schließen",
+    "irreversible": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort verbergen",
     "areYouSure": "Bist du sicher?",
@@ -59,9 +61,10 @@
   },
   "Auth": {
     "Login": {
+      "metaDescription": "Melde dich bei deinem Agora Auth Konto an.",
       "heading": "Anmelden",
-      "emailLabel": "E-Mail-Adresse",
-      "emailPlaceholder": "name@beispiel.de",
+      "identifierLabel": "E-Mail oder Benutzername",
+      "identifierPlaceholder": "E-Mail oder Benutzername",
       "passwordLabel": "Passwort",
       "passwordPlaceholder": "Passwort eingeben",
       "rememberMe": "Angemeldet bleiben",
@@ -70,7 +73,9 @@
       "forgotPassword": "Passwort vergessen?",
       "noAccount": "Noch kein Konto?",
       "noAccountLink": "Registrieren",
-      "success": "Anmeldung erfolgreich."
+      "success": "Anmeldung erfolgreich.",
+      "alreadyLoggedIn": "Du bist bereits angemeldet.",
+      "logout": "Abmelden"
     },
     "Register": {
       "heading": "Konto erstellen",
@@ -190,13 +195,46 @@
   },
   "Nav": {
     "home": "Startseite",
+    "users": "Nutzer",
+    "docs": "Dokumentation",
+    "about": "Über uns",
+    "status": "Status",
     "login": "Anmelden",
     "register": "Registrieren",
     "profile": "Profil",
     "settings": "Einstellungen",
-    "admin": "Verwaltung",
+    "admin": "Admin",
     "logout": "Abmelden",
     "loggedInAs": "Angemeldet als {name}"
+  },
+  "ErrorPages": {
+    "notFound": {
+      "heading": "Seite nicht gefunden",
+      "description": "Die Seite, die du suchst, existiert nicht oder wurde verschoben.",
+      "backHome": "Zurück zur Startseite"
+    },
+    "unauthorized": {
+      "heading": "Nicht autorisiert",
+      "description": "Du musst angemeldet sein, um diese Seite zu sehen.",
+      "logIn": "Einloggen",
+      "backHome": "Zurück zur Startseite"
+    },
+    "forbidden": {
+      "heading": "Zugriff verweigert",
+      "description": "Du hast keine Berechtigung, diese Seite zu sehen.",
+      "backHome": "Zurück zur Startseite"
+    },
+    "error": {
+      "heading": "Etwas ist schiefgelaufen",
+      "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später erneut.",
+      "tryAgain": "Erneut versuchen",
+      "backHome": "Zurück zur Startseite"
+    }
+  },
+  "Landing": {
+    "description": "Ein leichtgewichtiger Authentifizierungs- und Benutzerverwaltungsdienst, entwickelt für Lernen, Zusammenarbeit und praxisnahe API-Integration.",
+    "login": "Anmelden",
+    "docs": "Dokumentation"
   },
   "Admin": {
     "Users": {

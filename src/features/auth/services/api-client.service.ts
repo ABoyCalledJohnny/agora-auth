@@ -1,9 +1,12 @@
+import "server-only";
+
 import type { CreateClientRequest, UpdateClientRequest } from "../contracts.ts";
 import type { ApiClient } from "@/src/db/schema/index.ts";
 
 import { appConfig } from "@/src/config/index.ts";
 import { hashToken, verifyToken } from "@/src/lib/crypto.ts";
-import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
+import { handleServiceError } from "@/src/lib/service-error.ts";
 import { createPublicId, isSafeRedirect, stripUndefined } from "@/src/lib/utils.ts";
 import { DrizzleApiClientRepository } from "@/src/repositories/api-client.repository.ts";
 
@@ -76,6 +79,10 @@ export const ApiClientService = {
    * Validates if a provided origin matches the client's configured base URL.
    * Useful for enforcing that requests or post-login redirects actually originate from
    * or lead to the allowed client domain, preventing Open Redirect attacks.
+   *
+   * NOTE: Currently unused. Intended for a future multi-tenant OAuth flow where
+   * external clients redirect through this auth server and their redirect URLs
+   * need to be validated against their registered `baseUrl`.
    *
    * @param client The validated ApiClient.
    * @param urlToVerify The requested redirect URL or origin.

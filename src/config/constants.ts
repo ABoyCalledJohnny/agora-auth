@@ -89,6 +89,12 @@ export type UserStatus = (typeof USER_STATUS)[number];
 export const SYSTEM_ROLE_NAMES = ["admin", "user"] as const satisfies ZodEnumTuple;
 export type SystemRoleName = (typeof SYSTEM_ROLE_NAMES)[number];
 
+/** Role hierarchy: higher number = higher authority */
+export const ROLE_HIERARCHY: Record<SystemRoleName, number> = {
+  user: 0,
+  admin: 1,
+};
+
 /** Types of short-lived verification tokens (e.g., email_verification) */
 export const VERIFICATION_TOKEN_TYPE = ["email_verification", "password_reset"] as const satisfies ZodEnumTuple;
 export type VerificationTokenType = (typeof VERIFICATION_TOKEN_TYPE)[number];

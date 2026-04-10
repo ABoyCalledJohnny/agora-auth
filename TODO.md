@@ -159,22 +159,24 @@
         - [x] **Seed script:** Update `src/db/seed.ts` to generate development-only dummy data (e.g., fake users) and run script (`bun run db:seed`).
     - **Core Library:**
         - [x] **`withApiHandler`:** Implement API route wrapper (`src/lib/api-wrapper.ts`) - Zod input validation, structured JSON error responses, authentication/authorisation guards (via options like `{ auth: true, roles: ['admin'] }`), cookie management (set/clear `HttpOnly`, `Secure`, `SameSite=Lax` cookies), cache-control headers for authenticated routes, and redirect to `/login?next=…` on auth failure.
-        - [ ] **`withActionHandler`:** Implement Server Action wrapper (`src/lib/action-wrapper.ts`) - Zod input validation, structured error state, authentication/authorisation guards, cookie management, and redirect to `/login?next=…` on auth failure.
+        - [x] **`withActionHandler`:** Implement Server Action wrapper (`src/lib/action-wrapper.ts`) - Zod input validation, structured error state, authentication/authorisation guards, cookie management, and redirect to `/login?next=…` on auth failure.
     - **Frontend Shell:**
-        - [ ] **Root layout:** Set up `layout.tsx` with `NextIntlClientProvider` and `Toaster`. (`SessionProvider` is created and added later in the Auth feature.)
-        - [ ] **Landing page:** Implement `/` route (`page.tsx`) — marketing/welcome page.
-        - [ ] **Header and footer:** Implement `header.tsx` (top navigation/branding bar) and `footer.tsx` (bottom site info/links).
-        - [ ] **Navigation:** Implement `nav.tsx` with static placeholder links and two navigation patterns (desktop-only MVP):
-            - [ ] **Desktop nav:** Horizontal link bar in the header.
+        - [x] **Global styles:** Expand `globals.css` with base CSS variables, colour palette, and foundational styles.
+        - [x] **Root layout:** Set up `layout.tsx` with `NextIntlClientProvider` and `Toaster` (`src/components/ui/Toaster.tsx`). (`SessionProvider` is created and added later in the Auth feature.)
+        - [x] **Main wrapper:** Implement `main.tsx` — layout component wrapping page content between header and footer (`<main>` tag, max-width, padding).
+        - [x] **Landing page:** Implement `/` route (`page.tsx`) — marketing/welcome page.
+        - [x] **Header and footer:** Implement `header.tsx` (top navigation/branding bar) and `footer.tsx` (bottom site info/links).
+        - **Navigation:** Implement `nav.tsx` with static placeholder links and two navigation patterns (desktop-only MVP):
+            - [x] **Desktop nav:** Horizontal link bar in the header.
             - [ ] **User menu:** `Sheet` slide-in panel triggered by a user/avatar button (placeholder for now — auth-aware content is added in the Auth feature).
-        - [ ] **Error pages:** Implement `error.tsx`, `not-found.tsx`, `global-error.tsx`, `unauthorized.tsx`, `forbidden.tsx`.
-        - [ ] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
+        - [x] **Error pages:** Implement `error.tsx`, `not-found.tsx`, `global-error.tsx`, `unauthorized.tsx`, `forbidden.tsx`.
+        - [x] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
-            - [ ] Layout/Architecture: `Container`, `Card`, `Sheet` (slide-in panel for user menu).
-            - [ ] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`.
-            - [ ] General: `Button`, `Alert`, `Toast` (via `sonner`).
-            - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`.
-            - _Deferred to respective features or backlog:_ `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill`.
+            - [x] Layout/Architecture: `Container`, `Card`.
+            - [x] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`.
+            - [x] General: `Button`, `Alert`, `Avatar`, `Modal`, `Pill`.
+            - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`. 🟢
+            - [x] Hooks: `useFormAction`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
 
 ##### 3.2 Features
@@ -198,7 +200,7 @@
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
         - [x] `POST /api/auth/register` - Register new user.
         - [x] `POST /api/auth/login` - Authenticate and establish session. Set access/refresh cookies.
-        - [x] 🔒 `POST /api/auth/logout` - Invalidate session and clear cookies.
+        - [x] (🔒) `POST /api/auth/logout` - Invalidate session and clear cookies.
         - [x] (🔒) `POST /api/auth/refresh` - Rotate tokens using valid refresh cookie.
         - [x] `POST /api/auth/verify-email` - Confirm email via token.
         - [x] `POST /api/auth/verify-email/resend` - Re-issue verification email.
@@ -209,10 +211,10 @@
         - [x] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
         - [ ] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
     - **Frontend:**
-        - [ ] **`SessionProvider`:** Create in `src/providers/` - React Context with `useSession()` hook. Hydrate from `layout.tsx` via server-side `getSession()`. Add to root layout.
+        - [x] **`SessionProvider`:** Create in `src/providers/` - React Context with `useSession()` hook. Hydrate from `layout.tsx` via server-side `getSession()`. Add to root layout.
         - [ ] **`nav.tsx`:** Update with auth-aware rendering — guest links (Login, Register) vs. authenticated (Profile, Settings, Logout) vs. admin (Admin) using `useSession()`. Populate user menu `Sheet` with authenticated links.
         - [ ] **Auth forms:** Build `LoginForm` (reads and validates `?next=` param - must start with `/` - passes to login action for post-login redirect), `RegisterForm`, `ForgotPasswordForm`, `ResetPasswordForm`, `VerifyEmailPrompt`. Use `useActionState` for pending/error states.
-        - [ ] **Auth hooks:** `useRegister`, `useLogin`, `useLogout`, `useVerifyEmail`, `useResetPassword` in `src/features/auth/hooks/`.
+        - [ ] **Auth hooks:** `useLogout` `useResetPassword` in `src/features/auth/hooks/`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `auth`).
 
 ###### Feature: User Management (Days 13-15)
@@ -221,7 +223,7 @@
 - **Development:**
     - **Validation and Contracts:**
         - [ ] Create Zod validation schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`.
-        - [ ] Define response-shaping TypeScript types (`FrontendUser`, `PublicUser`) as field projections for output filtering.
+        - [ ] Define response-shaping TypeScript types (`PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
             - Set `username` as `display_name`?
@@ -245,10 +247,14 @@
     - [ ] Enable email authentication for default client.
     - [ ] Remove debug logs.
 
-###### Feature: Admin Dashboard (Days 15-16)
+###### Feature: Admin Dashboard (Days 15-16) 🟢
 
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
+    - **Validation and Contracts:**
+        - [ ] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling.
+    - **Services:**
+        - [ ] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account.
     - **API Routes and Server Actions:**
         - Implement admin endpoints (dual-channel). All routes require authentication and admin role via `{ auth: true, roles: ['admin'] }`:
         - [ ] 🔒 `GET /api/admin/users` - List all users (paginated).

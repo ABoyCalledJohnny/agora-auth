@@ -84,7 +84,7 @@ const databaseUrl = `postgres://${encodeURIComponent(env.APP_DB_USER)}:${encodeU
 export const appConfig = {
   app: {
     name: "Agora Auth",
-    tagline: "A robust, secure, and modern authentication and user management system.",
+    tagline: "Come together. Securely",
     url: env.APP_URL,
     env: env.APP_ENV,
     hostname: env.HOSTNAME,

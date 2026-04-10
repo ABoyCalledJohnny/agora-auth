@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { VerificationTokenType } from "@/src/config/constants.ts";
 import type { VerificationToken } from "@/src/db/schema/index.ts";
 
@@ -14,7 +16,8 @@ export type CreateVerificationTokenResult = {
 
 import { appConfig } from "@/src/config/index.ts";
 import { createToken, hashToken } from "@/src/lib/crypto.ts";
-import { AgoraError, handleServiceError } from "@/src/lib/errors.ts";
+import { AgoraError } from "@/src/lib/errors.ts";
+import { handleServiceError } from "@/src/lib/service-error.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleVerificationTokenRepository } from "@/src/repositories/verification-token.repository.ts";
 

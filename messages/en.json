@@ -51,6 +51,8 @@
     "loading": "Loading…",
     "or": "or",
     "back": "Back",
+    "close": "Close",
+    "irreversible": "This action cannot be undone.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "areYouSure": "Are you sure?",
@@ -59,9 +61,10 @@
   },
   "Auth": {
     "Login": {
+      "metaDescription": "Log in to your Agora Auth account.",
       "heading": "Log in",
-      "emailLabel": "Email address",
-      "emailPlaceholder": "you@example.com",
+      "identifierLabel": "Email or username",
+      "identifierPlaceholder": "Email or username",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Enter your password",
       "rememberMe": "Remember me",
@@ -70,7 +73,9 @@
       "forgotPassword": "Forgot your password?",
       "noAccount": "Don't have an account?",
       "noAccountLink": "Register",
-      "success": "Login successful"
+      "success": "Login successful",
+      "alreadyLoggedIn": "You are already logged in.",
+      "logout": "Log out"
     },
     "Register": {
       "heading": "Create an account",
@@ -190,6 +195,10 @@
   },
   "Nav": {
     "home": "Home",
+    "users": "Users",
+    "docs": "Docs",
+    "about": "About",
+    "status": "Status",
     "login": "Log in",
     "register": "Sign up",
     "profile": "Profile",
@@ -197,6 +206,35 @@
     "admin": "Admin",
     "logout": "Log out",
     "loggedInAs": "Logged in as {name}"
+  },
+  "ErrorPages": {
+    "notFound": {
+      "heading": "Page not found",
+      "description": "The page you are looking for does not exist or has been moved.",
+      "backHome": "Back to home"
+    },
+    "unauthorized": {
+      "heading": "Unauthorised",
+      "description": "You must be logged in to view this page.",
+      "logIn": "Log in",
+      "backHome": "Back to home"
+    },
+    "forbidden": {
+      "heading": "Forbidden",
+      "description": "You do not have permission to view this page.",
+      "backHome": "Back to home"
+    },
+    "error": {
+      "heading": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again later.",
+      "tryAgain": "Try again",
+      "backHome": "Back to home"
+    }
+  },
+  "Landing": {
+    "description": "A lightweight authentication and user management service built for learning, collaboration, and real-world API integration.",
+    "login": "Log in",
+    "docs": "Documentation"
   },
   "Admin": {
     "Users": {

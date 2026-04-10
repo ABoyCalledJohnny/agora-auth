@@ -1,9 +1,69 @@
+import type { Metadata, Viewport } from "next";
+
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { Inter } from "next/font/google";
+
+import { Footer } from "@/src/components/layout/footer.tsx";
+import { Header } from "@/src/components/layout/header.tsx";
+import { Main } from "@/src/components/layout/main.tsx";
+import { Toaster } from "@/src/components/ui/Toaster.tsx";
+import { appConfig } from "@/src/config/index.ts";
+import { getSession } from "@/src/lib/auth.ts";
+import { SessionProvider } from "@/src/providers/SessionProvider.tsx";
+
 import "./globals.css";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+const inter = Inter({ subsets: ["latin"] });
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Landing");
+  return {
+    title: {
+      default: appConfig.app.name,
+      template: `%s | ${appConfig.app.name}`,
+    },
+    description: t("description"),
+    metadataBase: new URL(appConfig.app.url),
+    robots: { index: false, follow: false },
+    icons: {
+      icon: { url: "/icon.svg", type: "image/svg" },
+    },
+  };
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content",
+  themeColor: "#ffffff",
+};
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const session = await getSession();
+
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang={locale}>
+      <body id="top" className={inter.className}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
+        >
+          Skip to content
+        </a>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <SessionProvider session={session}>
+            <div id="root" className="flex min-h-dvh flex-col">
+              <Header />
+              <Main>{children}</Main>
+              <Footer />
+            </div>
+            <Toaster />
+          </SessionProvider>
+        </NextIntlClientProvider>
+      </body>
     </html>
   );
 }
