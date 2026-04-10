@@ -175,7 +175,7 @@
             - [x] Layout/Architecture: `Container`, `Card`.
             - [x] Form: `Form`, `Input`, `Label`, `InputField`, `PasswordField`.
             - [x] General: `Button`, `Alert`, `Avatar`, `Modal`, `Pill`.
-            - [ ] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`. 🟢
+            - [x] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`.
             - [x] Hooks: `useFormAction`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
 
