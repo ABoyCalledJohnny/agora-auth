@@ -758,6 +758,12 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
+validation vs types vs contracts
+contracts, validation + type in feature todo?
+Aufteilung in todo sinnvoll?
+FullUser?
+HealthData, LiveData
+
 ### 3.3 Backlog
 
 **Deferred MVP Features**
@@ -789,6 +795,7 @@ See `./messages/{language}.json`
 
 - **Pagination Page Input:** Add an editable page number input field to the `Pagination` component so users can jump directly to a specific page.
 - **Full Responsiveness:** Implement complete mobile-first responsive design across all pages and components (navigation, forms, tables, modals, etc.).
+    - Position pagination, Farbe Hover, margin modal
 - **Shake Effect:** Animation for failed login attempts.
 - **Real-Time Password Feedback:** Per-rule checklist UI during password entry (using `createPasswordRules` with i18n).
 - **Translated Field Validation:** Zod schemas currently emit translation keys (e.g. `passwordMinLength`) or hardcoded English strings as error messages. Integrate `react-hook-form` with Zod (`@hookform/resolvers/zod`) for instant client-side validation, and translate field errors in the component layer via `useTranslations("Validation")`. This enables per-field feedback before submission and ensures all validation messages respect the active locale.
@@ -858,8 +865,16 @@ learnings, pipeline nervt zwar, aber ist auch super wichtig
 
 project specifics in README
 
+Nervig an Next:
 Doppelrequests
 Cookies, wo kann man sie setzen
 Caching
+
+Static about page
+
+Was will ich zeigen, Struktur
+Was war Priorität
+
+Kaleidoskode Projekt schicken
 
 ## 6. Initial Major Release and Deployment
