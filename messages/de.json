@@ -57,7 +57,8 @@
     "hidePassword": "Passwort verbergen",
     "areYouSure": "Bist du sicher?",
     "somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-    "success": "Erfolg"
+    "success": "Erfolg",
+    "notImplemented": "Diese Seite ist noch nicht implementiert."
   },
   "Auth": {
     "Login": {
@@ -235,6 +236,21 @@
     "description": "Ein leichtgewichtiger Authentifizierungs- und Benutzerverwaltungsdienst, entwickelt für Lernen, Zusammenarbeit und praxisnahe API-Integration.",
     "login": "Anmelden",
     "docs": "Dokumentation"
+  },
+  "About": {
+    "heading": "Über uns"
+  },
+  "Users": {
+    "heading": "Nutzer"
+  },
+  "Docs": {
+    "heading": "Dokumentation"
+  },
+  "Status": {
+    "heading": "Status",
+    "property": "Eigenschaft",
+    "value": "Wert",
+    "fetchError": "Statusdaten konnten nicht abgerufen werden."
   },
   "Admin": {
     "Users": {

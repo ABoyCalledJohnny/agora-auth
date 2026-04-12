@@ -57,7 +57,8 @@
     "hidePassword": "Hide password",
     "areYouSure": "Are you sure?",
     "somethingWentWrong": "Something went wrong. Please try again.",
-    "success": "Success"
+    "success": "Success",
+    "notImplemented": "This page is not implemented yet."
   },
   "Auth": {
     "Login": {
@@ -235,6 +236,21 @@
     "description": "A lightweight authentication and user management service built for learning, collaboration, and real-world API integration.",
     "login": "Log in",
     "docs": "Documentation"
+  },
+  "About": {
+    "heading": "About"
+  },
+  "Users": {
+    "heading": "Users"
+  },
+  "Docs": {
+    "heading": "Documentation"
+  },
+  "Status": {
+    "heading": "Status",
+    "property": "Property",
+    "value": "Value",
+    "fetchError": "Could not fetch health data."
   },
   "Admin": {
     "Users": {

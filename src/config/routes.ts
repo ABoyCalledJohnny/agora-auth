@@ -18,5 +18,5 @@ export const navRoutes: NavRoute[] = [
   { href: "/about", labelKey: "about" },
   { href: "/users", labelKey: "users" },
   { href: "/docs", labelKey: "docs" },
-  { href: "/api/health", labelKey: "status" },
+  { href: "/status", labelKey: "status" },
 ];

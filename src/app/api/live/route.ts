@@ -2,6 +2,8 @@ import type { ApiSuccessResponse, LiveData } from "@/src/types.ts";
 
 import { NO_STORE_HEADERS } from "@/src/config/constants.ts";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const response: ApiSuccessResponse<LiveData> = {
     success: true,

@@ -4,6 +4,8 @@ import { NO_STORE_HEADERS } from "@/src/config/constants.ts";
 import { client as sql } from "@/src/db/index.ts";
 import { logger } from "@/src/lib/logger.ts";
 
+export const dynamic = "force-dynamic";
+
 async function checkDatabaseConnection(): Promise<boolean> {
   try {
     // Execute a minimal query to verify the connection
