@@ -81,6 +81,9 @@ const databaseUrl = `postgres://${encodeURIComponent(env.APP_DB_USER)}:${encodeU
 //    For cookies, use cookieMaxAge (integer in seconds) instead.
 // ---------------------------------------------------------------------------
 
+const isProd = env.APP_ENV === "production";
+const cookiePrefix = isProd ? "__Secure-" : "";
+
 export const appConfig = {
   app: {
     name: "Agora Auth",
@@ -104,9 +107,16 @@ export const appConfig = {
     secret: env.AUTH_SECRET,
     jwtPrivateKey: env.JWT_PRIVATE_KEY,
     jwtPublicKey: env.JWT_PUBLIC_KEY,
-    refreshCookieName: "agora_refresh",
-    accessCookieName: "agora_access",
-    cookieSameSite: "lax",
+    isProd,
+    cookiePrefix,
+    accessCookieName: `${cookiePrefix}agora_access`,
+    refreshCookieName: `${cookiePrefix}agora_refresh`,
+    cookieDefaults: {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: "lax",
+      path: "/",
+    },
     accessTokenExpiry: "15m", // jose string — JWT exp claim / access cookie lifespan
     refreshTokenExpiry: "7d", // jose string — DB session claim / refresh cookie lifespan
     verificationTokenExpiry: "24h", // jose string — email verification / password reset

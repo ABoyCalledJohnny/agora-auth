@@ -224,15 +224,9 @@ export async function getSessionCookies(): Promise<{
   refreshCookie: RequestCookie | null;
 }> {
   const cookieStore = await cookies();
-  const isProd = appConfig.app.env === "production";
-  const cookiePrefix = isProd ? "__Secure-" : "";
 
-  const accessCookieName = `${cookiePrefix}${appConfig.auth.accessCookieName}`;
-  const refreshCookieName = `${cookiePrefix}${appConfig.auth.refreshCookieName}`;
-
-  // Grab the Access JWT from the cookies.
-  const accessCookie = cookieStore.get(accessCookieName) ?? null;
-  const refreshCookie = cookieStore.get(refreshCookieName) ?? null;
+  const accessCookie = cookieStore.get(appConfig.auth.accessCookieName) ?? null;
+  const refreshCookie = cookieStore.get(appConfig.auth.refreshCookieName) ?? null;
 
   return { accessCookie, refreshCookie };
 }
@@ -243,23 +237,14 @@ export async function getSessionCookies(): Promise<{
  */
 export async function setSessionCookies(accessToken: string, refreshToken: string) {
   const cookieStore = await cookies();
-  const isProd = appConfig.app.env === "production";
-  const cookiePrefix = isProd ? "__Secure-" : "";
 
-  const shared = {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: appConfig.auth.cookieSameSite,
-    path: "/",
-  } as const;
-
-  cookieStore.set(`${cookiePrefix}${appConfig.auth.accessCookieName}`, accessToken, {
-    ...shared,
+  cookieStore.set(appConfig.auth.accessCookieName, accessToken, {
+    ...appConfig.auth.cookieDefaults,
     maxAge: parseDuration(appConfig.auth.accessTokenExpiry) / 1000,
   });
 
-  cookieStore.set(`${cookiePrefix}${appConfig.auth.refreshCookieName}`, refreshToken, {
-    ...shared,
+  cookieStore.set(appConfig.auth.refreshCookieName, refreshToken, {
+    ...appConfig.auth.cookieDefaults,
     maxAge: parseDuration(appConfig.auth.refreshTokenExpiry) / 1000,
   });
 }
@@ -267,17 +252,15 @@ export async function setSessionCookies(accessToken: string, refreshToken: strin
 /** Clears both session cookies. */
 export async function clearSessionCookies() {
   const cookieStore = await cookies();
-  const isProd = appConfig.app.env === "production";
-  const cookiePrefix = isProd ? "__Secure-" : "";
 
   const deleteOptions = {
-    path: "/",
-    secure: isProd,
-    sameSite: appConfig.auth.cookieSameSite,
+    path: appConfig.auth.cookieDefaults.path,
+    secure: appConfig.auth.cookieDefaults.secure,
+    sameSite: appConfig.auth.cookieDefaults.sameSite,
   } as const;
 
-  cookieStore.delete({ name: `${cookiePrefix}${appConfig.auth.accessCookieName}`, ...deleteOptions });
-  cookieStore.delete({ name: `${cookiePrefix}${appConfig.auth.refreshCookieName}`, ...deleteOptions });
+  cookieStore.delete({ name: appConfig.auth.accessCookieName, ...deleteOptions });
+  cookieStore.delete({ name: appConfig.auth.refreshCookieName, ...deleteOptions });
 }
 
 /**

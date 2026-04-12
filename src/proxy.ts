@@ -6,17 +6,6 @@ import { NextResponse } from "next/server";
 import { appConfig } from "@/src/config/index.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 
-// ---------------------------------------------------------------------------
-// Derived constants
-// ---------------------------------------------------------------------------
-
-const IS_PROD = appConfig.app.env === "production";
-const COOKIE_PREFIX = IS_PROD ? "__Secure-" : "";
-const ACCESS_COOKIE = `${COOKIE_PREFIX}${appConfig.auth.accessCookieName}`;
-const REFRESH_COOKIE = `${COOKIE_PREFIX}${appConfig.auth.refreshCookieName}`;
-const ACCESS_MAX_AGE = parseDuration(appConfig.auth.accessTokenExpiry) / 1000;
-const REFRESH_MAX_AGE = parseDuration(appConfig.auth.refreshTokenExpiry) / 1000;
-
 // JWT verification — uses jose directly instead of JwtService because
 // proxy.ts is bundled separately by Next.js and cannot import `server-only`.
 let cachedPublicKey: Awaited<ReturnType<typeof importSPKI>> | null = null;
@@ -44,8 +33,8 @@ async function verifyAccessToken(token: string) {
 // ---------------------------------------------------------------------------
 
 export async function proxy(request: NextRequest) {
-  const accessToken = request.cookies.get(ACCESS_COOKIE)?.value;
-  const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
+  const accessToken = request.cookies.get(appConfig.auth.accessCookieName)?.value;
+  const refreshToken = request.cookies.get(appConfig.auth.refreshCookieName)?.value;
 
   // No tokens at all — nothing to do
   if (!accessToken && !refreshToken) {
@@ -91,20 +80,14 @@ export async function proxy(request: NextRequest) {
     // Set fresh cookies on both the forwarded request (for downstream
     // Server Components) and the outgoing response (for the browser).
     const response = NextResponse.next();
-    const cookieOptions = {
-      httpOnly: true,
-      secure: IS_PROD,
-      sameSite: appConfig.auth.cookieSameSite,
-      path: "/",
-    };
 
-    response.cookies.set(ACCESS_COOKIE, data.accessToken, {
-      ...cookieOptions,
-      maxAge: ACCESS_MAX_AGE,
+    response.cookies.set(appConfig.auth.accessCookieName, data.accessToken, {
+      ...appConfig.auth.cookieDefaults,
+      maxAge: parseDuration(appConfig.auth.accessTokenExpiry) / 1000,
     });
-    response.cookies.set(REFRESH_COOKIE, data.refreshToken, {
-      ...cookieOptions,
-      maxAge: REFRESH_MAX_AGE,
+    response.cookies.set(appConfig.auth.refreshCookieName, data.refreshToken, {
+      ...appConfig.auth.cookieDefaults,
+      maxAge: parseDuration(appConfig.auth.refreshTokenExpiry) / 1000,
     });
 
     return response;
