@@ -141,16 +141,9 @@ export function withApiHandler(
         } catch {
           throw new AgoraError("VALIDATION_ERROR", "Invalid or missing JSON body.");
         }
-        // TODO: TEMPORARY — remove after debugging classmate's register issue
-        console.log(`[DEBUG] ${request.method} ${request.nextUrl.pathname}`, {
-          contentType: request.headers.get("content-type"),
-          body,
-        });
         const sanitised = sanitizeInput(body);
         const result = config.bodySchema.safeParse(sanitised);
         if (!result.success) {
-          // TODO: TEMPORARY — remove after debugging
-          console.log(`[DEBUG] Validation failed:`, JSON.stringify(result.error.issues, null, 2));
           throw new AgoraError("VALIDATION_ERROR", "Validation failed.", {
             details: result.error.issues,
           });
