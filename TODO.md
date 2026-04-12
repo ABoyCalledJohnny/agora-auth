@@ -138,11 +138,10 @@
 - [x] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Shared Validation and Domain Rules:**
-        - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains.
+        - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains. Export inferred TypeScript types from schemas (e.g., `Preferences`, `PrivacySettings`) for type-safe usage across the application.
         - [x] **Global types:** Create `src/types.ts` to define system-wide interfaces like `ApiErrorResponse`, `ApiSuccessResponse`, and standard action states for uniform client-server communication as well es `PaginatedList`s.
     - **Database Layer:**
         - **Drizzle schemas:** Translate the ERD into Drizzle schema and relation files.
-            - **Validation:** Import shared constants and types from `constants.ts` and `validation.ts` where applicable.
             - **Types:** Export inferred TypeScript types from Drizzle schemas (e.g., `User`, `Session`, `Role`).
             - [x] Users Tables (`users.ts`)
             - [x] Auth Tables (`auth.ts`)
@@ -187,6 +186,7 @@
 - **Development:**
     - **Validation and Contracts:**
         - [x] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
+        - [x] Define response-shaping TypeScript types (`AuthTokens`, `LoginResponse`, `AccessTokenPayload`) for service output and JWT payload structures.
     - **Services:**
         - [x] **`AuthService`:** Registration and login orchestration.
         - [x] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
@@ -222,7 +222,7 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`.
+        - [ ] Create Zod validation schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`. 
         - [ ] Define response-shaping TypeScript types (`PublicUser`) as field projections for output filtering.
     - **Services:**
         - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
@@ -253,6 +253,7 @@
 - **Development:**
     - **Validation and Contracts:**
         - [ ] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling.
+        - [ ] Define response-shaping TypeScript types (`AdminListUsersResult`) as field projections for output filtering.
     - **Services:**
         - [ ] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account.
     - **API Routes and Server Actions:**

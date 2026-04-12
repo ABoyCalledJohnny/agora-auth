@@ -758,12 +758,6 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
-validation vs types vs contracts
-contracts, validation + type in feature todo?
-Aufteilung in todo sinnvoll?
-FullUser?
-HealthData, LiveData
-
 ### 3.3 Backlog
 
 **Deferred MVP Features**
