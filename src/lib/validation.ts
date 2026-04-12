@@ -132,14 +132,11 @@ export const paginationSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).catch(10), // Limit per page DoS protection
 });
 
-/**
- * Extension of paginationSchema for user list queries.
- * This guarantees safe inputs before hitting the UserRepository.
- */
-export const userListQuerySchema = paginationSchema.extend({
+/** Shared base schema for paginated user list queries (user and admin) */
+export const userListBaseSchema = paginationSchema.extend({
   status: statusSchema.optional(),
   search: z.string().max(100).optional(),
-  roleId: z.uuid().optional(), // assuming roleId is a UUID
+  roleId: z.uuid().optional(),
   sortBy: z.enum(["username", "email", "createdAt", "updatedAt"]).default("createdAt"),
   sortDirection: z.enum(["asc", "desc"]).default("desc"),
 });

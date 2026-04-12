@@ -1,7 +1,15 @@
-import type { ListUsersPageInput, ListUsersPageResult } from "./types.ts";
+import type { ListUsersPageResult } from "./types.ts";
 import type { UserStatus } from "@/src/config/constants.ts";
 import type { FullUser, NewUser, User, UserProfile, UserSettings } from "@/src/db/schema/index.ts";
 import type { CrudRepository } from "@/src/repositories/contracts.ts";
+
+import { z } from "zod";
+
+import { userListBaseSchema } from "@/src/lib/validation.ts";
+
+export const userListQuerySchema = userListBaseSchema;
+
+export type UserListQuery = z.infer<typeof userListQuerySchema>;
 
 export interface UserRepository extends CrudRepository<
   User,
@@ -16,7 +24,7 @@ export interface UserRepository extends CrudRepository<
   findByIdentifier(email: string): Promise<User | null>;
   findByRoleId(roleId: string): Promise<User[]>;
   findByStatus(status: UserStatus): Promise<User[]>;
-  listPage(input: ListUsersPageInput): Promise<ListUsersPageResult>;
+  listPage(input: UserListQuery): Promise<ListUsersPageResult>;
 
   // Aggregate Reads
   findByIdWithDetails(id: string): Promise<FullUser | null>;
