@@ -69,7 +69,7 @@ type TableHeaderCellProps = React.ComponentProps<"th">;
 
 export function TableHeaderCell({ children, className, ...rest }: TableHeaderCellProps) {
   return (
-    <th scope="col" className={cn("px-3 py-4 whitespace-nowrap", className)} {...rest}>
+    <th scope="col" className={cn("px-3 py-3 whitespace-nowrap", className)} {...rest}>
       {children}
     </th>
   );

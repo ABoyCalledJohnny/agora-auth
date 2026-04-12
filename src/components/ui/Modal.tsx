@@ -62,7 +62,7 @@ export function Modal({ open, onClose, title, children, actions, className }: Mo
         <div className="flex justify-end gap-3">
           {actions ?? (
             <Button variant="secondary" onClick={() => dialogRef.current?.close()}>
-              {t("close")}
+              {t("cancel")}
             </Button>
           )}
         </div>
