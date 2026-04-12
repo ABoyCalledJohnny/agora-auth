@@ -4,8 +4,8 @@
 # Usage:  make <target>
 # =============================================================================
 
-COMPOSE := docker compose -f compose.yaml -f compose.production.yaml
-CADDY   := docker compose -p caddy -f compose.caddy.yaml
+COMPOSE := sudo docker compose -f compose.yaml -f compose.production.yaml
+CADDY   := sudo docker compose -p caddy -f compose.caddy.yaml
 
 # --- Logs ---
 
