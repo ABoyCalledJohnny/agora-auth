@@ -104,6 +104,9 @@ jobs:
           cp compose.production.yaml deployment/
           cp compose.caddy.yaml deployment/
 
+          # Copy VPS operations Makefile
+          cp Makefile deployment/
+
       - name: 📤 Upload Artifact
         uses: actions/upload-artifact@v6
         with:
