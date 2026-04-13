@@ -6,7 +6,7 @@
     "INTERNAL": "Ein unerwarteter Serverfehler ist aufgetreten.",
     "UNAUTHORIZED": "Du musst angemeldet sein, um diese Aktion auszuführen.",
     "FORBIDDEN": "Du hast keine Berechtigung für diese Aktion.",
-    "INVALID_CREDENTIALS": "Die angegebene E-Mail oder das Passwort ist falsch.",
+    "INVALID_CREDENTIALS": "Die angegebenen Anmeldedaten sind falsch.",
     "TOKEN_EXPIRED": "Deine Sitzung oder dein Bestätigungs-Token ist abgelaufen.",
     "TOKEN_INVALID": "Das angegebene Token ist ungültig oder fehlerhaft.",
     "TOKEN_REVOKED": "Dieses Token wurde widerrufen.",

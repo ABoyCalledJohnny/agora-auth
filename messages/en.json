@@ -6,7 +6,7 @@
     "INTERNAL": "An unexpected internal server error occurred.",
     "UNAUTHORIZED": "You must be logged in to perform this action.",
     "FORBIDDEN": "You do not have permission to perform this action.",
-    "INVALID_CREDENTIALS": "The email or password provided is incorrect.",
+    "INVALID_CREDENTIALS": "The credentials provided are incorrect.",
     "TOKEN_EXPIRED": "Your session or verification token has expired.",
     "TOKEN_INVALID": "The provided token is invalid or malformed.",
     "TOKEN_REVOKED": "This token has been revoked.",

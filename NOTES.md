@@ -764,7 +764,6 @@ See `./messages/{language}.json`
 - Zurück auf die richtige Seite, wenn man Nutzer löscht
 - Seiten und Einstellungen als params?
 - email/username or password is incorrect
-- register,pw forgot dummy pages
 
 ### 3.3 Backlog
 
