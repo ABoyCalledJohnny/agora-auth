@@ -58,8 +58,6 @@ export type ValidationTranslator = (key: ValidationMessageKey) => string;
 // ============================================================================
 // Validation limits and sets used to power the schemas below.
 
-const RESERVED_USERNAME_SET = new Set<string>(RESERVED_USERNAMES);
-
 // ============================================================================
 // 3. ENUMS & SYSTEM TYPES
 // ============================================================================
@@ -102,7 +100,7 @@ export const usernameRules = (t: ValidationTranslator) =>
     .min(USERNAME_MIN_LENGTH, { message: t("usernameMinLength") })
     .max(USERNAME_MAX_LENGTH, { message: t("usernameMaxLength") })
     .regex(/^[a-z0-9_-]+$/, { message: t("usernameFormat") })
-    .refine((value) => !RESERVED_USERNAME_SET.has(value), {
+    .refine((value) => !RESERVED_USERNAMES.has(value), {
       message: t("usernameReserved"),
     });
 

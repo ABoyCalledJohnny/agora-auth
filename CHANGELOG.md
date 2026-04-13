@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.4.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.4.0-rc.0...v0.4.0) (2026-04-12)
+
+### Features
+
+- implement nav menu placeholder and status pages ([eac0727](https://github.com/ABoyCalledJohnny/agora-auth/commit/eac072734d180f296f66d1a2d04e4a811606ebbe))
+
+### Bug Fixes
+
+- add correct cookie properties to clearSessionCookies function ([1c88c8e](https://github.com/ABoyCalledJohnny/agora-auth/commit/1c88c8e13175e6ffc2d2982e35ead5c0386c901e))
+- add sudo to Makefile commands ([83f79cd](https://github.com/ABoyCalledJohnny/agora-auth/commit/83f79cd3cdc0c8900f8e57196ab489ba2f8b5d69))
+- improve positioning of centered layout for mobile and desktop ([02fad45](https://github.com/ABoyCalledJohnny/agora-auth/commit/02fad45f6c1ad1894a9274bbbf201ee656434d7e))
+- modal button label and table header styling ([0e018f4](https://github.com/ABoyCalledJohnny/agora-auth/commit/0e018f4ff0bbabf29948fb8f8cc5b88967cf474b))
+
+### Documentation
+
+- **notes:** update notes ([e34beb1](https://github.com/ABoyCalledJohnny/agora-auth/commit/e34beb11ad4b644faefda15b916c45ceeda475c4))
+
+### Chores
+
+- add Makefile for VPS operations shortcuts ([e60be8c](https://github.com/ABoyCalledJohnny/agora-auth/commit/e60be8c50fb4e546736ff8834d8aeaa2183ffd52))
+- remove debug logs from api wrapper ([3a1cd82](https://github.com/ABoyCalledJohnny/agora-auth/commit/3a1cd82951a01e79bbaab17e24ec0e07611b1d18))
+- update dependencies to resolve audit vulnerabilities ([22a9662](https://github.com/ABoyCalledJohnny/agora-auth/commit/22a966240ae6ded32f32787b492113bd26dff8b9))
+
 ## [0.4.0-rc.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.3.0...v0.4.0-rc.0) (2026-04-10)
 
 ### Features

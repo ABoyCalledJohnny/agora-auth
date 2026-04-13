@@ -6,7 +6,7 @@
     "INTERNAL": "Ein unerwarteter Serverfehler ist aufgetreten.",
     "UNAUTHORIZED": "Du musst angemeldet sein, um diese Aktion auszuführen.",
     "FORBIDDEN": "Du hast keine Berechtigung für diese Aktion.",
-    "INVALID_CREDENTIALS": "Die angegebene E-Mail oder das Passwort ist falsch.",
+    "INVALID_CREDENTIALS": "Die angegebenen Anmeldedaten sind falsch.",
     "TOKEN_EXPIRED": "Deine Sitzung oder dein Bestätigungs-Token ist abgelaufen.",
     "TOKEN_INVALID": "Das angegebene Token ist ungültig oder fehlerhaft.",
     "TOKEN_REVOKED": "Dieses Token wurde widerrufen.",
@@ -79,6 +79,7 @@
       "logout": "Abmelden"
     },
     "Register": {
+      "metaDescription": "Erstelle ein neues Agora Auth Konto.",
       "heading": "Konto erstellen",
       "usernameLabel": "Benutzername",
       "usernamePlaceholder": "Benutzernamen wählen",
@@ -96,6 +97,7 @@
       "success": "Benutzer erfolgreich registriert."
     },
     "ForgotPassword": {
+      "metaDescription": "Setze dein Agora Auth Passwort zurück.",
       "heading": "Passwort vergessen?",
       "description": "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen.",
       "emailLabel": "E-Mail-Adresse",
@@ -238,16 +240,20 @@
     "docs": "Dokumentation"
   },
   "About": {
-    "heading": "Über uns"
+    "heading": "Über uns",
+    "metaDescription": "Erfahre mehr über Agora Auth."
   },
   "Users": {
-    "heading": "Nutzer"
+    "heading": "Nutzer",
+    "metaDescription": "Registrierte Agora Auth Nutzer durchsuchen."
   },
   "Docs": {
-    "heading": "Dokumentation"
+    "heading": "Dokumentation",
+    "metaDescription": "Agora Auth API-Dokumentation und Anleitungen."
   },
   "Status": {
     "heading": "Status",
+    "metaDescription": "Überprüfe den aktuellen Status von Agora Auth.",
     "property": "Eigenschaft",
     "value": "Wert",
     "fetchError": "Statusdaten konnten nicht abgerufen werden."

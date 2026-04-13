@@ -758,6 +758,12 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
+- Nutzerliste:
+    - Alles fetchen oder immer nur Teile?
+    - Irgendein Cache?
+- Zurück auf die richtige Seite, wenn man Nutzer löscht
+- Seiten und Einstellungen als params?
+
 ### 3.3 Backlog
 
 **Deferred MVP Features**

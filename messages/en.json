@@ -6,7 +6,7 @@
     "INTERNAL": "An unexpected internal server error occurred.",
     "UNAUTHORIZED": "You must be logged in to perform this action.",
     "FORBIDDEN": "You do not have permission to perform this action.",
-    "INVALID_CREDENTIALS": "The email or password provided is incorrect.",
+    "INVALID_CREDENTIALS": "The credentials provided are incorrect.",
     "TOKEN_EXPIRED": "Your session or verification token has expired.",
     "TOKEN_INVALID": "The provided token is invalid or malformed.",
     "TOKEN_REVOKED": "This token has been revoked.",
@@ -79,6 +79,7 @@
       "logout": "Log out"
     },
     "Register": {
+      "metaDescription": "Create a new Agora Auth account.",
       "heading": "Create an account",
       "usernameLabel": "Username",
       "usernamePlaceholder": "Choose a username",
@@ -96,6 +97,7 @@
       "success": "User registered successfully"
     },
     "ForgotPassword": {
+      "metaDescription": "Reset your Agora Auth password.",
       "heading": "Forgot your password?",
       "description": "Enter your email and we'll send you a reset link.",
       "emailLabel": "Email address",
@@ -238,16 +240,20 @@
     "docs": "Documentation"
   },
   "About": {
-    "heading": "About"
+    "heading": "About",
+    "metaDescription": "Learn more about Agora Auth."
   },
   "Users": {
-    "heading": "Users"
+    "heading": "Users",
+    "metaDescription": "Browse registered Agora Auth users."
   },
   "Docs": {
-    "heading": "Documentation"
+    "heading": "Documentation",
+    "metaDescription": "Agora Auth API documentation and guides."
   },
   "Status": {
     "heading": "Status",
+    "metaDescription": "Check the current health and status of Agora Auth.",
     "property": "Property",
     "value": "Value",
     "fetchError": "Could not fetch health data."
