@@ -758,6 +758,12 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
+1. Table
+2. IDs
+3. Improvements
+    - Width columns
+    - Direktauswahl Seite
+
 ### 3.3 Backlog
 
 **Deferred MVP Features**

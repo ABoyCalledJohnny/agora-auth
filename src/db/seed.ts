@@ -1,7 +1,8 @@
+import { randomUUID } from "node:crypto";
+
 import { eq, like } from "drizzle-orm";
 import { firstNames, lastNames, seed } from "drizzle-seed";
 
-import { USER_STATUS } from "../config/constants.ts";
 import { appConfig } from "../config/index.ts";
 import { createPublicId } from "../lib/utils.ts";
 import { db } from "./index.ts";
@@ -15,7 +16,7 @@ const seedSchema = {
 
 const SEED_COUNT = 100;
 const DRIZZLE_SEED_VALUE = 20260318;
-const SEED_EMAIL_DOMAIN = "seed.local";
+const SEED_EMAIL_DOMAIN = "example.com";
 
 function toHandlePart(value: string): string {
   const normalized = value
@@ -26,6 +27,20 @@ function toHandlePart(value: string): string {
 }
 
 function createSeedUsers(count: number) {
+  // Username patterns that mimic real user choices
+  const usernamePatterns: ((f: string, l: string, s: string) => string)[] = [
+    (f, _l, s) => `${f}${s}`, // alice, alice2
+    (f, l, s) => `${f}_${l[0]}${s}`, // bob_k, bob_k2
+    (f, l, s) => `${f[0]}${l}${s}`, // cjones, cjones2
+    (f, l, s) => `${f}.${l}${s}`, // diana.kim, diana.kim2
+    (f, l, s) => `${l}${f[0]}${s}`, // hayese, hayese2
+    (f, l, s) => `${l}_${f[0]}${s}`, // foster_f, foster_f2
+    (f, l, s) => `${f[0]}.${l}${s}`, // g.miller, g.miller2
+    (f, l, s) => `${f}${l[0]}${s}`, // hannahm, hannahm2
+    (f, l, s) => `${f}${l}${s}`, // ivanlee, ivanlee2
+    (f, _l, s) => `x_${f}${s}`, // x_julia, x_julia2
+  ];
+
   return Array.from({ length: count }, (_, index) => {
     const firstNameRaw = firstNames[(index * 17 + 11) % firstNames.length] ?? "Alex";
     const lastNameRaw = lastNames[(index * 29 + 7) % lastNames.length] ?? "Miller";
@@ -34,10 +49,12 @@ function createSeedUsers(count: number) {
 
     const first = toHandlePart(firstName);
     const last = toHandlePart(lastName);
-    const suffix = String(index + 1).padStart(3, "0");
+    const cycle = Math.floor(index / usernamePatterns.length);
+    const suffix = cycle > 0 ? String(cycle + 1) : "";
+    const pattern = usernamePatterns[index % usernamePatterns.length]!;
 
-    const username = `${first}_${last}_${suffix}`.slice(0, 30);
-    const email = `${first}.${last}.${suffix}@${SEED_EMAIL_DOMAIN}`;
+    const username = pattern(first, last, suffix).slice(0, 30);
+    const email = `${username.replace(/[_.]/g, ".")}@${SEED_EMAIL_DOMAIN}`;
     const displayName = `${firstName} ${lastName}`;
 
     return {
@@ -65,10 +82,18 @@ async function seedDevData(): Promise<void> {
     users: {
       count: SEED_COUNT,
       columns: {
+        id: funcs.valuesFromArray({
+          values: seedUsers.map(() => randomUUID()),
+          isUnique: true,
+        }),
         publicId: funcs.valuesFromArray({ values: seedUsers.map((user) => user.publicId), isUnique: true }),
         username: funcs.valuesFromArray({ values: seedUsers.map((user) => user.username), isUnique: true }),
         email: funcs.valuesFromArray({ values: seedUsers.map((user) => user.email), isUnique: true }),
-        status: funcs.valuesFromArray({ values: [...USER_STATUS] }),
+        status: funcs.weightedRandom([
+          { weight: 0.1, value: funcs.default({ defaultValue: "pending" }) },
+          { weight: 0.8, value: funcs.default({ defaultValue: "active" }) },
+          { weight: 0.1, value: funcs.default({ defaultValue: "suspended" }) },
+        ]),
       },
       with: {
         userSettings: 1,
@@ -201,7 +226,7 @@ async function seedDevData(): Promise<void> {
         pronouns: funcs.valuesFromArray({ values: ["he/him", "she/her", "they/them"] }),
         websiteUrl: funcs.default({ defaultValue: null }),
         avatarUrl: funcs.valuesFromArray({
-          values: seedUsers.map((user) => `https://api.dicebear.com/9.x/avataaars/svg?seed=${user.username}`),
+          values: seedUsers.map((_, i) => `https://i.pravatar.cc/150?u=${i + 1}`),
         }),
         hobbies: funcs.valuesFromArray({
           values: [

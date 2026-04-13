@@ -3,7 +3,6 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 
-import { Button } from "@/src/components/ui/Button.tsx";
 import { cn } from "@/src/lib/utils.ts";
 
 type ModalProps = {
@@ -58,14 +57,6 @@ export function Modal({ open, onClose, title, children, actions, className }: Mo
         </h2>
 
         <div className="text-sm text-neutral-600">{children}</div>
-
-        <div className="flex justify-end gap-3">
-          {actions ?? (
-            <Button variant="secondary" onClick={() => dialogRef.current?.close()}>
-              {t("cancel")}
-            </Button>
-          )}
-        </div>
       </div>
     </dialog>
   );

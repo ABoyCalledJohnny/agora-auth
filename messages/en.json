@@ -272,12 +272,25 @@
       "actionActivate": "Activate",
       "actionDelete": "Delete",
       "createUser": "Create user",
+      "actionCancel": "Cancel",
+      "actionConfirm": "Confirm",
+      "confirmDeleteTitle": "Delete User",
+      "confirmSuspendTitle": "Suspend User",
+      "confirmActivateTitle": "Activate User",
+      "confirmDeleteMessage": "User {username} and all associated data will be permanently removed. This action cannot be undone.",
+      "confirmSuspendMessage": "User {username} will be suspended.",
+      "confirmActivateMessage": "The user account of {username} will be activated.",
       "emptyState": "No users found.",
-      "statusUpdateSuccess": "User status updated.",
-      "deleteSuccess": "User deleted.",
+      "suspendSuccess": "User {username} has been suspended.",
+      "activateSuccess": "User {username} has been activated.",
+      "statusUpdateError": "Failed to update status for user {username}.",
+      "deleteSuccess": "User {username} has been deleted.",
+      "deleteError": "Failed to delete user {username}.",
       "Pagination": {
+        "first": "First page",
         "previous": "Previous",
         "next": "Next",
+        "last": "Last page",
         "pageOf": "Page {page} of {total}"
       }
     }

@@ -272,12 +272,25 @@
       "actionActivate": "Aktivieren",
       "actionDelete": "Löschen",
       "createUser": "Benutzer anlegen",
+      "actionCancel": "Abbrechen",
+      "actionConfirm": "Bestätigen",
+      "confirmDeleteTitle": "Benutzer löschen",
+      "confirmSuspendTitle": "Benutzer sperren",
+      "confirmActivateTitle": "Benutzer aktivieren",
+      "confirmDeleteMessage": "Benutzer {username} und alle zugehörigen Daten werden unwiderruflich entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirmSuspendMessage": "Benutzer {username} wird gesperrt.",
+      "confirmActivateMessage": "Das Benutzerkonto von {username} wird aktiviert.",
       "emptyState": "Keine Benutzer gefunden.",
-      "statusUpdateSuccess": "Benutzerstatus aktualisiert.",
-      "deleteSuccess": "Benutzer gelöscht.",
+      "suspendSuccess": "Benutzer {username} wurde gesperrt.",
+      "activateSuccess": "Benutzer {username} wurde aktiviert.",
+      "statusUpdateError": "Status von Benutzer {username} konnte nicht aktualisiert werden.",
+      "deleteSuccess": "Benutzer {username} wurde gelöscht.",
+      "deleteError": "Benutzer {username} konnte nicht gelöscht werden.",
       "Pagination": {
+        "first": "Erste Seite",
         "previous": "Zurück",
         "next": "Weiter",
+        "last": "Letzte Seite",
         "pageOf": "Seite {page} von {total}"
       }
     }

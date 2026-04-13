@@ -83,7 +83,7 @@ type TableCellProps = React.ComponentProps<"td">;
 
 export function TableCell({ children, className, ...rest }: TableCellProps) {
   return (
-    <td className={cn("px-3 py-4 whitespace-nowrap text-neutral-700", className)} {...rest}>
+    <td className={cn("px-3 py-3 whitespace-nowrap text-neutral-700", className)} {...rest}>
       {children}
     </td>
   );
