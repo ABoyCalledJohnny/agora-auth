@@ -273,6 +273,8 @@
       "actionDelete": "Löschen",
       "createUser": "Benutzer anlegen",
       "emptyState": "Keine Benutzer gefunden.",
+      "statusUpdateSuccess": "Benutzerstatus aktualisiert.",
+      "deleteSuccess": "Benutzer gelöscht.",
       "Pagination": {
         "previous": "Zurück",
         "next": "Weiter",

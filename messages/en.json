@@ -273,6 +273,8 @@
       "actionDelete": "Delete",
       "createUser": "Create user",
       "emptyState": "No users found.",
+      "statusUpdateSuccess": "User status updated.",
+      "deleteSuccess": "User deleted.",
       "Pagination": {
         "previous": "Previous",
         "next": "Next",
