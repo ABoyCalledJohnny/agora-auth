@@ -758,11 +758,13 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
-validation vs types vs contracts
-contracts, validation + type in feature todo?
-Aufteilung in todo sinnvoll?
-FullUser?
-HealthData, LiveData
+- Nutzerliste:
+    - Alles fetchen oder immer nur Teile?
+    - Irgendein Cache?
+- Zurück auf die richtige Seite, wenn man Nutzer löscht
+- Seiten und Einstellungen als params?
+- email/username or password is incorrect
+- register,pw forgot dummy pages
 
 ### 3.3 Backlog
 
