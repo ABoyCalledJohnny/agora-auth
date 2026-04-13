@@ -139,6 +139,8 @@ export const userListBaseSchema = paginationSchema.extend({
   sortDirection: z.enum(["asc", "desc"]).default("desc"),
 });
 
+export type UserListBase = z.infer<typeof userListBaseSchema>;
+
 /** Standardized privacy toggles for user profiles */
 export const privacySettingsSchema = z.object({
   profileVisibility: z.enum(["members_only", "private"]).default(DEFAULT_PRIVACY_SETTINGS.profileVisibility),

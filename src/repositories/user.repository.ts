@@ -179,9 +179,12 @@ export const DrizzleUserRepository: UserRepository = {
         )
       : undefined;
 
+    // Status condition
+    const statusCondition = status ? eq(users.status, status) : undefined;
+
     // Filter condition: We use `and()` to combine multiple conditions.
     // In Drizzle, if any condition passed to `and()` is `undefined`, it is safely ignored.
-    const whereClause = and(status ? eq(users.status, status) : undefined, roleCondition, searchCondition);
+    const whereClause = and(statusCondition, roleCondition, searchCondition);
 
     // Sorting string to DB column mapping: Since user input (`sortBy` 'username') is just a string,
     // we explicitly map it to the actual database column reference (like `users.username`) to
@@ -200,7 +203,7 @@ export const DrizzleUserRepository: UserRepository = {
     const orderByClause = sortDirection === "asc" ? asc(sortColumn) : desc(sortColumn);
 
     // Fetch the paginated rows from the database (e.g. "select * from users where ... order by ... limit 10 offset 10")
-    const items = whereClause
+    const items: User[] = whereClause
       ? await db.select().from(users).where(whereClause).orderBy(orderByClause).limit(limit).offset(offset)
       : await db.select().from(users).orderBy(orderByClause).limit(limit).offset(offset);
 
@@ -213,7 +216,7 @@ export const DrizzleUserRepository: UserRepository = {
           .where(whereClause)
       : await db.select({ count: sql<number>`count(*)` }).from(users);
 
-    const total = totalResult[0]?.count ?? 0;
+    const total = Number(totalResult[0]?.count ?? 0);
 
     // Return the required struct for standard paginated responses.
     return {

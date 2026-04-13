@@ -252,10 +252,10 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling.
-        - [ ] Define response-shaping TypeScript types (`AdminListUsersResult`) as field projections for output filtering.
+        - [x] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling.
+        - [x] Define response-shaping TypeScript types (`AdminListUsersResult`) as field projections for output filtering.
     - **Services:**
-        - [ ] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account.
+        - [x] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account.
     - **API Routes and Server Actions:**
         - Implement admin endpoints (dual-channel). All routes require authentication and admin role via `{ auth: true, roles: ['admin'] }`:
         - [ ] 🔒 `GET /api/admin/users` - List all users (paginated).
