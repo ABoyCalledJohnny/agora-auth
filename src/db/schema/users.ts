@@ -97,6 +97,11 @@ export type UserWithRoles = User & {
   roles: { role: Role }[];
 };
 
+export type UserWithRolesAndProfile = User & {
+  roles: { role: Role }[];
+  profile: UserProfile;
+};
+
 export type FullUser = User & {
   roles: { role: Role }[];
   settings: UserSettings;

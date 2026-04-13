@@ -1,4 +1,5 @@
 import type { UserStatus } from "@/src/config/constants.ts";
+import type { UserWithRolesAndProfile } from "@/src/db/schema/index.ts";
 import type { UserRepository } from "@/src/features/user/contracts.ts";
 
 import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
@@ -202,13 +203,17 @@ export const DrizzleUserRepository: UserRepository = {
     // wrapping our chosen database column.
     const orderByClause = sortDirection === "asc" ? asc(sortColumn) : desc(sortColumn);
 
-    // Fetch the paginated rows from the database (e.g. "select * from users where ... order by ... limit 10 offset 10")
-    const items: User[] = whereClause
-      ? await db.select().from(users).where(whereClause).orderBy(orderByClause).limit(limit).offset(offset)
-      : await db.select().from(users).orderBy(orderByClause).limit(limit).offset(offset);
+    const items: UserWithRolesAndProfile[] = await db.query.users.findMany({
+      where: whereClause,
+      orderBy: orderByClause,
+      limit,
+      offset,
+      with: {
+        roles: { with: { role: true } },
+        profile: true,
+      },
+    });
 
-    // Count query: A data table needs to know the total number of items available to render
-    // its pagination numbers (e.g. "Page 1 of 5"). We issue a separate query to just get the count.
     const totalResult = whereClause
       ? await db
           .select({ count: sql<number>`count(*)` })
@@ -218,13 +223,7 @@ export const DrizzleUserRepository: UserRepository = {
 
     const total = Number(totalResult[0]?.count ?? 0);
 
-    // Return the required struct for standard paginated responses.
-    return {
-      items,
-      total,
-      page,
-      limit,
-    };
+    return { items, total, page, limit };
   },
 
   // -------------------------------------------------------------------------
