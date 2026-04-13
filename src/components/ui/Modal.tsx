@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 
 import { cn } from "@/src/lib/utils.ts";
@@ -14,8 +13,7 @@ type ModalProps = {
   className?: string;
 };
 
-export function Modal({ open, onClose, title, children, actions, className }: ModalProps) {
-  const t = useTranslations("Common");
+export function Modal({ open, onClose, title, children, className }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {

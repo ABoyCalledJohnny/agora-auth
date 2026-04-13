@@ -283,6 +283,7 @@
       "emptyState": "Keine Benutzer gefunden.",
       "suspendSuccess": "Benutzer {username} wurde gesperrt.",
       "activateSuccess": "Benutzer {username} wurde aktiviert.",
+      "statusUpdateSuccess": "Status von Benutzer {username} wurde aktualisiert.",
       "statusUpdateError": "Status von Benutzer {username} konnte nicht aktualisiert werden.",
       "deleteSuccess": "Benutzer {username} wurde gelöscht.",
       "deleteError": "Benutzer {username} konnte nicht gelöscht werden.",
