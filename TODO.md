@@ -258,9 +258,9 @@
         - [x] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account.
     - **API Routes and Server Actions:**
         - Implement admin endpoints (dual-channel). All routes require authentication and admin role via `{ auth: true, roles: ['admin'] }`:
-        - [ ] 🔒 `GET /api/admin/users` - List all users (paginated).
-        - [ ] 🔒 `PATCH /api/admin/users/:id/status` - Suspend/activate a user.
-        - [ ] 🔒 `DELETE /api/admin/users/:id` - Delete a user account.
+        - [x] 🔒 `GET /api/admin/users` - List all users (paginated).
+        - [x] 🔒 `PATCH /api/admin/users/:id/status` - Suspend/activate a user.
+        - [x] 🔒 `DELETE /api/admin/users/:id` - Delete a user account.
     - **Frontend:**
         - [ ] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog). Use URL search params (`useSearchParams` + `router.push`) for pagination state so page survives refresh and back/forward navigation.
         - [ ] **Admin hooks:** `useAdminUsers` (for list/pagination), `useUpdateUserStatus`, `useDeleteUser` in `src/features/admin/hooks/`.
