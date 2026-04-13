@@ -79,6 +79,7 @@
       "logout": "Abmelden"
     },
     "Register": {
+      "metaDescription": "Erstelle ein neues Agora Auth Konto.",
       "heading": "Konto erstellen",
       "usernameLabel": "Benutzername",
       "usernamePlaceholder": "Benutzernamen wählen",
@@ -96,6 +97,7 @@
       "success": "Benutzer erfolgreich registriert."
     },
     "ForgotPassword": {
+      "metaDescription": "Setze dein Agora Auth Passwort zurück.",
       "heading": "Passwort vergessen?",
       "description": "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen.",
       "emailLabel": "E-Mail-Adresse",
@@ -238,16 +240,20 @@
     "docs": "Dokumentation"
   },
   "About": {
-    "heading": "Über uns"
+    "heading": "Über uns",
+    "metaDescription": "Erfahre mehr über Agora Auth."
   },
   "Users": {
-    "heading": "Nutzer"
+    "heading": "Nutzer",
+    "metaDescription": "Registrierte Agora Auth Nutzer durchsuchen."
   },
   "Docs": {
-    "heading": "Dokumentation"
+    "heading": "Dokumentation",
+    "metaDescription": "Agora Auth API-Dokumentation und Anleitungen."
   },
   "Status": {
     "heading": "Status",
+    "metaDescription": "Überprüfe den aktuellen Status von Agora Auth.",
     "property": "Eigenschaft",
     "value": "Wert",
     "fetchError": "Statusdaten konnten nicht abgerufen werden."
