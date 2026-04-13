@@ -759,7 +759,9 @@ See `./messages/{language}.json`
 ### 3.1 + 3.2
 
 1. Table
+    1. has been activated...
 2. IDs
+    - Length
 3. Improvements
     - Width columns
     - Direktauswahl Seite

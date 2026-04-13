@@ -282,7 +282,7 @@
       "confirmActivateMessage": "The user account of {username} will be activated.",
       "emptyState": "No users found.",
       "suspendSuccess": "User {username} has been suspended.",
-      "activateSuccess": "User {username} has been activated.",
+      "activateSuccess": "The user account of {username} has been activated.",
       "statusUpdateSuccess": "Status for user {username} has been updated.",
       "statusUpdateError": "Failed to update status for user {username}.",
       "deleteSuccess": "User {username} has been deleted.",

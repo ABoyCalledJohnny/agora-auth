@@ -282,7 +282,7 @@
       "confirmActivateMessage": "Das Benutzerkonto von {username} wird aktiviert.",
       "emptyState": "Keine Benutzer gefunden.",
       "suspendSuccess": "Benutzer {username} wurde gesperrt.",
-      "activateSuccess": "Benutzer {username} wurde aktiviert.",
+      "activateSuccess": "Das Benutzerkonto von {username} wurde aktiviert.",
       "statusUpdateSuccess": "Status von Benutzer {username} wurde aktualisiert.",
       "statusUpdateError": "Status von Benutzer {username} konnte nicht aktualisiert werden.",
       "deleteSuccess": "Benutzer {username} wurde gelöscht.",

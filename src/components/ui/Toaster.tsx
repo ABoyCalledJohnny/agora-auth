@@ -3,5 +3,7 @@
 import { Toaster as SonnerToaster } from "sonner";
 
 export function Toaster() {
-  return <SonnerToaster position="top-right" richColors closeButton />;
+  return (
+    <SonnerToaster position="top-right" richColors closeButton toastOptions={{ style: { fontSize: "0.875rem" } }} />
+  );
 }
