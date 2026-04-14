@@ -35,7 +35,7 @@ import { sanitizeInput } from "@/src/lib/utils.ts";
 type RouteParams = Promise<Record<string, string>>;
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
-// TypeScript still types it as `Session | null` — use `session!` or a guard.
+// TypeScript still types it as `Session | null` - use `session!` or a guard.
 
 // ---------------------------------------------------------------------------
 // Internals
@@ -74,7 +74,7 @@ function formatApiError(error: unknown): NextResponse {
 // withApiHandler
 // ---------------------------------------------------------------------------
 
-/** With schema — handler receives `{ request, data, session, client, params }`. */
+/** With schema - handler receives `{ request, data, session, client, params }`. */
 export function withApiHandler<TSchema extends z.ZodType>(
   config: HandlerConfig<TSchema> & { bodySchema: TSchema },
   handler: (context: {
@@ -86,7 +86,7 @@ export function withApiHandler<TSchema extends z.ZodType>(
   }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
 
-/** Without schema — handler receives `{ request, session, client, params }`. */
+/** Without schema - handler receives `{ request, session, client, params }`. */
 export function withApiHandler(
   config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: {

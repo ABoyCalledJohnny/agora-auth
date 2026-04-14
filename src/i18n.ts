@@ -36,7 +36,7 @@ function resolveFromHeader(acceptLanguageHeader: string): string | undefined {
     if ((LOCALES as readonly string[]).includes(baseLanguage)) return baseLanguage;
   }
 
-  // No supported language found — caller will fall back to defaultLocale
+  // No supported language found - caller will fall back to defaultLocale
   return undefined;
 }
 

@@ -9,7 +9,7 @@ import {
 } from "./constants.ts";
 
 // ---------------------------------------------------------------------------
-// 1. Environment schema — validates process.env at import time.
+// 1. Environment schema - validates process.env at import time.
 //    If a required variable is missing the server won't start.
 //
 //    z.coerce.number() converts the env string ("5432") to a number before
@@ -66,7 +66,7 @@ const env = process.env.SKIP_ENV_VALIDATION
   : envSchema.parse(process.env);
 
 // ---------------------------------------------------------------------------
-// 2. Derived URL — composed once from validated parts.
+// 2. Derived URL - composed once from validated parts.
 //    CI/CD injects app-user creds for the runtime step and superuser creds
 //    for the migration step. Same env var names, different values per step.
 // ---------------------------------------------------------------------------
@@ -74,7 +74,7 @@ const env = process.env.SKIP_ENV_VALIDATION
 const databaseUrl = `postgres://${encodeURIComponent(env.APP_DB_USER)}:${encodeURIComponent(env.APP_DB_PASSWORD)}@${env.DB_HOST}:${env.DB_PORT}/${env.POSTGRES_DB}`;
 
 // ---------------------------------------------------------------------------
-// 3. Application configuration — single source of truth.
+// 3. Application configuration - single source of truth.
 //
 //    Token expiry strings ('15m', '7d', '24h') are consumed by the `jose`
 //    library: new SignJWT(payload).setExpirationTime(appConfig.auth.accessTokenExpiry)
@@ -117,9 +117,9 @@ export const appConfig = {
       sameSite: "lax",
       path: "/",
     },
-    accessTokenExpiry: "15m", // jose string — JWT exp claim / access cookie lifespan
-    refreshTokenExpiry: "7d", // jose string — DB session claim / refresh cookie lifespan
-    verificationTokenExpiry: "24h", // jose string — email verification / password reset
+    accessTokenExpiry: "15m", // jose string - JWT exp claim / access cookie lifespan
+    refreshTokenExpiry: "7d", // jose string - DB session claim / refresh cookie lifespan
+    verificationTokenExpiry: "24h", // jose string - email verification / password reset
     allowSessionIpChange: true,
     allowSessionAgentChange: true,
   },

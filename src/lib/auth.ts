@@ -48,7 +48,7 @@ export type AppSession = {
 };
 
 // ---------------------------------------------------------------------------
-// Session retrieval (read-only — safe for Server Components)
+// Session retrieval (read-only - safe for Server Components)
 // ---------------------------------------------------------------------------
 
 /**
@@ -59,8 +59,8 @@ export type AppSession = {
  *
  * If the Access JWT is expired or missing, returns `null` without attempting
  * a refresh. Silent token refresh is handled by:
- * - `proxy.ts` — for page navigations (runs before the render)
- * - `authenticate()` — for Server Actions / Route Handlers
+ * - `proxy.ts` - for page navigations (runs before the render)
+ * - `authenticate()` - for Server Actions / Route Handlers
  */
 export const getSession = cache(_getSession);
 
@@ -103,7 +103,7 @@ async function _getSession(): Promise<AppSession | null> {
 export async function authenticate(): Promise<AppSession> {
   const { accessCookie, refreshCookie } = await getSessionCookies();
 
-  // No tokens at all — nothing to do
+  // No tokens at all - nothing to do
   if (!accessCookie && !refreshCookie) {
     throw new AgoraError("UNAUTHORIZED");
   }
@@ -121,7 +121,7 @@ export async function authenticate(): Promise<AppSession> {
         },
       };
     } catch {
-      // Expired or invalid — fall through to refresh attempt
+      // Expired or invalid - fall through to refresh attempt
     }
   }
 

@@ -1,5 +1,12 @@
 # Agora Auth
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/assets/agora-logo-dark.svg" />
+    <img src="src/assets/agora-logo.svg" alt="Agora Auth Logo" width="400" />
+  </picture>
+</p>
+
 ![Badge: Latest Release](https://img.shields.io/github/v/release/ABoyCalledJohnny/agora-auth)
 ![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
 
@@ -17,6 +24,7 @@ A full-stack authentication and user management system built as a final project 
 - [Agora Auth](#agora-auth)
     - [Table of Contents](#table-of-contents)
     - [About the Project](#about-the-project)
+        - [Priorities](#priorities)
         - [Key Features](#key-features)
     - [Tech Stack](#tech-stack)
     - [Prerequisites](#prerequisites)
@@ -40,6 +48,16 @@ Agora Auth is the final project ("Abschlussprojekt") for a full-stack web develo
 
 The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system. It prioritises security best practices like HTTP-only cookies, Argon2 password hashing, RS256-signed JWTs, and strict Zod input validation throughout.
 
+### Priorities
+
+- **Intentional Engineering:** Prioritise reliability and correctness over speed. Understand the tools and design decisions rather than blindly accepting AI-generated code - use AI as a targeted assistant, not a substitute for understanding.
+- **Production-Ready Quality:** Build an MVP that handles errors and edge cases gracefully, going beyond a simple "happy path" demo.
+- **Security First:** Treat security as a core requirement from day one, applying multiple layers of protection throughout the system.
+- **Clean Architecture:** Keep a clear separation of concerns so the codebase stays maintainable and easy to navigate.
+- **Modularity:** Design components and logic to be reusable, independent, and easily composable.
+- **Automation & Workflow:** Establish automated checks for code quality and deployment early to ensure consistency.
+- **Modern Best Practices:** Leverage current, stable features of the chosen technologies rather than outdated patterns.
+
 ### Key Features
 
 - **Stateless JWT Access Tokens:** Paired with database-backed sessions and automatic token rotation.
@@ -59,6 +77,10 @@ The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to pro
 - **Database:** PostgreSQL
 - **ORM:** Drizzle ORM
 - **Validation:** Zod
+- **JWT & JWKS:** jose
+- **Internationalisation:** next-intl
+- **ID Generation:** nanoid
+- **Toast Notifications:** Sonner
 - **Reverse Proxy:** Caddy (auto-TLS)
 - **CI/CD:** GitHub Actions
 - **Container Registry:** GitHub Container Registry (GHCR)

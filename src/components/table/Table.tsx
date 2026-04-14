@@ -1,7 +1,7 @@
 import { cn } from "@/src/lib/utils.ts";
 
 // ---------------------------------------------------------------------------
-// Table Root — horizontal scroll wrapper + styled <table>
+// Table Root - horizontal scroll wrapper + styled <table>
 // ---------------------------------------------------------------------------
 
 type TableProps = React.ComponentProps<"table">;

@@ -14,7 +14,7 @@ import { getRequestMetadata } from "@/src/lib/auth.ts";
  *
  * Accepts a refresh token in the JSON body, rotates the session, and returns
  * fresh access + refresh tokens. Used by:
- * - `proxy.ts` — silent refresh before page navigations
+ * - `proxy.ts` - silent refresh before page navigations
  * - External API clients
  */
 export const POST = withApiHandler(

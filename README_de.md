@@ -1,5 +1,12 @@
 # Agora Auth
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/assets/agora-logo-dark.svg" />
+    <img src="src/assets/agora-logo.svg" alt="Agora Auth Logo" width="400" />
+  </picture>
+</p>
+
 ![Badge: Latest Release](https://img.shields.io/github/v/release/ABoyCalledJohnny/agora-auth)
 ![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
 
@@ -17,6 +24,7 @@ Ein Fullstack-Authentifizierungs- und Benutzerverwaltungssystem, entwickelt als 
 - [Agora Auth](#agora-auth)
     - [Inhaltsverzeichnis](#inhaltsverzeichnis)
     - [Über das Projekt](#über-das-projekt)
+        - [Prioritäten](#prioritäten)
         - [Hauptfunktionen](#hauptfunktionen)
     - [Tech-Stack](#tech-stack)
     - [Voraussetzungen](#voraussetzungen)
@@ -36,9 +44,19 @@ Ein Fullstack-Authentifizierungs- und Benutzerverwaltungssystem, entwickelt als 
 
 ## Über das Projekt
 
-Agora Auth ist das Abschlussprojekt eines Fullstack-Webentwicklungs-Programms und wurde innerhalb von ca. 13 Arbeitstagen, plus wenige zusätzliche Tage für die Vorbereitung, entwickelt. Das Ziel war es, ein produktionsreifes Authentifizierungs- und Benutzerverwaltungssystem von Grund auf zu entwerfen und umzusetzen — von der Backend-Architektur über das Datenbankdesign und die API-Entwicklung bis hin zur Frontend-UI, CI/CD und dem Deployment auf einem Live-Server.
+Agora Auth ist das Abschlussprojekt eines Fullstack-Webentwicklungs-Programms und wurde innerhalb von ca. 13 Arbeitstagen, plus wenige zusätzliche Tage für die Vorbereitung, entwickelt. Das Ziel war es, ein produktionsreifes Authentifizierungs- und Benutzerverwaltungssystem von Grund auf zu entwerfen und umzusetzen - von der Backend-Architektur über das Datenbankdesign und die API-Entwicklung bis hin zur Frontend-UI, CI/CD und dem Deployment auf einem Live-Server.
 
 Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um ein sicheres und skalierbares Identitätsmanagementsystem bereitzustellen. Dabei haben bewährte Sicherheitspraktiken wie HTTP-only-Cookies, Argon2-Passwort-Hashing, RS256-signierte JWTs und durchgehend strenge Zod-Eingabevalidierung höchste Priorität.
+
+### Prioritäten
+
+- **Bewusstes Engineering:** Zuverlässigkeit und Korrektheit vor Geschwindigkeit. Die eingesetzten Werkzeuge und Designentscheidungen verstehen, anstatt KI-generierten Code blind zu übernehmen - KI als gezielten Assistenten nutzen, nicht als Ersatz für eigenes Verständnis.
+- **Produktionsreife Qualität:** Ein MVP entwickeln, das Fehler und Randfälle sauber behandelt und über eine reine „Happy Path"-Demo hinausgeht.
+- **Sicherheit von Anfang an:** Sicherheit als Kernanforderung vom ersten Tag an behandeln und mehrere Schutzschichten im gesamten System anwenden.
+- **Saubere Architektur:** Eine klare Trennung der Zuständigkeiten einhalten, damit die Codebasis wartbar und übersichtlich bleibt.
+- **Modularität:** Komponenten und Logik wiederverwendbar, unabhängig und leicht kombinierbar gestalten.
+- **Automatisierung & Workflow:** Automatisierte Prüfungen für Codequalität und Deployment frühzeitig etablieren, um Konsistenz sicherzustellen.
+- **Moderne Best Practices:** Aktuelle, stabile Features der gewählten Technologien nutzen, anstatt auf veraltete Muster zurückzugreifen.
 
 ### Hauptfunktionen
 
@@ -59,6 +77,10 @@ Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um e
 - **Datenbank:** PostgreSQL
 - **ORM:** Drizzle ORM
 - **Validierung:** Zod
+- **JWT & JWKS:** jose
+- **Internationalisierung:** next-intl
+- **ID-Generierung:** nanoid
+- **Toast-Benachrichtigungen:** Sonner
 - **Reverse Proxy:** Caddy (Auto-TLS)
 - **CI/CD:** GitHub Actions
 - **Container Registry:** GitHub Container Registry (GHCR)

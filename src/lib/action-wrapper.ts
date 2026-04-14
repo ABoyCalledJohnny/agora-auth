@@ -29,7 +29,7 @@ import { sanitizeInput } from "@/src/lib/utils.ts";
  */
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
-// TypeScript still types it as `Session | null` — use `session!` or a guard.
+// TypeScript still types it as `Session | null` - use `session!` or a guard.
 
 // ---------------------------------------------------------------------------
 // Internals
@@ -65,13 +65,13 @@ function parseFormData(input: unknown): unknown {
 // withActionHandler
 // ---------------------------------------------------------------------------
 
-/** With schema — handler receives `{ data, session, client }`. */
+/** With schema - handler receives `{ data, session, client }`. */
 export function withActionHandler<TSchema extends z.ZodType, TResult>(
   config: HandlerConfig & { bodySchema: TSchema },
   handler: (context: { data: z.infer<TSchema>; session: AppSession | null; client: ApiClient }) => Promise<TResult>,
 ): (rawInput: FormData) => Promise<ApiResponse<TResult>>;
 
-/** Without schema — handler receives `{ session, client }`. */
+/** Without schema - handler receives `{ session, client }`. */
 export function withActionHandler<TResult>(
   config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: { session: AppSession | null; client: ApiClient }) => Promise<TResult>,

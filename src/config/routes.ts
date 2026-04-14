@@ -1,5 +1,5 @@
 export type NavRoute = {
-  /** URL path — must correspond to an existing page.tsx route. */
+  /** URL path - must correspond to an existing page.tsx route. */
   href: string;
   /** Key inside the "Nav" i18n namespace (messages/en.json → Nav.*). */
   labelKey: string;

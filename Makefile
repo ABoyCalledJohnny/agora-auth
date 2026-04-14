@@ -1,5 +1,5 @@
 # =============================================================================
-# VPS Operations — convenience targets for production container management.
+# VPS Operations - convenience targets for production container management.
 #
 # Usage:  make <target>
 # =============================================================================

@@ -136,7 +136,7 @@ const securityHeaders = [
    * HTTP Strict Transport Security (HSTS)
    *
    * Only enabled in production.
-   * ❗ No `preload` — that is a permanent, domain-level decision.
+   * ❗ No `preload` - that is a permanent, domain-level decision.
    */
   ...(isProd
     ? [

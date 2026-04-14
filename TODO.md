@@ -162,12 +162,12 @@
     - **Frontend Shell:**
         - [x] **Global styles:** Expand `globals.css` with base CSS variables, colour palette, and foundational styles.
         - [x] **Root layout:** Set up `layout.tsx` with `NextIntlClientProvider` and `Toaster` (`src/components/ui/Toaster.tsx`). (`SessionProvider` is created and added later in the Auth feature.)
-        - [x] **Main wrapper:** Implement `main.tsx` — layout component wrapping page content between header and footer (`<main>` tag, max-width, padding).
-        - [x] **Landing page:** Implement `/` route (`page.tsx`) — marketing/welcome page.
+        - [x] **Main wrapper:** Implement `main.tsx` - layout component wrapping page content between header and footer (`<main>` tag, max-width, padding).
+        - [x] **Landing page:** Implement `/` route (`page.tsx`) - marketing/welcome page.
         - [x] **Header and footer:** Implement `header.tsx` (top navigation/branding bar) and `footer.tsx` (bottom site info/links).
         - **Navigation:** Implement `nav.tsx` with static placeholder links and two navigation patterns (desktop-only MVP):
             - [x] **Desktop nav:** Horizontal link bar in the header.
-            - [ ] **User menu:** `Sheet` slide-in panel triggered by a user/avatar button (placeholder for now — auth-aware content is added in the Auth feature).
+            - [ ] **User menu:** `Sheet` slide-in panel triggered by a user/avatar button (placeholder for now - auth-aware content is added in the Auth feature).
         - [x] **Error pages:** Implement `error.tsx`, `not-found.tsx`, `global-error.tsx`, `unauthorized.tsx`, `forbidden.tsx`.
         - [x] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
@@ -212,7 +212,7 @@
         - [ ] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
     - **Frontend:**
         - [x] **`SessionProvider`:** Create in `src/providers/` - React Context with `useSession()` hook. Hydrate from `layout.tsx` via server-side `getSession()`. Add to root layout.
-        - [ ] **`nav.tsx`:** Update with auth-aware rendering — guest links (Login, Register) vs. authenticated (Profile, Settings, Logout) vs. admin (Admin) using `useSession()`. Populate user menu `Sheet` with authenticated links.
+        - [ ] **`nav.tsx`:** Update with auth-aware rendering - guest links (Login, Register) vs. authenticated (Profile, Settings, Logout) vs. admin (Admin) using `useSession()`. Populate user menu `Sheet` with authenticated links.
         - [ ] **Auth forms:** Build `LoginForm` (reads and validates `?next=` param - must start with `/` - passes to login action for post-login redirect), `RegisterForm`, `ForgotPasswordForm`, `ResetPasswordForm`, `VerifyEmailPrompt`. Use `useActionState` for pending/error states.
         - [ ] **Auth hooks:** `useLogout` `useResetPassword` in `src/features/auth/hooks/`.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `auth`).

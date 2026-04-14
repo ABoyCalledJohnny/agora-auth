@@ -1,5 +1,5 @@
 # =============================================================================
-# Caddy — shared reverse proxy for all deployed environments.
+# Caddy - shared reverse proxy for all deployed environments.
 #
 # Runs independently of the app stacks. Connects to staging and production
 # app containers via the shared caddy_net network.

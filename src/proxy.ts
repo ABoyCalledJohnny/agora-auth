@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { appConfig } from "@/src/config/index.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 
-// JWT verification — uses jose directly instead of JwtService because
+// JWT verification - uses jose directly instead of JwtService because
 // proxy.ts is bundled separately by Next.js and cannot import `server-only`.
 let cachedPublicKey: Awaited<ReturnType<typeof importSPKI>> | null = null;
 
@@ -21,7 +21,7 @@ async function verifyAccessToken(token: string) {
 }
 
 // ---------------------------------------------------------------------------
-// Proxy — Silent Token Refresh
+// Proxy - Silent Token Refresh
 //
 // Runs before every matched page navigation. If the access token is expired
 // but a refresh token exists, it fetches POST /api/auth/refresh to rotate
@@ -36,23 +36,23 @@ export async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get(appConfig.auth.accessCookieName)?.value;
   const refreshToken = request.cookies.get(appConfig.auth.refreshCookieName)?.value;
 
-  // No tokens at all — nothing to do
+  // No tokens at all - nothing to do
   if (!accessToken && !refreshToken) {
     return NextResponse.next();
   }
 
-  // Access token present — verify it
+  // Access token present - verify it
   if (accessToken) {
     try {
       await verifyAccessToken(accessToken);
-      // Still valid — proceed normally
+      // Still valid - proceed normally
       return NextResponse.next();
     } catch {
-      // Expired or invalid — fall through to refresh attempt
+      // Expired or invalid - fall through to refresh attempt
     }
   }
 
-  // No refresh token available — can't refresh, let the page handle it
+  // No refresh token available - can't refresh, let the page handle it
   if (!refreshToken) {
     return NextResponse.next();
   }
@@ -92,13 +92,13 @@ export async function proxy(request: NextRequest) {
 
     return response;
   } catch {
-    // Refresh failed — proceed without session (page will redirect to login)
+    // Refresh failed - proceed without session (page will redirect to login)
     return NextResponse.next();
   }
 }
 
 // ---------------------------------------------------------------------------
-// Matcher — skip API routes and static assets
+// Matcher - skip API routes and static assets
 // ---------------------------------------------------------------------------
 
 export const config = {

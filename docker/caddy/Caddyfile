@@ -1,8 +1,8 @@
 # =============================================================================
-# Caddyfile — Reverse proxy for agora-auth
+# Caddyfile - Reverse proxy for agora-auth
 #
 # Caddy automatically provisions and renews TLS certificates via Let's Encrypt.
-# HTTP → HTTPS redirect is automatic — no extra config needed.
+# HTTP → HTTPS redirect is automatic - no extra config needed.
 #
 # Docker DNS resolves each alias to all matching container IPs on that
 # network, so replicas are load-balanced automatically.
@@ -17,7 +17,7 @@
 }
 
 # ---------------------------------------------------------------------------
-# Production — agora-auth.de
+# Production - agora-auth.de
 # ---------------------------------------------------------------------------
 agora-auth.de, www.agora-auth.de {
 	# Redirect www → apex (single canonical URL for SEO).
@@ -28,7 +28,7 @@ agora-auth.de, www.agora-auth.de {
 
 	# Forward requests to the production app containers.
 	reverse_proxy app:3000 {
-		# Active health checks — Caddy probes each upstream independently.
+		# Active health checks - Caddy probes each upstream independently.
 		# If a replica fails (no 2xx response within the timeout), Caddy
 		# removes it from the pool and stops sending it traffic. It keeps
 		# probing on the same interval and re-adds the replica once it

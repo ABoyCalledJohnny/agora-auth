@@ -1,5 +1,5 @@
 # =============================================================================
-# Base Compose — shared structure for all environments.
+# Base Compose - shared structure for all environments.
 #
 # This file contains NO env vars, no secrets, no env_file references.
 # Those are added by environment-specific override files:
@@ -8,7 +8,7 @@
 #               (auto-merges compose.yaml + compose.override.yaml)
 #
 #   Production: docker compose -p production -f compose.yaml -f compose.production.yaml up -d
-#               (on VPS, via CI/CD — uses project name "production")
+#               (on VPS, via CI/CD - uses project name "production")
 #
 # Caddy routes traffic via an external network.
 # Create it once on the VPS:  docker network create caddy_net

@@ -358,7 +358,7 @@ All values in this table are **never committed** to version control. They are st
 | **Infrastructure (CI/CD)**       |                          |         |                                                         |
 | `PROD_CRON_SECRET`               | `CRON_SECRET`            |  prod   | Bearer token for cron / webhook endpoints               |
 | `STAGING_CRON_SECRET`            | `CRON_SECRET`            | staging | Bearer token for cron / webhook endpoints               |
-| `GH_CR_PAT`                      | `GH_CR_PAT`              |   all   | GitHub PAT (`read:packages`) — only if GHCR is private  |
+| `GH_CR_PAT`                      | `GH_CR_PAT`              |   all   | GitHub PAT (`read:packages`) - only if GHCR is private  |
 | `VPS_SSH_KEY`                    | `VPS_SSH_KEY`            |   all   | Private SSH key for CD pipeline to access VPS           |
 | `VPS_KNOWN_HOSTS`                | `VPS_KNOWN_HOSTS`        |   all   | Pinned VPS SSH host key (prevents MITM during deploy)   |
 | `VPS_HOST`                       | `VPS_HOST`               |   all   | IP/Hostname of the VPS server                           |
@@ -373,7 +373,7 @@ All values in this table are **never committed** to version control. They are st
 > - `DATABASE_URL` is composed at runtime in `config/index.ts` - no env var needed.
 > - `CRON_SECRET` is a bearer token used when an external scheduler (cron daemon, GitHub Actions, etc.) calls your app's `/api/cron/*` endpoints to prove it is a trusted caller. Not actively utilized right now but kept for overview.
 > - `AUTH_SECRET` follows the standard Next.js Auth convention for cookie/session signing. It is distinct from `JWT_PRIVATE_KEY` which signs the stateless access JWTs. Not needed in project.
-> - `GH_CR_PAT` is a GitHub Personal Access Token (classic, with `read:packages` scope) used by the VPS to pull Docker images from GHCR. Only needed if packages are **private** — public packages can be pulled without authentication. The built-in `GITHUB_TOKEN` only exists within the Actions runner context and cannot be forwarded to external servers over SSH. Create one at _GitHub → Settings → Developer settings → Personal access tokens_ if needed.
+> - `GH_CR_PAT` is a GitHub Personal Access Token (classic, with `read:packages` scope) used by the VPS to pull Docker images from GHCR. Only needed if packages are **private** - public packages can be pulled without authentication. The built-in `GITHUB_TOKEN` only exists within the Actions runner context and cannot be forwarded to external servers over SSH. Create one at _GitHub → Settings → Developer settings → Personal access tokens_ if needed.
 > - `VPS_KNOWN_HOSTS` is the SSH host key entry for the VPS, pinned as a secret to avoid trust-on-first-use (TOFU) attacks. Obtain it by running `ssh-keyscan -p <PORT> <HOST>` from a trusted machine and verifying the fingerprint matches. Store the full output line as the secret value.
 > - **Bootstrapping Variables** (`INITIAL_ADMIN_*`, `DEFAULT_CLIENT_SECRET`) are only consumed once during initialization scripts, bypassing typical lifetime persistence, but should remain correctly set for infrastructure recovery.
 
@@ -394,12 +394,12 @@ openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 openssl rsa -in private.pem -pubout -out public.pem
 # Paste the full PEM contents into the GitHub secret (including BEGIN/END lines).
 
-# VPS_SSH_KEY — generate a dedicated deploy key (no passphrase)
+# VPS_SSH_KEY - generate a dedicated deploy key (no passphrase)
 ssh-keygen -t ed25519 -C "github-actions-deploy" -f deploy_key -N ""
 # Add deploy_key.pub to ~/.ssh/authorized_keys on the VPS.
 # Paste the contents of deploy_key (the private key) into the GitHub secret.
 
-# VPS_KNOWN_HOSTS — run from a trusted machine you have already verified
+# VPS_KNOWN_HOSTS - run from a trusted machine you have already verified
 ssh-keyscan -p <PORT> <HOST>
 # Verify the fingerprint matches the VPS:  ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
 # Paste the full output line(s) into the GitHub secret.
@@ -581,7 +581,7 @@ _The following features are vital for enterprise hardening but are deferred to t
 - `main.tsx`: Layout component wrapping `{children}` between header and footer. Provides the semantic `<main>` tag with consistent max-width, padding, and flex-grow behaviour. Avoids duplicating these styles in every `page.tsx`.
 - `header.tsx`: Top navigation and branding bar.
 - `footer.tsx`: Bottom site information and links.
-- `nav.tsx`: Auth-aware navigation component. Uses `useSession()` to conditionally render guest links (Login, Register) vs. authenticated links (Profile, Settings, Logout) and admin-only links (Admin). Houses two navigation patterns (desktop-only MVP — no dedicated mobile hamburger menu):
+- `nav.tsx`: Auth-aware navigation component. Uses `useSession()` to conditionally render guest links (Login, Register) vs. authenticated links (Profile, Settings, Logout) and admin-only links (Admin). Houses two navigation patterns (desktop-only MVP - no dedicated mobile hamburger menu):
     - **Desktop nav:** Horizontal link bar visible in the header.
     - **User menu (authenticated):** `Sheet` slide-in panel triggered by an avatar/user button when logged in. Contains user-specific links (Profile, Settings, Logout) plus admin links if applicable.
 - `loading.tsx`: Root-level loading UI (Suspense boundary). Displays a spinner or skeleton during route transitions and data fetching.
@@ -639,7 +639,7 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
     - `Avatar`: Displays a styled user image `avatarUrl` or fallback initials (useful in nav/User Table).
     - `Modal` / `Dialog`: Central overlay for confirming dangerous actions like "Delete/Suspend User" in the admin panel.
     - `Tabs` (or `TabGroup`/`TabPanel`): For navigating sections without page reloads (e.g., in Settings).
-    - `Toaster` (via `sonner`): Toast notification container (`src/components/ui/Toaster.tsx`) mounted in root layout. Toasts are triggered imperatively via `toast()` — no dedicated component needed.
+    - `Toaster` (via `sonner`): Toast notification container (`src/components/ui/Toaster.tsx`) mounted in root layout. Toasts are triggered imperatively via `toast()` - no dedicated component needed.
     - `Alert`: For inline page-level alerts (e.g., static error messages at the top of a form).
     - `Pill` / `Badge`: Minimal inline status indicator (useful for showing roles or active/suspended statuses in tables).
 
@@ -726,31 +726,20 @@ See `./messages/{language}.json`
 
 #### Project Time Frame
 
-| **Week**         | **Date** | **Time (Days)** |               |
-| ---------------- | -------- | --------------- | ------------- |
-|                  |          |                 |               |
-| **4 (holidays)** | 06/04/26 | 0.5             | Ostermontag   |
-|                  | 07/04/26 | 1               |               |
-|                  | 08/04/26 | 0.5             | Familientag   |
-|                  | 09/04/26 | 1               |               |
-|                  | 10/04/26 | 1               |               |
-|                  |          |                 |               |
-| **5**            | 13/04/26 | 1               |               |
-|                  | 14/04/26 | 1               |               |
-|                  | 15/04/26 | 1               |               |
-|                  | 16/04/26 | 0               | Präsentation  |
-|                  |          |                 |               |
-|                  |          | **7**           | **Days left** |
+| **Week** | **Date** | **Time (Days)** |               |
+| -------- | -------- | --------------- | ------------- |
+|          |          |                 |               |
+|          | 14/04/26 | 1               |               |
+|          | 15/04/26 | 1               |               |
+|          | 16/04/26 | 0               | Präsentation  |
+|          |          |                 |               |
+|          |          | **2**           | **Days left** |
 
 #### Schedule
 
-| Task                       | Dates         | Notes                                                                                                                                                                                                                                                                       |
-| :------------------------- | :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **3.2 Auth - Frontend**    | 06/04 - 08/04 | Login form, `SessionProvider`, `nav` update, hooks                                                                                                                                                                                                                          |
-| **3.1 Frontend Shell**     | 09/04 - 10/04 | Root layout, landing page, header/footer, desktop nav. Core UI primitives (Container, Card, Table, Button, Forms). Desktop-only MVP — no mobile hamburger menu. _Defer `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill` to their respective features or backlog._ |
-| **3.2 Admin Dashboard**    | 13/04 - 14/04 | 3 endpoints, admin dashboard and `UserTable` (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                               |
-| **5. Docs + Presentation** | 15/04         | `README.md`, `api.md`, `TODO.md`, `NOTES.md`, presentation prep.                                                                                                                                                                                                            |
-| **Buffer**                 | 15/04         | ???                                                                                                                                                                                                                                                                         |
+| Task                       | Dates         | Notes                                                            |
+| :------------------------- | :------------ | :--------------------------------------------------------------- |
+| **5. Docs + Presentation** | 14/04 - 15/04 | `README.md`, `api.md`, `TODO.md`, `NOTES.md`, presentation prep. |
 
 ---
 
@@ -836,45 +825,4 @@ See `./messages/{language}.json`
 client interceptor for old tabs (still locked in? update layout.tsx)
 grid layout tabelle
 was noch von security
-
-## 5. Documentation
-
-- Elevator Pitch
-- Postman-Demo, API-Routen früher
-- Refresh token, access token
-- API + Error Handling
-- Struktur, Datenfluss
-    - Zweigleisigkeit
-- Umstellung Sprache
-- Was noch aus Notizen?
-- Live Update
-- refresh and access token pattern Vorteile
-
-- Dateien/Todos updaten
-- Dateien synchronisieren
-
-Passwort Account
-
-learnings, pipeline nervt zwar, aber ist auch super wichtig
-
-project specifics in README
-
-Nervig an Next:
-Doppelrequests
-Cookies, wo kann man sie setzen
-Caching
-
-Static about page
-
-Was will ich zeigen, Struktur
-Was war Priorität
-
-Kaleidoskode Projekt schicken
-
-Zu wenig Zeit, keine klaren Regeln
-
-Bild Admin
-
-Nicht für Mobile momentan
-
-## 6. Initial Major Release and Deployment
+static about page
