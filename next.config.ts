@@ -31,7 +31,7 @@ const csp = `
   style-src 'self' 'unsafe-inline';
 
   /* Images via <Image>, data URLs, and blobs (e.g. avatars, uploads) */
-  img-src 'self' data: blob: https://i.pravatar.cc;
+  img-src 'self' data: blob: https://i.pravatar.cc https://avatars.githubusercontent.com;
 
   /* Fonts served locally */
   font-src 'self';
@@ -158,6 +158,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "i.pravatar.cc",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
       },
     ],
   },
