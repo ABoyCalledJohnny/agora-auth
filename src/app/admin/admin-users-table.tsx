@@ -27,9 +27,12 @@ type AdminUsersTableProps = {
 };
 
 export function AdminUsersTable({ users, total, page, limit }: AdminUsersTableProps) {
+  // Hooks
   const t = useTranslations("Admin.Users");
   const tPagination = useTranslations("Admin.Users.Pagination");
   const format = useFormatter();
+
+  // State
   const [showModal, setShowModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<{
     type: AdminAction;
@@ -38,12 +41,15 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
   } | null>(null);
   const [highlightedUserId, setHighlightedUserId] = useState<string | null>(null);
 
+  // Custom hooks
   const { setPage } = useAdminUsers();
   const { updateStatus, isPending: isStatusPending } = useUpdateUserStatus();
   const { deleteUser, isPending: isDeletePending } = useDeleteUser();
 
+  // Vars and constants
   const totalPages = Math.ceil(total / limit);
 
+  // Modal functions
   function openModal(type: AdminAction, userId: string, username: string) {
     setPendingAction({ type, userId, username });
     setShowModal(true);
@@ -54,6 +60,7 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
     setPendingAction(null);
   }
 
+  // Handles the admin actions and closes the modal again.
   function confirmAction() {
     if (!pendingAction) return;
 
