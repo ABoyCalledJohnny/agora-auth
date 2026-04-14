@@ -5,9 +5,12 @@
 
 > [!NOTE]
 > **MVP erreicht**
-> Das Projekt hat seinen Minimum-Viable-Product-Meilenstein erreicht. Alle Kern-Authentifizierungsabläufe, das Admin-Dashboard, die CI/CD-Pipeline, das Produktions-Deployment und die Internationalisierung sind voll funktionsfähig. Verbleibende Arbeiten betreffen Self-Service-API-Routen für die Benutzerverwaltung (Profil, E-Mail, Benutzername, Passwortänderungen) und die Anbindung externer Benachrichtigungsdienste.
+> Das Projekt hat seinen Minimum-Viable-Product-Meilenstein erreicht. Alle Kern-Authentifizierungsabläufe, das Admin-Dashboard, die CI/CD-Pipeline, das Produktions-Deployment und die Internationalisierung sind voll funktionsfähig.
 
-Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-Lösung, die mit Next.js, Drizzle ORM und PostgreSQL entwickelt wurde.
+> [!NOTE]
+> Das Frontend ist derzeit nicht für kleinere Bildschirme optimiert und wird am besten auf dem Desktop betrachtet.
+
+Ein Fullstack-Authentifizierungs- und Benutzerverwaltungssystem, entwickelt als Abschlussprojekt eines Webentwicklungs-Programms, mit Next.js, Drizzle ORM und PostgreSQL.
 
 ## Inhaltsverzeichnis
 
@@ -33,9 +36,9 @@ Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-L�
 
 ## Über das Projekt
 
-Agora Auth ist eine umfassende Authentifizierungslösung, die für moderne Webanwendungen entwickelt wurde. Sie basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um ein sicheres und skalierbares Identitätsmanagementsystem bereitzustellen.
+Agora Auth ist das Abschlussprojekt eines Fullstack-Webentwicklungs-Programms und wurde innerhalb von ca. 13 Arbeitstagen, plus wenige zusätzliche Tage für die Vorbereitung, entwickelt. Das Ziel war es, ein produktionsreifes Authentifizierungs- und Benutzerverwaltungssystem von Grund auf zu entwerfen und umzusetzen — von der Backend-Architektur über das Datenbankdesign und die API-Entwicklung bis hin zur Frontend-UI, CI/CD und dem Deployment auf einem Live-Server.
 
-Sie bietet eine solide Grundlage für Benutzerregistrierung, Login, Profilverwaltung und sichere API-Interaktionen, wobei bewährte Sicherheitspraktiken wie HTTP-only-Cookies und strenge Eingabevalidierung höchste Priorität haben.
+Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um ein sicheres und skalierbares Identitätsmanagementsystem bereitzustellen. Dabei haben bewährte Sicherheitspraktiken wie HTTP-only-Cookies, Argon2-Passwort-Hashing, RS256-signierte JWTs und durchgehend strenge Zod-Eingabevalidierung höchste Priorität.
 
 ### Hauptfunktionen
 
@@ -45,7 +48,6 @@ Sie bietet eine solide Grundlage für Benutzerregistrierung, Login, Profilverwal
 - **Admin-Dashboard:** Vollständige Benutzeroberfläche zur Benutzerverwaltung (Auflisten, Sperren, Aktivieren, Löschen von Konten).
 - **Externe Client-API:** Sichere dienstübergreifende Verifizierung mittels RS256-Token-Signierung und einem öffentlichen JWKS-Endpunkt.
 - **Internationalisierung:** Vollständige Unterstützung für Englisch und Deutsch via next-intl.
-- **E-Mail-Verifizierung & Passwort-Zurücksetzung:** Token-basierte Abläufe mit konfigurierbarer SMTP-Integration.
 
 ---
 
@@ -183,14 +185,12 @@ Das Projekt folgt einer feature-getriebenen, modularen Struktur, die auf dem Nex
 
 ## Entwicklungs-Workflow
 
-> [!NOTE]
-> Die grundlegende Entwicklungsumgebung wurde etabliert. Mit zentralen Bun-Skripten lassen sich Datenbank-Migrationen, Typprüfungen, Formatierungen sowie der Next.js-Entwicklungsserver im Verbund mit dem lokalen Docker-Netzwerk nahtlos ausführen.
-
-Die aktuellen Next.js- und Bun-Skripte in der `package.json` unterstützen bereits unter anderem folgende Operationen:
+Alle Entwicklungsaufgaben werden über Bun-Skripte in der `package.json` gesteuert:
 
 - Initialisierung der Datenbank und Ausführen von Drizzle-Migrationen.
-- Entwicklung von Frontend/Backend mit dem Next.js-Entwicklungsserver.
+- Entwicklung von Frontend/Backend mit dem Next.js-Entwicklungsserver und Turbopack.
 - Formatierung und Typprüfung der Codebasis (via Prettier, ESLint und `bun typecheck`).
+- Build, Verifizierung und Deployment der Anwendung.
 
 ### Nützliche Befehle
 
@@ -212,10 +212,12 @@ Die aktuellen Next.js- und Bun-Skripte in der `package.json` unterstützen berei
 
 ## Roadmap & Dokumentation
 
-Die vollständige Roadmap des Projekts, detaillierte Funktionsbeschreibungen und das Implementierungs-Backlog werden in der **[TODO.md](TODO.md)** festgehalten.
-Alle Designentscheidungen, Architektur-Skizzen, Logikabläufe und Strategien zur Fehlerkonfiguration werden in den **[NOTES.md](NOTES.md)** dokumentiert.
+Das Projekt hat seinen MVP-Meilenstein erreicht. Eine Weiterentwicklung über diesen Punkt hinaus ist nicht garantiert.
 
-Zusätzlich ist die API-Dokumentation im Verzeichnis `docs/` zu finden:
+Die Roadmap, das Implementierungs-Backlog, Designentscheidungen, Architektur-Skizzen und Logikabläufe sind in der **[NOTES.md](NOTES.md)** dokumentiert.
+Übergreifende Aufgaben werden in der **[TODO.md](TODO.md)** festgehalten.
+
+Die API-Dokumentation ist im Verzeichnis `docs/` zu finden:
 
 - [API-Dokumentation (EN)](docs/api.md)
 - [API-Dokumentation (DE)](docs/api_de.md)

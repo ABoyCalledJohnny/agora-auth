@@ -5,9 +5,12 @@
 
 > [!NOTE]
 > **MVP Reached**
-> The project has reached its Minimum Viable Product milestone. All core authentication flows, the admin dashboard, CI/CD pipeline, production deployment, and internationalisation are fully operational. Remaining work focuses on self-service user account management API routes (profile, email, username, password changes) and external notification service integration.
+> The project has reached its Minimum Viable Product milestone. All core authentication flows, the admin dashboard, CI/CD pipeline, production deployment, and internationalisation are fully operational.
 
-A robust, secure, and modern authentication and user management system built with Next.js, Drizzle ORM, and PostgreSQL.
+> [!NOTE]
+> The frontend is currently not optimised for smaller screens and is best viewed on desktop.
+
+A full-stack authentication and user management system built as a final project ("Abschlussprojekt") for a web development program, using Next.js, Drizzle ORM, and PostgreSQL.
 
 ## Table of Contents
 
@@ -33,9 +36,9 @@ A robust, secure, and modern authentication and user management system built wit
 
 ## About the Project
 
-Agora Auth is a comprehensive authentication solution designed for modern web applications. It leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system.
+Agora Auth is the final project ("Abschlussprojekt") for a full-stack web development program and was built within approximately 13 working days, plus a few additional days of preparation. The goal was to design and implement a production-grade authentication and user management system from scratch - covering backend architecture, database design, API development, frontend UI, CI/CD, and deployment to a live server.
 
-It provides a solid foundation for user registration, login, profile management, and secure API interactions, prioritising security best practices like HTTP-only cookies and strict input validation.
+The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system. It prioritises security best practices like HTTP-only cookies, Argon2 password hashing, RS256-signed JWTs, and strict Zod input validation throughout.
 
 ### Key Features
 
@@ -45,7 +48,6 @@ It provides a solid foundation for user registration, login, profile management,
 - **Admin Dashboard:** Full user management interface (listing, suspending, activating, deleting accounts).
 - **External Client API:** Secure cross-service verification using RS256 token signing and a public JWKS endpoint.
 - **Internationalisation:** Full English and German language support via next-intl.
-- **Email Verification & Password Reset:** Token-based flows with configurable SMTP integration.
 
 ---
 
@@ -183,14 +185,12 @@ The project follows a feature-driven, modular structure built on top of Next.js 
 
 ## Development Workflow
 
-> [!NOTE]
-> The foundational development workflow has been established. You can run database migrations, formatting, type checking, and the Next.js development server with its associated local container network seamlessly via Bun scripts.
-
-Current Next.js and Bun scripts in `package.json` already support operations such as:
+All development tasks are handled via Bun scripts defined in `package.json`:
 
 - Initialising the database and running Drizzle migrations.
-- Developing the frontend/backend using the Next.js dev server.
+- Developing the frontend/backend using the Next.js dev server with Turbopack.
 - Formatting and type-checking the codebase (via Prettier, ESLint, and `bun typecheck`).
+- Building, verifying, and deploying the application.
 
 ### Useful Commands
 
@@ -212,10 +212,12 @@ Current Next.js and Bun scripts in `package.json` already support operations suc
 
 ## Roadmap & Reference Documentation
 
-The project's entire roadmap, detailed feature descriptions, and implementation backlog are tracked in **[TODO.md](TODO.md)**.
-All design decisions, architecture sketches, logic flows, and error configuration strategies are kept in **[NOTES.md](NOTES.md)**.
+The project has reached its MVP milestone. Further development beyond this point is not guaranteed.
 
-Additionally, API documentation can be found in the `docs/` directory:
+The roadmap, implementation backlog, design decisions, architecture sketches, and logic flows are documented in **[NOTES.md](NOTES.md)**.
+High-level task tracking is kept in **[TODO.md](TODO.md)**.
+
+API documentation can be found in the `docs/` directory:
 
 - [API Documentation (EN)](docs/api.md)
 - [API Documentation (DE)](docs/api_de.md)
