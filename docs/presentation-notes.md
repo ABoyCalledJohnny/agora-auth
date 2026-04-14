@@ -90,7 +90,7 @@
 
 ## 7. API-Design + externe Clients (~2 Min) ⏱ spätestens 0:19
 
-**Zeigen:** `docs/api_DRAFT.md` — Routenübersicht-Tabelle (§7)
+**Zeigen:** `docs/api.md` — Routenübersicht-Tabelle (§7)
 
 - Routenübersicht kurz zeigen: 22 Endpunkte, 9 implementiert, Rest geplant
 - Einheitliches Response-Format: `{ success, message, data }` bzw. `{ success, error: { code, message } }`

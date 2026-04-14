@@ -4,8 +4,8 @@
 ![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
 
 > [!NOTE]
-> **Active Development**
-> The core authentication logic (API routes, Server Actions, Zod schemas, database models, and type-safe wrappers), CI/CD pipeline, and production deployment are fully operational. The project is currently focusing on frontend UI completion (user management, admin dashboard), and external notification service integration.
+> **MVP Reached**
+> The project has reached its Minimum Viable Product milestone. All core authentication flows, the admin dashboard, CI/CD pipeline, production deployment, and internationalisation are fully operational. Remaining work focuses on self-service user account management API routes (profile, email, username, password changes) and external notification service integration.
 
 A robust, secure, and modern authentication and user management system built with Next.js, Drizzle ORM, and PostgreSQL.
 
@@ -14,7 +14,7 @@ A robust, secure, and modern authentication and user management system built wit
 - [Agora Auth](#agora-auth)
     - [Table of Contents](#table-of-contents)
     - [About the Project](#about-the-project)
-        - [Key Features (Planned)](#key-features-planned)
+        - [Key Features](#key-features)
     - [Tech Stack](#tech-stack)
     - [Prerequisites](#prerequisites)
     - [Getting Started](#getting-started)
@@ -35,15 +35,17 @@ A robust, secure, and modern authentication and user management system built wit
 
 Agora Auth is a comprehensive authentication solution designed for modern web applications. It leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system.
 
-It aims to provide a solid foundation for user registration, login, profile management, and secure API interactions, prioritising security best practices like HTTP-only cookies and strict input validation.
+It provides a solid foundation for user registration, login, profile management, and secure API interactions, prioritising security best practices like HTTP-only cookies and strict input validation.
 
-### Key Features (Planned)
+### Key Features
 
-- **Stateless JWT Access Tokens:** Paired with database-backed sessions.
+- **Stateless JWT Access Tokens:** Paired with database-backed sessions and automatic token rotation.
 - **Secure Password Hashing:** Using Bun's native Argon2.
-- **Granular Permissions:** Distinguishing between public and private user data with role-based access control.
-- **Admin Dashboard:** Interface for user management (listing, suspending, deleting accounts).
+- **Role-Based Access Control:** Granular permissions distinguishing between public and private user data.
+- **Admin Dashboard:** Full user management interface (listing, suspending, activating, deleting accounts).
 - **External Client API:** Secure cross-service verification using RS256 token signing and a public JWKS endpoint.
+- **Internationalisation:** Full English and German language support via next-intl.
+- **Email Verification & Password Reset:** Token-based flows with configurable SMTP integration.
 
 ---
 
@@ -150,7 +152,7 @@ The project follows a feature-driven, modular structure built on top of Next.js 
 │   ├── caddy/              # Caddy reverse proxy config
 │   ├── migrator/           # Database migration runner
 │   └── postgres/           # Database initialisation scripts
-├── docs/                   # API documentation and drafts
+├── docs/                   # API documentation
 ├── drizzle/                # Database migrations output
 ├── messages/               # Internationalisation (i18n) translation files
 ├── public/                 # Static assets (robots.txt, etc.)
@@ -213,10 +215,10 @@ Current Next.js and Bun scripts in `package.json` already support operations suc
 The project's entire roadmap, detailed feature descriptions, and implementation backlog are tracked in **[TODO.md](TODO.md)**.
 All design decisions, architecture sketches, logic flows, and error configuration strategies are kept in **[NOTES.md](NOTES.md)**.
 
-Additionally, API documentation drafts can be found in the `docs/` directory:
+Additionally, API documentation can be found in the `docs/` directory:
 
-- [API Draft (EN)](docs/api_DRAFT.md)
-- [API Draft (DE)](docs/api_de_DRAFT.md)
+- [API Documentation (EN)](docs/api.md)
+- [API Documentation (DE)](docs/api_de.md)
 
 ---
 

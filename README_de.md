@@ -4,8 +4,8 @@
 ![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
 
 > [!NOTE]
-> **Aktive Entwicklung**
-> Die Kern-Authentifizierungslogik (API-Routen, Server Actions, Zod-Schemas, Datenbankmodelle und typsichere Wrapper), die CI/CD-Pipeline und das Produktions-Deployment sind voll funktionsfähig. Das Projekt konzentriert sich derzeit auf die Fertigstellung der Frontend-UI (Benutzerverwaltung, Admin-Dashboard) und die Anbindung von externen Benachrichtigungs-Diensten.
+> **MVP erreicht**
+> Das Projekt hat seinen Minimum-Viable-Product-Meilenstein erreicht. Alle Kern-Authentifizierungsabläufe, das Admin-Dashboard, die CI/CD-Pipeline, das Produktions-Deployment und die Internationalisierung sind voll funktionsfähig. Verbleibende Arbeiten betreffen Self-Service-API-Routen für die Benutzerverwaltung (Profil, E-Mail, Benutzername, Passwortänderungen) und die Anbindung externer Benachrichtigungsdienste.
 
 Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-Lösung, die mit Next.js, Drizzle ORM und PostgreSQL entwickelt wurde.
 
@@ -14,7 +14,7 @@ Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-L�
 - [Agora Auth](#agora-auth)
     - [Inhaltsverzeichnis](#inhaltsverzeichnis)
     - [Über das Projekt](#über-das-projekt)
-        - [Hauptfunktionen (Geplant)](#hauptfunktionen-geplant)
+        - [Hauptfunktionen](#hauptfunktionen)
     - [Tech-Stack](#tech-stack)
     - [Voraussetzungen](#voraussetzungen)
     - [Erste Schritte](#erste-schritte)
@@ -35,15 +35,17 @@ Eine robuste, sichere und moderne Authentifizierungs- und Benutzerverwaltungs-L�
 
 Agora Auth ist eine umfassende Authentifizierungslösung, die für moderne Webanwendungen entwickelt wurde. Sie basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um ein sicheres und skalierbares Identitätsmanagementsystem bereitzustellen.
 
-Das Ziel ist es, eine solide Grundlage für Benutzerregistrierung, Login, Profilverwaltung und sichere API-Interaktionen zu schaffen, wobei bewährte Sicherheitspraktiken wie HTTP-only-Cookies und strenge Eingabevalidierung höchste Priorität haben.
+Sie bietet eine solide Grundlage für Benutzerregistrierung, Login, Profilverwaltung und sichere API-Interaktionen, wobei bewährte Sicherheitspraktiken wie HTTP-only-Cookies und strenge Eingabevalidierung höchste Priorität haben.
 
-### Hauptfunktionen (Geplant)
+### Hauptfunktionen
 
-- **Zustandslose JWT-Zugriffstoken:** In Kombination mit datenbankgestützten Sitzungen.
+- **Zustandslose JWT-Zugriffstoken:** In Kombination mit datenbankgestützten Sitzungen und automatischer Token-Rotation.
 - **Sicheres Passwort-Hashing:** Unter Verwendung von Buns nativem Argon2.
-- **Granulare Berechtigungen:** Unterscheidung zwischen öffentlichen und privaten Benutzerdaten mit rollenbasierter Zugriffskontrolle.
-- **Admin-Dashboard:** Benutzeroberfläche zur Benutzerverwaltung (Auflisten, Sperren, Löschen von Konten).
+- **Rollenbasierte Zugriffskontrolle:** Granulare Berechtigungen mit Unterscheidung zwischen öffentlichen und privaten Benutzerdaten.
+- **Admin-Dashboard:** Vollständige Benutzeroberfläche zur Benutzerverwaltung (Auflisten, Sperren, Aktivieren, Löschen von Konten).
 - **Externe Client-API:** Sichere dienstübergreifende Verifizierung mittels RS256-Token-Signierung und einem öffentlichen JWKS-Endpunkt.
+- **Internationalisierung:** Vollständige Unterstützung für Englisch und Deutsch via next-intl.
+- **E-Mail-Verifizierung & Passwort-Zurücksetzung:** Token-basierte Abläufe mit konfigurierbarer SMTP-Integration.
 
 ---
 
@@ -150,7 +152,7 @@ Das Projekt folgt einer feature-getriebenen, modularen Struktur, die auf dem Nex
 │   ├── caddy/              # Caddy Reverse-Proxy-Konfiguration
 │   ├── migrator/           # Skript zur Datenbankmigration
 │   └── postgres/           # Skripte zur Datenbankinitialisierung
-├── docs/                   # API-Dokumentation und Entwürfe
+├── docs/                   # API-Dokumentation
 ├── drizzle/                # Ausgabe der Datenbankmigrationen
 ├── messages/               # Übersetzungsdateien (i18n)
 ├── public/                 # Statische Ressourcen (robots.txt, etc.)
@@ -213,10 +215,10 @@ Die aktuellen Next.js- und Bun-Skripte in der `package.json` unterstützen berei
 Die vollständige Roadmap des Projekts, detaillierte Funktionsbeschreibungen und das Implementierungs-Backlog werden in der **[TODO.md](TODO.md)** festgehalten.
 Alle Designentscheidungen, Architektur-Skizzen, Logikabläufe und Strategien zur Fehlerkonfiguration werden in den **[NOTES.md](NOTES.md)** dokumentiert.
 
-Zusätzlich sind Entwürfe zur API-Dokumentation im Verzeichnis `docs/` zu finden:
+Zusätzlich ist die API-Dokumentation im Verzeichnis `docs/` zu finden:
 
-- [API-Entwurf (EN)](docs/api_DRAFT.md)
-- [API-Entwurf (DE)](docs/api_de_DRAFT.md)
+- [API-Dokumentation (EN)](docs/api.md)
+- [API-Dokumentation (DE)](docs/api_de.md)
 
 ---
 

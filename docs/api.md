@@ -1,9 +1,9 @@
-# Agora Auth API Draft (Auth Only)
+# Agora Auth API Documentation (Auth & Admin)
 
-> **⚠️ IMPORTANT UPDATE:**
+> **⚠️ IMPORTANT:**
 > All successful API responses are now wrapped in a standardized envelope: `{ "success": true, "message": "...", "data": { ... } }`. Please ensure your client parsers account for the nested `data` object!
 
-This draft intentionally covers only core auth management:
+This document covers the implemented core auth and admin management endpoints:
 
 - register
 - login
@@ -13,7 +13,7 @@ This draft intentionally covers only core auth management:
 - reset password (request + confirm)
 - JWKS
 
-Everything else (user management, admin) is out of scope in this document for now.
+Everything else (user self-service management) is not yet implemented and returns `501 Not Implemented`.
 
 ## 1. Base URL
 
@@ -487,8 +487,21 @@ Example request body:
 
 ```json
 {
-        "token": "TOKEN_FROM_EMAIL",
-        "password": "AnotherStrongPassword123!"
+	"token": "TOKEN_FROM_EMAIL",
+	"password": "AnotherStrongPassword123!"
+}
+```
+
+Success:
+
+- `200 OK` password updated
+
+Example success body:
+
+```json
+{
+	"success": true,
+	"message": "Password updated successfully.",
 	"data": null
 }
 ```
@@ -600,20 +613,30 @@ const resetRes = await fetch("http://localhost:3000/api/auth/reset-password/conf
 	},
 	body: JSON.stringify({
 		token: "TOKEN_FROM_EMAIL",
-                password: "AnotherStrongPassword123!",
-const refreshRes = await fetch("http://localhost:3000/api/auth/refresh", {
-	method: "POST",
-	headers: {
-		"Content-Type": "application/json",
-	},
-	body: JSON.stringify({
-		refreshToken: "opaque_refresh_token",
+		password: "AnotherStrongPassword123!",
 	}),
+});
+
+const resetData = await resetRes.json();
+console.log(resetData);
+```
+
+### Refresh = await fetch("http://localhost:3000/api/auth/refresh", {
+
+    method: "POST",
+    headers: {
+    	"Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+    	refreshToken: "opaque_refresh_token",
+    }),
+
 });
 
 const refreshData = await refreshRes.json();
 console.log(refreshData);
-```
+
+````
 
 ### Logout (`200 OK`)
 
@@ -625,7 +648,7 @@ const logoutRes = await fetch("http://localhost:3000/api/auth/logout", {
 if (logoutRes.status === 200) {
 	console.log("Logged out successfully");
 }
-```
+````
 
 ## 7. Route Overview
 
@@ -650,14 +673,14 @@ if (logoutRes.status === 200) {
 | `DELETE`   | `/api/user`                        | 🔒     | Self-serve account deletion                   | Planned     |
 | `GET`      | `/api/users/:username`             | 🔒     | Get public user profile                       | Planned     |
 | **Admin**  |                                    |        |                                               |             |
-| `GET`      | `/api/admin/users`                 | Admin  | List all users (paginated)                    | Planned     |
-| `PATCH`    | `/api/admin/users/:id/status`      | Admin  | Suspend or activate a user                    | Planned     |
-| `DELETE`   | `/api/admin/users/:id`             | Admin  | Delete a user account                         | Planned     |
+| `GET`      | `/api/admin/users`                 | Admin  | List all users (paginated)                    | Implemented |
+| `PATCH`    | `/api/admin/users/:id/status`      | Admin  | Suspend or activate a user                    | Implemented |
+| `DELETE`   | `/api/admin/users/:id`             | Admin  | Delete a user account                         | Implemented |
 | **System** |                                    |        |                                               |             |
 | `GET`      | `/api/health`                      | Public | Database and application health check         | Implemented |
 | `GET`      | `/api/live`                        | Public | Liveness probe                                | Implemented |
 
 ## 8. Implementation Status
 
-This is still a draft spec.
-Current route handlers may return `501 Not Implemented` until services are fully connected.
+Auth and admin endpoints are fully implemented.
+User self-service route handlers currently return `501 Not Implemented` and will be connected in a future release.

@@ -1,9 +1,9 @@
-# Agora Auth API Entwurf (Nur Auth)
+# Agora Auth API Dokumentation (Auth & Admin)
 
-> **⚠️ WICHTIGES UPDATE:**
+> **⚠️ WICHTIG:**
 > Alle erfolgreichen API-Antworten sind jetzt in einen Standard-Umschlag gewrapped: `{ "success": true, "message": "...", "data": { ... } }`. Bitte passe deine Client-Parser entsprechend an und beachte das verschachtelte `data`-Objekt!
 
-Dieser Entwurf deckt absichtlich nur die Kernbereiche der Authentifizierung ab:
+Dieses Dokument deckt die implementierten Auth- und Admin-Endpunkte ab:
 
 - register
 - login
@@ -13,7 +13,7 @@ Dieser Entwurf deckt absichtlich nur die Kernbereiche der Authentifizierung ab:
 - reset password (request + confirm)
 - JWKS
 
-Alles andere (User-Management, Admin) ist in diesem Dokument aktuell nicht enthalten.
+Alles andere (User-Self-Service-Management) ist noch nicht implementiert und gibt `501 Not Implemented` zurück.
 
 ## 1. Base URL
 
@@ -89,8 +89,10 @@ Globaler Hinweis zu Response-Bodies:
 
 ```json
 {
+	"success": false,
 	"error": "Human readable message",
-	"code": "ERROR_CODE"
+	"code": "ERROR_CODE",
+	"details": {}
 }
 ```
 
@@ -107,6 +109,7 @@ Globaler Hinweis zu Response-Bodies:
 - `ACCOUNT_SUSPENDED` (403)
 - `EMAIL_EXISTS` (409)
 - `USERNAME_EXISTS` (409)
+- `NOT_IMPLEMENTED` (501)
 - `INTERNAL` (500)
 
 ## 4. Client-Identifikation (Empfohlen)
@@ -477,10 +480,15 @@ Request-Body (Entwurf):
 
 Beispiel Request-Body:
 
-````json
+```json
 {
-        "token": "TOKEN_FROM_EMAIL",
-        "password": "AnotherStrongPassword123!"
+	"token": "TOKEN_FROM_EMAIL",
+	"password": "AnotherStrongPassword123!"
+}
+```
+
+Erfolg:
+
 - `200 OK` Passwort aktualisiert
 
 Beispiel Success-Body:
@@ -491,7 +499,7 @@ Beispiel Success-Body:
 	"message": "Password updated successfully.",
 	"data": null
 }
-````
+```
 
 Fehler:
 
@@ -600,20 +608,30 @@ const resetRes = await fetch("http://localhost:3000/api/auth/reset-password/conf
 	},
 	body: JSON.stringify({
 		token: "TOKEN_FROM_EMAIL",
-                password: "AnotherStrongPassword123!",
-const refreshRes = await fetch("http://localhost:3000/api/auth/refresh", {
-	method: "POST",
-	headers: {
-		"Content-Type": "application/json",
-	},
-	body: JSON.stringify({
-		refreshToken: "opaque_refresh_token",
+		password: "AnotherStrongPassword123!",
 	}),
+});
+
+const resetData = await resetRes.json();
+console.log(resetData);
+```
+
+### Refresh = await fetch("http://localhost:3000/api/auth/refresh", {
+
+    method: "POST",
+    headers: {
+    	"Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+    	refreshToken: "opaque_refresh_token",
+    }),
+
 });
 
 const refreshData = await refreshRes.json();
 console.log(refreshData);
-```
+
+````
 
 ### Logout (`204 No Content`)
 
@@ -625,7 +643,7 @@ const logoutRes = await fetch("http://localhost:3000/api/auth/logout", {
 if (logoutRes.status === 200) {
 	console.log("Logged out successfully");
 }
-```
+````
 
 ## 7. Routenübersicht
 
@@ -650,14 +668,14 @@ if (logoutRes.status === 200) {
 | `DELETE`   | `/api/user`                        | 🔒     | Selbstständige Kontolöschung                       | Geplant       |
 | `GET`      | `/api/users/:username`             | 🔒     | Öffentliches Nutzerprofil abrufen                  | Geplant       |
 | **Admin**  |                                    |        |                                                    |               |
-| `GET`      | `/api/admin/users`                 | Admin  | Alle Nutzer auflisten (paginiert)                  | Geplant       |
-| `PATCH`    | `/api/admin/users/:id/status`      | Admin  | Nutzer sperren oder aktivieren                     | Geplant       |
-| `DELETE`   | `/api/admin/users/:id`             | Admin  | Nutzerkonto löschen                                | Geplant       |
+| `GET`      | `/api/admin/users`                 | Admin  | Alle Nutzer auflisten (paginiert)                  | Implementiert |
+| `PATCH`    | `/api/admin/users/:id/status`      | Admin  | Nutzer sperren oder aktivieren                     | Implementiert |
+| `DELETE`   | `/api/admin/users/:id`             | Admin  | Nutzerkonto löschen                                | Implementiert |
 | **System** |                                    |        |                                                    |               |
 | `GET`      | `/api/health`                      | Public | Datenbank- und Anwendungs-Healthcheck              | Implementiert |
 | `GET`      | `/api/live`                        | Public | Liveness-Probe                                     | Implementiert |
 
 ## 8. Implementierungsstatus
 
-Das ist weiterhin ein Draft/Entwurf.
-Aktuelle Route-Handler können `501 Not Implemented` zurückgeben, bis die Services komplett verbunden sind.
+Auth- und Admin-Endpunkte sind vollständig implementiert.
+User-Self-Service-Route-Handler geben derzeit `501 Not Implemented` zurück und werden in einem zukünftigen Release angebunden.
