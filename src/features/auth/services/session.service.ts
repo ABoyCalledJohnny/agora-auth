@@ -120,9 +120,14 @@ export const SessionService = {
           }
 
           await DrizzleSessionRepository.revokeAllForUser(stolenSession.userId);
+
+          throw new AgoraError(
+            "INVALID_CREDENTIALS",
+            "Previously rotated session token reused. All sessions for this user have been revoked.",
+          );
         }
 
-        throw new AgoraError("INVALID_CREDENTIALS", "Session invalid, expired, or compromised.");
+        throw new AgoraError("INVALID_CREDENTIALS", "Session invalid or expired.");
       }
 
       // Generate replacement

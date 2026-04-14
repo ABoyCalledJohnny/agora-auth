@@ -758,8 +758,6 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
-1. Table
-
 ### 3.3 Backlog
 
 **Deferred MVP Features**
