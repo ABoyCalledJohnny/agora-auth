@@ -10,14 +10,16 @@ import { Nav } from "./nav.tsx";
 export function Header() {
   return (
     <header id="masthead" className="sticky top-0 z-40 h-16 border-b border-neutral-200 bg-white">
-      <Container className="relative flex h-full items-center justify-between">
-        <Link href="/" className="flex">
-          <Image src={logo} alt="Agora - Home" className="h-8 w-auto" />
-        </Link>
-        <div className="absolute left-1/2 -translate-x-1/2">
-          <Nav />
+      <Container className="flex h-full items-center">
+        <div className="flex flex-1 justify-start">
+          <Link href="/" className="flex">
+            <Image src={logo} alt="Agora - Home" className="h-8 w-auto" />
+          </Link>
         </div>
-        <AuthStatus />
+        <Nav />
+        <div className="flex flex-1 justify-end">
+          <AuthStatus />
+        </div>
       </Container>
     </header>
   );

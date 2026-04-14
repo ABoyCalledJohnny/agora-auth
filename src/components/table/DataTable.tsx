@@ -21,11 +21,21 @@ type DataTableProps<T> = {
   columns: Column<T>[];
   rows: T[];
   keyExtractor: (row: T) => string;
+  rowClassName?: (row: T) => string | undefined;
+  onRowAnimationEnd?: (row: T) => void;
   emptyState?: React.ReactNode;
   className?: string;
 };
 
-export function DataTable<T>({ columns, rows, keyExtractor, emptyState, className }: DataTableProps<T>) {
+export function DataTable<T>({
+  columns,
+  rows,
+  keyExtractor,
+  rowClassName,
+  onRowAnimationEnd,
+  emptyState,
+  className,
+}: DataTableProps<T>) {
   return (
     <Table className={className}>
       <TableHead>
@@ -46,7 +56,11 @@ export function DataTable<T>({ columns, rows, keyExtractor, emptyState, classNam
           </tr>
         ) : (
           rows.map((row) => (
-            <TableRow key={keyExtractor(row)}>
+            <TableRow
+              key={keyExtractor(row)}
+              className={rowClassName?.(row)}
+              onAnimationEnd={() => onRowAnimationEnd?.(row)}
+            >
               {columns.map((column) => (
                 <TableCell key={column.key} className={column.className}>
                   {column.render(row)}

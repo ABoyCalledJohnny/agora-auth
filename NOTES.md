@@ -758,13 +758,6 @@ See `./messages/{language}.json`
 
 ### 3.1 + 3.2
 
-- Nutzerliste:
-    - Alles fetchen oder immer nur Teile?
-    - Irgendein Cache?
-- Zurück auf die richtige Seite, wenn man Nutzer löscht
-- Seiten und Einstellungen als params?
-- email/username or password is incorrect
-
 ### 3.3 Backlog
 
 **Deferred MVP Features**
@@ -843,6 +836,8 @@ See `./messages/{language}.json`
 - **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
 
 client interceptor for old tabs (still locked in? update layout.tsx)
+grid layout tabelle
+was noch von security
 
 ## 5. Documentation
 
@@ -877,5 +872,9 @@ Was will ich zeigen, Struktur
 Was war Priorität
 
 Kaleidoskode Projekt schicken
+
+Zu wenig Zeit, keine klaren Regeln
+
+Bild Admin
 
 ## 6. Initial Major Release and Deployment

@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 
 import { Card } from "@/src/components/ui/Card.tsx";
 import { CardHeadline } from "@/src/components/ui/CardHeadline.tsx";
+import { adminListUsersSchema } from "@/src/features/admin/contracts.ts";
+import { AdminService } from "@/src/features/admin/services/admin.service.ts";
 import { assertAuth } from "@/src/lib/auth.ts";
 
 import { AdminUsersTable } from "./admin-users-table.tsx";
@@ -15,9 +17,26 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Page() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function Page({ searchParams }: PageProps) {
   await assertAuth({ roles: ["admin"], redirectTo: "/admin" });
   const t = await getTranslations("Admin.Users");
+  const rawParams = await searchParams;
+
+  const query = adminListUsersSchema.parse({
+    page: rawParams.page,
+    limit: rawParams.limit,
+    status: rawParams.status,
+    search: rawParams.search,
+    roleId: rawParams.roleId,
+    sortBy: rawParams.sortBy,
+    sortDirection: rawParams.sortDirection,
+  });
+
+  const { items, total, page, limit } = await AdminService.listUsers(query);
 
   return (
     <Card>
@@ -36,7 +55,7 @@ export default async function Page() {
         }
         iconPosition="right"
       />
-      <AdminUsersTable />
+      <AdminUsersTable users={items} total={total} page={page} limit={limit} />
     </Card>
   );
 }

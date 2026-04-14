@@ -17,14 +17,6 @@ export type ApiErrorResponse<TDetails = unknown> = {
 
 export type ApiResponse<TData = unknown, TDetails = unknown> = ApiSuccessResponse<TData> | ApiErrorResponse<TDetails>;
 
-export type PaginatedListRequest<TSortBy = string, TSortDirection = "asc" | "desc"> = {
-  page?: number;
-  limit?: number;
-  search?: string;
-  sortBy?: TSortBy;
-  sortDirection?: TSortDirection;
-};
-
 export type PaginatedListResponse<T> = {
   items: T[];
   total: number;

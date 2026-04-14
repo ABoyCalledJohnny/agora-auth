@@ -16,6 +16,7 @@ import { z } from "zod";
 import {
   DEFAULT_PREFERENCES,
   DEFAULT_PRIVACY_SETTINGS,
+  LEGACY_PUBLIC_ID_PATTERN,
   LOCALES,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
@@ -77,9 +78,11 @@ export const verificationTokenTypeSchema = z.enum(VERIFICATION_TOKEN_TYPE);
 // ============================================================================
 // Factory functions that accept a translation hook to return localized errors.
 
-/** Strict identifier validation for NanoIDs exposed in public URLs */
+/** Strict identifier validation for NanoIDs exposed in public URLs (accepts legacy and current format) */
 export const publicIdSchema = (t: ValidationTranslator) =>
-  z.string().regex(new RegExp(`^[a-z]{${PUBLIC_ID_LENGTH}}$`), t("publicIdFormat"));
+  z
+    .string()
+    .regex(new RegExp(`^[a-z0-9]{${PUBLIC_ID_LENGTH}}$|${LEGACY_PUBLIC_ID_PATTERN.source}`), t("publicIdFormat"));
 
 /** Comprehensive password security policy */
 export const passwordRules = (t: ValidationTranslator) =>
@@ -127,20 +130,19 @@ export const slugSchema = (t: ValidationTranslator) =>
 /** Standard Pagination bounds for Search Parameters */
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).catch(1),
-  limit: z.coerce.number().int().min(1).max(100).catch(10), // Limit per page DoS protection
+  limit: z.coerce.number().int().min(1).max(50).catch(10), // Limit per page DoS protection
 });
 
-/**
- * Extension of paginationSchema for user list queries.
- * This guarantees safe inputs before hitting the UserRepository.
- */
-export const userListQuerySchema = paginationSchema.extend({
+/** Shared base schema for paginated user list queries (user and admin) */
+export const userListBaseSchema = paginationSchema.extend({
   status: statusSchema.optional(),
   search: z.string().max(100).optional(),
-  roleId: z.uuid().optional(), // assuming roleId is a UUID
+  roleId: z.uuid().optional(),
   sortBy: z.enum(["username", "email", "createdAt", "updatedAt"]).default("createdAt"),
   sortDirection: z.enum(["asc", "desc"]).default("desc"),
 });
+
+export type UserListBase = z.infer<typeof userListBaseSchema>;
 
 /** Standardized privacy toggles for user profiles */
 export const privacySettingsSchema = z.object({

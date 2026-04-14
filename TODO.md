@@ -138,11 +138,10 @@
 - [x] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Shared Validation and Domain Rules:**
-        - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains.
+        - [x] **Validation module:** Create validation.ts to centralise reusable Zod schemas (password requirements, username parsing) with i18n support, and define composite structural JSON validation (`UserPreferences`, `PrivacySettings`) mapping to database domains. Export inferred TypeScript types from schemas (e.g., `Preferences`, `PrivacySettings`) for type-safe usage across the application.
         - [x] **Global types:** Create `src/types.ts` to define system-wide interfaces like `ApiErrorResponse`, `ApiSuccessResponse`, and standard action states for uniform client-server communication as well es `PaginatedList`s.
     - **Database Layer:**
         - **Drizzle schemas:** Translate the ERD into Drizzle schema and relation files.
-            - **Validation:** Import shared constants and types from `constants.ts` and `validation.ts` where applicable.
             - **Types:** Export inferred TypeScript types from Drizzle schemas (e.g., `User`, `Session`, `Role`).
             - [x] Users Tables (`users.ts`)
             - [x] Auth Tables (`auth.ts`)
@@ -187,6 +186,7 @@
 - **Development:**
     - **Validation and Contracts:**
         - [x] Create Zod validation schemas (`registerSchema`, `loginSchema`, `resetPasswordSchema`, `newPasswordSchema`) in `src/features/auth/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `RegisterInput`, `LoginInput`) for type-safe request handling.
+        - [x] Define response-shaping TypeScript types (`AuthTokens`, `LoginResponse`, `AccessTokenPayload`) for service output and JWT payload structures.
     - **Services:**
         - [x] **`AuthService`:** Registration and login orchestration.
         - [x] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
@@ -252,17 +252,18 @@
 - [ ] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling.
+        - [x] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling.
+        - [x] Define response-shaping TypeScript types (`AdminListUsersResult`) as field projections for output filtering.
     - **Services:**
-        - [ ] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account.
+        - [x] **`AdminService`:** Admin-specific user management operations using shared `UserRepository` and `RoleRepository`. List users (paginated, filtered, sorted via `listPage`), change user status (suspend/activate with self-action guard), delete user account.
     - **API Routes and Server Actions:**
         - Implement admin endpoints (dual-channel). All routes require authentication and admin role via `{ auth: true, roles: ['admin'] }`:
-        - [ ] 🔒 `GET /api/admin/users` - List all users (paginated).
-        - [ ] 🔒 `PATCH /api/admin/users/:id/status` - Suspend/activate a user.
-        - [ ] 🔒 `DELETE /api/admin/users/:id` - Delete a user account.
+        - [x] 🔒 `GET /api/admin/users` - List all users (paginated).
+        - [x] 🔒 `PATCH /api/admin/users/:id/status` - Suspend/activate a user.
+        - [x] 🔒 `DELETE /api/admin/users/:id` - Delete a user account.
     - **Frontend:**
-        - [ ] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog).
-        - [ ] **Admin hooks:** `useAdminUsers` (for list/pagination), `useUpdateUserStatus`, `useDeleteUser` in `src/features/admin/hooks/`.
+        - [x] **Admin hooks:** `useAdminUsers` (for list/pagination), `useUpdateUserStatus`, `useDeleteUser` in `src/features/admin/hooks/`.
+            - [ ] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog). Use URL search params (`useSearchParams` + `router.push`) for pagination state so page survives refresh and back/forward navigation.
 - [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `admin`).
 
 ---
