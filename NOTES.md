@@ -759,12 +759,6 @@ See `./messages/{language}.json`
 ### 3.1 + 3.2
 
 1. Table
-    1. has been activated...
-2. IDs
-    - Length
-3. Improvements
-    - Width columns
-    - Direktauswahl Seite
 
 ### 3.3 Backlog
 
@@ -878,5 +872,9 @@ Was will ich zeigen, Struktur
 Was war Priorität
 
 Kaleidoskode Projekt schicken
+
+Zu wenig Zeit, keine klaren Regeln
+
+Bild Admin
 
 ## 6. Initial Major Release and Deployment

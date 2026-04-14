@@ -41,7 +41,7 @@ type TableBodyProps = React.ComponentProps<"tbody">;
 
 export function TableBody({ children, className, ...rest }: TableBodyProps) {
   return (
-    <tbody className={cn("divide-y divide-neutral-100", className)} {...rest}>
+    <tbody className={cn(className)} {...rest}>
       {children}
     </tbody>
   );
@@ -55,7 +55,10 @@ type TableRowProps = React.ComponentProps<"tr">;
 
 export function TableRow({ children, className, ...rest }: TableRowProps) {
   return (
-    <tr className={cn("transition-colors hover:bg-neutral-50", className)} {...rest}>
+    <tr
+      className={cn("border-b border-neutral-100 transition-colors last:border-b-0 hover:bg-neutral-50", className)}
+      {...rest}
+    >
       {children}
     </tr>
   );

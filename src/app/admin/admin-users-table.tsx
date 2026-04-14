@@ -36,6 +36,7 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
     userId: string;
     username: string;
   } | null>(null);
+  const [highlightedUserId, setHighlightedUserId] = useState<string | null>(null);
 
   const { setPage } = useAdminUsers();
   const { updateStatus, isPending: isStatusPending } = useUpdateUserStatus();
@@ -67,7 +68,10 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
       const status = type === "suspend" ? "suspended" : "active";
       const successKey = type === "suspend" ? "suspendSuccess" : "activateSuccess";
       updateStatus(userId, status, {
-        onSuccess: () => toast.success(t(successKey, { username })),
+        onSuccess: () => {
+          toast.success(t(successKey, { username }));
+          setHighlightedUserId(userId);
+        },
         onError: () => toast.error(t("statusUpdateError", { username })),
       });
     }
@@ -85,13 +89,17 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
     {
       key: "id",
       header: "ID",
-      className: "min-w-52",
-      render: (user) => user.publicId,
+      className: "w-56 max-w-56",
+      render: (user) => (
+        <span className="block truncate" title={user.publicId}>
+          {user.publicId}
+        </span>
+      ),
     },
     {
       key: "username",
       header: t("columnUsername"),
-      className: "min-w-22 max-w-36",
+      className: "min-w-30",
       render: (user) => (
         <span className="block truncate" title={user.username}>
           {user.username}
@@ -101,7 +109,7 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
     {
       key: "email",
       header: t("columnEmail"),
-      className: "min-w-48 max-w-56",
+      className: "min-w-44",
       render: (user) => (
         <span className="block truncate" title={user.email}>
           {user.email}
@@ -111,6 +119,7 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
     {
       key: "role",
       header: t("columnRole"),
+      className: "w-24",
       render: (user) => {
         const highest = user.roles
           .map((r) => r.role.name)
@@ -121,13 +130,14 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
     {
       key: "status",
       header: t("columnStatus"),
+      className: "w-24",
       render: (user) => <StatusPill variant={user.status} className="min-w-21 py-0.5" />,
     },
     {
       key: "createdAt",
       header: t("columnCreated"),
       render: (user) => format.dateTime(user.createdAt, { dateStyle: "medium" }),
-      className: "min-w-28",
+      className: "w-28",
     },
     {
       key: "lastSignInAt",
@@ -138,13 +148,13 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
         ) : (
           <span className="block text-center">-</span>
         ),
-      className: "min-w-28",
+      className: "w-28",
     },
     {
       key: "actions",
       header: "",
       render: (user) => (
-        <div className="flex gap-1.5">
+        <div className="flex justify-end gap-1.5">
           {user.status === "active" ? (
             <Button
               variant="secondary"
@@ -174,12 +184,20 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
           </Button>
         </div>
       ),
+      className: "w-46",
     },
   ];
 
   return (
     <>
-      <DataTable columns={columns} rows={users} keyExtractor={(user) => user.id} emptyState={t("emptyState")} />
+      <DataTable
+        columns={columns}
+        rows={users}
+        keyExtractor={(user) => user.id}
+        rowClassName={(user) => (user.id === highlightedUserId ? "animate-[row-flash_1.5s_ease-out]" : undefined)}
+        onRowAnimationEnd={() => setHighlightedUserId(null)}
+        emptyState={t("emptyState")}
+      />
       <Pagination
         page={page}
         totalPages={totalPages}
@@ -205,10 +223,19 @@ export function AdminUsersTable({ users, total, page, limit }: AdminUsersTablePr
       >
         <p>
           {pendingAction?.type === "delete"
-            ? t("confirmDeleteMessage", { username: pendingAction.username })
+            ? t.rich("confirmDeleteMessage", {
+                username: pendingAction.username,
+                bold: (chunks) => <strong>{chunks}</strong>,
+              })
             : pendingAction?.type === "suspend"
-              ? t("confirmSuspendMessage", { username: pendingAction.username })
-              : t("confirmActivateMessage", { username: pendingAction?.username ?? "" })}
+              ? t.rich("confirmSuspendMessage", {
+                  username: pendingAction.username,
+                  bold: (chunks) => <strong>{chunks}</strong>,
+                })
+              : t.rich("confirmActivateMessage", {
+                  username: pendingAction?.username ?? "",
+                  bold: (chunks) => <strong>{chunks}</strong>,
+                })}
         </p>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="secondary" onClick={closeModal}>

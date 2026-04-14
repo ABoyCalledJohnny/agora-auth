@@ -16,6 +16,7 @@ import { z } from "zod";
 import {
   DEFAULT_PREFERENCES,
   DEFAULT_PRIVACY_SETTINGS,
+  LEGACY_PUBLIC_ID_PATTERN,
   LOCALES,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
@@ -77,9 +78,11 @@ export const verificationTokenTypeSchema = z.enum(VERIFICATION_TOKEN_TYPE);
 // ============================================================================
 // Factory functions that accept a translation hook to return localized errors.
 
-/** Strict identifier validation for NanoIDs exposed in public URLs */
+/** Strict identifier validation for NanoIDs exposed in public URLs (accepts legacy and current format) */
 export const publicIdSchema = (t: ValidationTranslator) =>
-  z.string().regex(new RegExp(`^[a-z]{${PUBLIC_ID_LENGTH}}$`), t("publicIdFormat"));
+  z
+    .string()
+    .regex(new RegExp(`^[a-z0-9]{${PUBLIC_ID_LENGTH}}$|${LEGACY_PUBLIC_ID_PATTERN.source}`), t("publicIdFormat"));
 
 /** Comprehensive password security policy */
 export const passwordRules = (t: ValidationTranslator) =>

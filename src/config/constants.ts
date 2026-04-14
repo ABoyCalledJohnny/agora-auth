@@ -30,9 +30,12 @@ export const NO_STORE_HEADERS = {
   "Cache-Control": "no-store, max-age=0",
 };
 
-// Letters-only public IDs need slightly more length than base36 to keep similar entropy.
-export const PUBLIC_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-export const PUBLIC_ID_LENGTH = 27;
+// Alphanumeric public IDs: 24 chars × log₂(36) ≈ 124 bits of entropy (above UUID v4).
+export const PUBLIC_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+export const PUBLIC_ID_LENGTH = 24;
+
+// Legacy public IDs used lowercase letters only at length 27.
+export const LEGACY_PUBLIC_ID_PATTERN = /^[a-z]{27}$/;
 
 // 32-bytes of high-entropy data encoded as base64url will always be exactly 43 characters long.
 export const TOKEN_BYTE_LENGTH = 32;
