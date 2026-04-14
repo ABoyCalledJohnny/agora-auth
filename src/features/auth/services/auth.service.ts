@@ -4,7 +4,7 @@ import type { LoginRequest, RegisterRequest, ResetPasswordConfirmRequest, ResetP
 import type { AuthTokens, LoginResponse } from "../types.ts";
 import type { ApiClient, User } from "@/src/db/schema/index.ts";
 
-import { RESERVED_USERNAMES, type UserStatus } from "@/src/config/constants.ts";
+import { DEFAULT_ROLE, RESERVED_USERNAMES, type UserStatus } from "@/src/config/constants.ts";
 import { appConfig } from "@/src/config/index.ts";
 import { hashPassword, verifyPassword } from "@/src/lib/crypto.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
@@ -51,6 +51,7 @@ export const AuthService = {
         status,
       });
       await DrizzleUserRepository.setPasswordHash(newUser.id, hashedPassword);
+      await DrizzleRoleRepository.assignRoleByName(newUser.id, DEFAULT_ROLE);
 
       // TODO Implement/finalise after NotificationService creation.
 

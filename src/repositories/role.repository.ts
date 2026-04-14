@@ -72,6 +72,12 @@ export const DrizzleRoleRepository: RoleRepository = {
     }
   },
 
+  async assignRoleByName(userId: string, roleName: SystemRoleName): Promise<void> {
+    const role = await this.findByName(roleName);
+    if (!role) throw new AgoraError("NOT_FOUND", `Role "${roleName}" not found.`);
+    await this.assignRoleToUser(userId, role.id);
+  },
+
   /**
    * Removes a joined relationship strictly stripping rights from a User.
    *

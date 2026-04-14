@@ -28,6 +28,7 @@ export interface RoleRepository extends CrudRepository<
 
   // Update
   assignRoleToUser(userId: string, roleId: string): Promise<void>;
+  assignRoleByName(userId: string, roleName: SystemRoleName): Promise<void>;
   removeRoleFromUser(userId: string, roleId: string): Promise<void>;
 }
 

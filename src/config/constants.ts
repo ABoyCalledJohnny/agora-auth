@@ -92,6 +92,9 @@ export type UserStatus = (typeof USER_STATUS)[number];
 export const SYSTEM_ROLE_NAMES = ["admin", "user"] as const satisfies ZodEnumTuple;
 export type SystemRoleName = (typeof SYSTEM_ROLE_NAMES)[number];
 
+/** The role assigned to newly registered users */
+export const DEFAULT_ROLE: SystemRoleName = "user";
+
 /** Role hierarchy: higher number = higher authority */
 export const ROLE_HIERARCHY: Record<SystemRoleName, number> = {
   user: 0,
