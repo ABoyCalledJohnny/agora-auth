@@ -834,6 +834,8 @@ See `./messages/{language}.json`
 - **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
 
 client interceptor for old tabs (still locked in? update layout.tsx)
+grid layout tabelle
+was noch von security
 
 ## 5. Documentation
 
