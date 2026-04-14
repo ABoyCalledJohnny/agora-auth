@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.0-rc.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.4.0...v0.5.0-rc.0) (2026-04-14)
+
+### Features
+
+- admin user management dashboard ([#5](https://github.com/ABoyCalledJohnny/agora-auth/issues/5)) ([d5f6422](https://github.com/ABoyCalledJohnny/agora-auth/commit/d5f64222db17b089bcef69329c39961e1889379f))
+
+### Bug Fixes
+
+- add register and forgot password dummy pages, add meta description to all dummy pages. ([7fbc85a](https://github.com/ABoyCalledJohnny/agora-auth/commit/7fbc85a163320153b7704cb418938f8a1c18204d))
+- add role to user upon creation ([4595295](https://github.com/ABoyCalledJohnny/agora-auth/commit/4595295b266a47c3edd0d2e4fedb32ec14d4ceb5))
+- broaden invalid credentials login message ([0a0366c](https://github.com/ABoyCalledJohnny/agora-auth/commit/0a0366cdee7ce4f9eae77e4a7ebac853d4937be3))
+
+### Documentation
+
+- update notes ([fbd5f4b](https://github.com/ABoyCalledJohnny/agora-auth/commit/fbd5f4b893f2582301a366feef943571289ec50c))
+- update project readme and api documentation ([a7976c1](https://github.com/ABoyCalledJohnny/agora-auth/commit/a7976c1821fb40ebe0c64bdfcc51c16400dee874))
+
 ## [0.4.0](https://github.com/ABoyCalledJohnny/agora-auth/compare/v0.4.0-rc.0...v0.4.0) (2026-04-12)
 
 ### Features
