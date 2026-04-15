@@ -1,4 +1,9 @@
-// src/db/schema/_helpers.ts
+/**
+ * Schema Helpers
+ *
+ * Reusable column definitions shared across all database tables.
+ */
+
 import { timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const idColumn = (name = "id") => uuid(name).defaultRandom().primaryKey();

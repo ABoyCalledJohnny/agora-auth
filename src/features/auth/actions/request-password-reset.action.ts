@@ -1,5 +1,10 @@
 "use server";
 
+/**
+ * Request password reset action.
+ * Dispatches a password reset email to the user.
+ */
+
 import { withActionHandler } from "@/src/lib/action-wrapper.ts";
 
 import { resetPasswordRequestSchema } from "../contracts.ts";
@@ -13,7 +18,7 @@ export const requestPasswordResetAction = withActionHandler(
   async ({ data: { email }, client }) => {
     await AuthService.requestPasswordReset({ email }, client);
 
-    // The action wrapper will map this to { success: true, data: null }
+    // The action wrapper maps this to { success: true, data: null }.
     return null;
   },
 );

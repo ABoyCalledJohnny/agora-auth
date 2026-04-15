@@ -19,17 +19,17 @@ import { sanitizeInput } from "@/src/lib/utils.ts";
  * A higher-order function that wraps Next.js Server Actions to provide a unified
  * pipeline for authentication, authorisation, validation, and error handling.
  *
- * Typical Flow:
- * 1. Authentication: If `auth: true` or `roles` are provided, it calls `authenticate()` to verify the access token/session.
- * 2. Authorisation: If `roles` are provided, it calls `authorize()` to check if the user has the required roles.
- * 3. Client Resolution: Resolves the default internal API client (since this is a server action originating from our own frontend).
- * 4. Validation: If `bodySchema` is provided, it normalizes (handles FormData or plain objects), sanitizes, and validates the input against the Zod schema.
- * 5. Execution: Runs your specific server action handler with the strongly-typed `data`, `session`, and `client`.
- * 6. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ApiResponse` union, preventing untyped exceptions from crashing the frontend.
+ * Typical flow:
+ * 1. Authentication - verifies the access token/session if required.
+ * 2. Authorisation - checks RBAC roles if specified.
+ * 3. Client resolution - resolves the default internal API client.
+ * 4. Validation - sanitises and validates input against a Zod schema.
+ * 5. Execution - runs the handler with strongly-typed `data`, `session`, and `client`.
+ * 6. Error handling - catches errors and returns a standard `ApiResponse` union.
  */
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
-// TypeScript still types it as `Session | null` — use `session!` or a guard.
+// TypeScript still types it as `Session | null` - use `session!` or a guard.
 
 // ---------------------------------------------------------------------------
 // Internals
@@ -65,13 +65,13 @@ function parseFormData(input: unknown): unknown {
 // withActionHandler
 // ---------------------------------------------------------------------------
 
-/** With schema — handler receives `{ data, session, client }`. */
+/** With schema - handler receives `{ data, session, client }`. */
 export function withActionHandler<TSchema extends z.ZodType, TResult>(
   config: HandlerConfig & { bodySchema: TSchema },
   handler: (context: { data: z.infer<TSchema>; session: AppSession | null; client: ApiClient }) => Promise<TResult>,
 ): (rawInput: FormData) => Promise<ApiResponse<TResult>>;
 
-/** Without schema — handler receives `{ session, client }`. */
+/** Without schema - handler receives `{ session, client }`. */
 export function withActionHandler<TResult>(
   config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: { session: AppSession | null; client: ApiClient }) => Promise<TResult>,
@@ -97,11 +97,11 @@ export function withActionHandler(
         authorize(session, config.roles);
       }
 
-      // 3. Client Resolution
-      // Server actions originate from our own frontend, so we always use the default client here.
+      // 3. Client resolution.
+      // Server actions originate from our own frontend, so we always use the default client.
       const client = await ApiClientService.getDefaultClient();
 
-      // 4. Validation & sanitisation
+      // 4. Validation and sanitisation.
       let data: unknown;
       if (config.bodySchema) {
         const input = parseFormData(rawInput);
@@ -115,13 +115,13 @@ export function withActionHandler(
         data = result.data;
       }
 
-      // 5. Execute handler & return success
+      // 5. Execute handler and return success.
       const context = config.bodySchema ? { data, session, client } : { session, client };
       const result = await handler(context);
 
       return { success: true as const, data: result, message: "Success" };
     } catch (error) {
-      // 6. Error Handling
+      // 6. Error handling.
 
       if (isRedirectError(error)) {
         throw error;

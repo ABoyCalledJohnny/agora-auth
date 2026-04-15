@@ -1,10 +1,10 @@
 /**
- * Cryptography Utility Functions:
+ * Cryptography Utilities
  *
- * - `hashPassword`: Secure password hashing using Bun's native optimized Argon2id implementation.
- * - `verifyPassword`: Verifies a plain text password against an Argon2id hash.
- * - `hashToken`: Fast, deterministic SHA-256 hashing for high-entropy secrets like API keys and verification tokens.
- * - `verifyToken`: Verifies a plaintext token against its SHA-256 hash using a constant-time comparison.
+ * - `hashPassword`: Secure password hashing using Argon2id.
+ * - `verifyPassword`: Verifies a plain-text password against an Argon2id hash.
+ * - `hashToken`: Fast, deterministic SHA-256 hashing for high-entropy secrets.
+ * - `verifyToken`: Verifies a plaintext token against its SHA-256 hash using constant-time comparison.
  */
 
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
@@ -14,8 +14,8 @@ import * as argon2 from "argon2";
 import { TOKEN_BYTE_LENGTH } from "@/src/config/constants.ts";
 
 /**
- * Secure password hashing using Argon2id implementation.
- * Argon2id is the current industry recommended algorithm for password hashing.
+ * Secure password hashing using Argon2id.
+ * Argon2id is the current industry-recommended algorithm for password hashing.
  */
 export async function hashPassword(password: string): Promise<string> {
   // argon2.hash automatically generates a salt and returns
@@ -24,10 +24,10 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 /**
- * Verify a plain text password against an Argon2id hash.
+ * Verifies a plain-text password against an Argon2id hash.
  *
- * @param password The plain text password to verify
- * @param hash The Argon2id hash stored in the database, 32 bytes -> 43 characters
+ * @param password The plain-text password to verify.
+ * @param hash The Argon2id hash stored in the database.
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return await argon2.verify(hash, password);
@@ -46,13 +46,12 @@ export function hashToken(key: string): string {
 }
 
 /**
- * Verify a plaintext high-entropy string against its SHA-256 hash securely.
+ * Verifies a plaintext high-entropy string against its SHA-256 hash securely.
  *
- * Why not use `===`?
  * Standard string comparison (`===`) stops at the first mismatched character.
- * Attackers can measure the time it takes for the comparison to fail to
- * guess the hash character by character (a "timing attack").
- * This function uses a constant-time comparison to prevent that.
+ * Attackers can measure the time it takes for the comparison to fail to guess
+ * the hash character by character (a "timing attack"). This function uses a
+ * constant-time comparison to prevent that.
  */
 export function verifyToken(plainKey: string, hashedKey: string): boolean {
   const plainHash = hashToken(plainKey);

@@ -14,7 +14,7 @@
 2. **[Development](#3-development)**
     1. [Infrastructure and Core Setup](#31-infrastructure-and-core-setup): _(notes added during implementation)_
     2. [Features](#32-features): Auth and component considerations and questions.
-    3. [Backlog](#backlog): Deferred MVP features, future enhancements, settings, UX improvements, infrastructure, and admin ideas.
+    3. [Backlog](#33-backlog): Auth completion, user management, admin enhancements, feature ideas, UI/UX, infrastructure, architecture, and open questions.
 3. **[Documentation](#5-documentation):** Presentation scheduling notes.
 4. **[Initial Major Release and Deployment](#6-initial-major-release-and-deployment):** _(notes added during implementation)_
 
@@ -35,43 +35,51 @@
 ##### Description
 
 **Short Description:**
-A robust, secure, and modern authentication and user management system built with Next.js, Drizzle ORM, and PostgreSQL.
+A full-stack authentication and user management system built as a final project ("Abschlussprojekt") for a web development program, using Next.js, Drizzle ORM, and PostgreSQL.
 
 **Project Description:**
-Agora Auth is a comprehensive authentication solution designed for modern web applications. Built on the Turbine boilerplate, it leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system. Key features include stateless JWT access tokens paired with database-backed sessions, secure password hashing (via Bun's native Argon2), a granular permission system distinguishing between public and private user data, and an admin dashboard for user management (with a paginated user table for listing, suspending, and deleting accounts). It aims to provide a solid foundation for user registration, login, profile management, and secure API interactions, prioritising security best practices like HTTP-only cookies and strict input validation.
+Agora Auth is the final project ("Abschlussprojekt") for a full-stack web development program and was built within approximately 13 working days, plus a few additional days of preparation. The goal was to design and implement a production-grade authentication and user management system from scratch - covering backend architecture, database design, API development, frontend UI, CI/CD, and deployment to a live server. The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system. It prioritises security best practices like HTTP-only cookies, Argon2 password hashing, RS256-signed JWTs, and strict Zod input validation throughout. The project has reached its MVP milestone. Further development beyond this point is not guaranteed.
 
 ##### MVP Scope
 
 **Core Authentication**
 
-- **Registration & Verification:** Secure sign-up with duplicate checks, password hashing, and email verification.
-- **Login:** Credential verification.
-- **Password Management:** Secure password reset flows via email.
+- **Registration:** Secure sign-up with duplicate checks and `Argon2` password hashing.
+- **Login:** Credential verification with timing-attack mitigation.
 - **Logout:** Server-side session invalidation and cookie clearance.
+- **Session Management:** Database-backed sessions with refresh token rotation and reuse detection.
+- **Stateless JWT Access Tokens:** RS256-signed, short-lived access tokens paired with rotating refresh tokens.
 
 **External API & Clients**
 
 - **Client Authentication:** Extensible API allowing third-party services to consume Agora Auth (client management handled manually via DB for MVP).
 - **Asymmetrical JWTs:** RS256 token signing with public JWKS endpoint for secure cross-service verification.
 
-**User Management**
-
-- **User Profile:** Protected page for authenticated users (minimal).
-- **User Settings:** Self-service profile updates and preferences (minimal).
-    - **Account Deletion:** Self-service account removal.
-
 **Access Control**
 
 - **Role-Based Authorisation:** Distinction between 'User' and 'Admin' roles (more can be added at a later date).
 - **Protected Routes:** Middleware/pipeline redirects for unauthenticated access attempts.
-- **Resource Ownership:** Logic ensuring users can only modify their own data (unless admin).
 
 **Admin Dashboard**
 
-- **User Management GUI:** Admin interface to list, suspend/activate, and delete users (`AdminUserTable` with pagination and quick actions).
+- **User Management GUI:** Admin interface to list, suspend/activate, and delete users (`AdminUserTable` with pagination, filtering, sorting, and quick actions).
+
+**Infrastructure**
+
+- **CI/CD Pipeline:** Three-stage GitHub Actions pipeline (Verify, Package, Deploy).
+- **Production Deployment:** Docker Compose on VPS with Caddy (auto-TLS), 2 app replicas, PostgreSQL.
+- **Internationalisation:** Full English and German language support via `next-intl`.
+- **Centralised Configuration:** Typed, Zod-validated environment config with fail-fast startup.
+- **Unified Error Handling:** `AgoraError` class with fixed error codes, HTTP mapping, and i18n-ready messages.
 
 **Deferred to Backlog**
 
+- **Email Verification:** Token infrastructure is built, but email sending (NotificationService) is not implemented.
+- **Password Reset:** Token creation and consumption work, but email delivery is missing.
+- **Registration UI:** Backend API works, frontend page not wired up.
+- **User Profile:** Protected page for authenticated users.
+- **User Settings:** Self-service profile updates, email/username/password changes, account deletion.
+- **Resource Ownership:** Logic ensuring users can only modify their own data (unless admin).
 - **"Remember Me":** Toggle between persistent and session cookies.
 - See the [Backlog](#backlog) for additional planned features and ideas.
 
@@ -123,6 +131,11 @@ MIT
 - `next-intl`: Internationalisation (i18n) for Next.js.
 - `nanoid`: Fast, URL-friendly unique string identifier generator (useful for tokens and IDs).
 - `sonner`: Toast notifications for elegant asynchronous UI feedback.
+
+**Deferred to Backlog:**
+
+- `react-hook-form`, `@hookform/resolvers`: Listed as dependencies but not actively used yet (planned for client-side validation).
+- `nodemailer`: Installed but NotificationService/mail service not implemented.
 
 #### Research
 
@@ -186,6 +199,10 @@ https://dbdiagram.io/d/Auth-Wright-695f8d2ed6e030a024753b90
         - `email`: `transactional`, `marketing`, `security`, `newsletter`
         - `push`: `messages`, `mentions`, `updates`, `posts`
 
+**Deferred to Backlog:**
+
+- User Settings JSON columns are defined in the schema design but not implemented in the application.
+
 #### Service Architecture and Logic
 
 ##### Services
@@ -197,6 +214,11 @@ https://dbdiagram.io/d/Auth-Wright-695f8d2ed6e030a024753b90
 - **`VerificationTokenService`**: Manages stateful tokens for email verification and password reset (generate, hash, store, verify).
 - **`ApiClientService`**: Verifies external API clients (validates API keys, checks allowed domains, resolves client-specific auth page path templates) before granting them access to core services.
 - **`NotificationService`**: Abstraction layer for sending emails (welcome, password reset, verification). Decouples business logic from specific email providers.
+
+**Deferred to Backlog:**
+
+- `UserService`: Planned for profile updates, email/username changes, account deletion - not implemented.
+- `NotificationService`: Email sending infrastructure not implemented (blocks email verification and password reset flows).
 
 ##### API Design
 
@@ -215,19 +237,6 @@ _Note: The core functionality described below will be implemented using a "dual-
 
 _Important distinction:_ `POST /api/auth/*/confirm` endpoints consume tokens. User-facing frontend routes remain `/verify-email/[token]` and `/reset-password/[token]`.
 
-**User Management (`/api/user/*`)**
-
-- `GET /profile`: Retrieve the authenticated user's complete profile data (including private fields).
-- `PATCH /profile`: Update profile details (e.g., display name, bio).
-- `PATCH /email`: Initiate an email change (requires new verification).
-- `PATCH /username`: Change the unique account username.
-- `PATCH /password`: Change password while already authenticated (requires current password).
-- `DELETE /`: Self-serve account deletion.
-
-**Public Profiles (`/api/users/*`)** _(authenticated users only)_
-
-- `GET /:username`: Retrieve a specified user's public profile (requires authentication, strictly public fields, respects profile visibility settings).
-
 **Public JWKS (`/api/auth/jwks`)**
 
 - `GET /`: Returns the JSON Web Key Set (public keys) so other services can verify the JWTs issued by this system.
@@ -237,6 +246,13 @@ _Important distinction:_ `POST /api/auth/*/confirm` endpoints consume tokens. Us
 - `GET /`: List all users (with pagination, filtering, sorting).
 - `PATCH /:id/status`: Change a user's status (e.g., suspend, activate).
 - `DELETE /:id`: Administrator account deletion.
+
+**Deferred to Backlog:**
+
+- `POST /verify-email/request`: Requires NotificationService.
+- `POST /reset-password/request`: Requires NotificationService.
+- All User Management endpoints (`GET /profile`, `PATCH /profile`, `PATCH /email`, `PATCH /username`, `PATCH /password`, `DELETE /`): Requires UserService.
+- `GET /api/users/:username`: Public profile endpoint.
 
 ##### Logic Flow
 
@@ -279,6 +295,12 @@ _Note: The core logic executed by Services is the same across environments. The 
     - **Step 2 (Service):** `UserService` checks new email for duplicates -> `VerificationTokenService` generates token with `metadata: { newEmail }` and stores hashed token -> `NotificationService` sends verification email to the _new_ address. _(Note: DB record retains old email to prevent lockout until new one is verified.)_
     - **Step 3 (Response):** Controller redirects / notifies user to check email.
     - **Step 4 (Complete):** User clicks link -> `VerificationTokenService` validates token and extracts `metadata.newEmail` -> `UserService` updates User record to new email -> `VerificationTokenService` deletes token -> Controller redirects back to User Settings with a success message.
+
+**Deferred to Backlog:**
+
+- Registration Flow steps involving email sending (Step 2 NotificationService call, Steps 3-4 verification) - token infrastructure is built but email delivery is missing.
+- Password Reset Flow - token creation and consumption work, but email delivery (Steps 1-3) is not functional.
+- Email Change Flow - not implemented (requires UserService and NotificationService).
 
 #### Core Configuration and Standards
 
@@ -358,7 +380,7 @@ All values in this table are **never committed** to version control. They are st
 | **Infrastructure (CI/CD)**       |                          |         |                                                         |
 | `PROD_CRON_SECRET`               | `CRON_SECRET`            |  prod   | Bearer token for cron / webhook endpoints               |
 | `STAGING_CRON_SECRET`            | `CRON_SECRET`            | staging | Bearer token for cron / webhook endpoints               |
-| `GH_CR_PAT`                      | `GH_CR_PAT`              |   all   | GitHub PAT (`read:packages`) — only if GHCR is private  |
+| `GH_CR_PAT`                      | `GH_CR_PAT`              |   all   | GitHub PAT (`read:packages`) - only if GHCR is private  |
 | `VPS_SSH_KEY`                    | `VPS_SSH_KEY`            |   all   | Private SSH key for CD pipeline to access VPS           |
 | `VPS_KNOWN_HOSTS`                | `VPS_KNOWN_HOSTS`        |   all   | Pinned VPS SSH host key (prevents MITM during deploy)   |
 | `VPS_HOST`                       | `VPS_HOST`               |   all   | IP/Hostname of the VPS server                           |
@@ -373,7 +395,7 @@ All values in this table are **never committed** to version control. They are st
 > - `DATABASE_URL` is composed at runtime in `config/index.ts` - no env var needed.
 > - `CRON_SECRET` is a bearer token used when an external scheduler (cron daemon, GitHub Actions, etc.) calls your app's `/api/cron/*` endpoints to prove it is a trusted caller. Not actively utilized right now but kept for overview.
 > - `AUTH_SECRET` follows the standard Next.js Auth convention for cookie/session signing. It is distinct from `JWT_PRIVATE_KEY` which signs the stateless access JWTs. Not needed in project.
-> - `GH_CR_PAT` is a GitHub Personal Access Token (classic, with `read:packages` scope) used by the VPS to pull Docker images from GHCR. Only needed if packages are **private** — public packages can be pulled without authentication. The built-in `GITHUB_TOKEN` only exists within the Actions runner context and cannot be forwarded to external servers over SSH. Create one at _GitHub → Settings → Developer settings → Personal access tokens_ if needed.
+> - `GH_CR_PAT` is a GitHub Personal Access Token (classic, with `read:packages` scope) used by the VPS to pull Docker images from GHCR. Only needed if packages are **private** - public packages can be pulled without authentication. The built-in `GITHUB_TOKEN` only exists within the Actions runner context and cannot be forwarded to external servers over SSH. Create one at _GitHub → Settings → Developer settings → Personal access tokens_ if needed.
 > - `VPS_KNOWN_HOSTS` is the SSH host key entry for the VPS, pinned as a secret to avoid trust-on-first-use (TOFU) attacks. Obtain it by running `ssh-keyscan -p <PORT> <HOST>` from a trusted machine and verifying the fingerprint matches. Store the full output line as the secret value.
 > - **Bootstrapping Variables** (`INITIAL_ADMIN_*`, `DEFAULT_CLIENT_SECRET`) are only consumed once during initialization scripts, bypassing typical lifetime persistence, but should remain correctly set for infrastructure recovery.
 
@@ -394,12 +416,12 @@ openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 openssl rsa -in private.pem -pubout -out public.pem
 # Paste the full PEM contents into the GitHub secret (including BEGIN/END lines).
 
-# VPS_SSH_KEY — generate a dedicated deploy key (no passphrase)
+# VPS_SSH_KEY - generate a dedicated deploy key (no passphrase)
 ssh-keygen -t ed25519 -C "github-actions-deploy" -f deploy_key -N ""
 # Add deploy_key.pub to ~/.ssh/authorized_keys on the VPS.
 # Paste the contents of deploy_key (the private key) into the GitHub secret.
 
-# VPS_KNOWN_HOSTS — run from a trusted machine you have already verified
+# VPS_KNOWN_HOSTS - run from a trusted machine you have already verified
 ssh-keyscan -p <PORT> <HOST>
 # Verify the fingerprint matches the VPS:  ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
 # Paste the full output line(s) into the GitHub secret.
@@ -436,6 +458,12 @@ JWT_PUBLIC_KEY=""
 # --- Optional ---
 # CRON_SECRET=""     # Only needed if testing cron endpoints locally
 # MAIL_FROM=""       # Override sender address (default: noreply@localhost)
+
+# --- LAN / Mobile Testing ---
+# Allow cross-origin requests from LAN IPs in dev (Next.js allowedDevOrigins)
+ALLOWED_DEV_ORIGINS=""
+# Comma-separated origin allowlist (host:port) for server-side CORS checks
+ALLOWED_ORIGINS=""
 ```
 
 > [!NOTE]
@@ -496,6 +524,9 @@ Complete matrix of every variable across all committed `.env` files. Replace `{p
 | **Rate Limiting**                 |               |                              |                               |                            |                    |
 | `RATE_LIMIT_MAX`                  |     `100`     |              -               |               -               |             -              |         -          |
 | `RATE_LIMIT_WINDOW`               |     `60`      |              -               |               -               |             -              |         -          |
+| **LAN / Mobile Testing**          |               |                              |                               |                            |                    |
+| `ALLOWED_DEV_ORIGINS`             |               |       🔒 `.env.local`        |               -               |             -              |         -          |
+| `ALLOWED_ORIGINS`                 |               |       🔒 `.env.local`        |               -               |             -              |         -          |
 | **Infrastructure**                |               |                              |                               |                            |                    |
 | `CRON_SECRET`                     |               |                              |                               |          🔒 CI/CD          |      🔒 CI/CD      |
 
@@ -581,7 +612,7 @@ _The following features are vital for enterprise hardening but are deferred to t
 - `main.tsx`: Layout component wrapping `{children}` between header and footer. Provides the semantic `<main>` tag with consistent max-width, padding, and flex-grow behaviour. Avoids duplicating these styles in every `page.tsx`.
 - `header.tsx`: Top navigation and branding bar.
 - `footer.tsx`: Bottom site information and links.
-- `nav.tsx`: Auth-aware navigation component. Uses `useSession()` to conditionally render guest links (Login, Register) vs. authenticated links (Profile, Settings, Logout) and admin-only links (Admin). Houses two navigation patterns (desktop-only MVP — no dedicated mobile hamburger menu):
+- `nav.tsx`: Auth-aware navigation component. Uses `useSession()` to conditionally render guest links (Login, Register) vs. authenticated links (Profile, Settings, Logout) and admin-only links (Admin). Houses two navigation patterns (desktop-only MVP - no dedicated mobile hamburger menu):
     - **Desktop nav:** Horizontal link bar visible in the header.
     - **User menu (authenticated):** `Sheet` slide-in panel triggered by an avatar/user button when logged in. Contains user-specific links (Profile, Settings, Logout) plus admin links if applicable.
 - `loading.tsx`: Root-level loading UI (Suspense boundary). Displays a spinner or skeleton during route transitions and data fetching.
@@ -609,6 +640,13 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
 - User Profile: `useGetProfile`, `useUpdateProfile`, `useUpdateEmail`, `useUpdateUsername`, `useUpdatePassword`, `useDeleteAccount`
 - Public: `useGetPublicProfile`
 - Admin: `useAdminUsers`, `useUpdateUserStatus`, `useDeleteUser`
+
+**Deferred to Backlog:**
+
+- Auth hooks not implemented: `useRegister`, `useVerifyEmail`, `useResetPassword`.
+- All User Profile hooks: `useGetProfile`, `useUpdateProfile`, `useUpdateEmail`, `useUpdateUsername`, `useUpdatePassword`, `useDeleteAccount`.
+- Public hook: `useGetPublicProfile`.
+- Implemented: `useFormAction` (generic wrapper used by login/logout and admin actions).
 
 **Reusable UI Primitives (Design System)**
 
@@ -639,9 +677,16 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
     - `Avatar`: Displays a styled user image `avatarUrl` or fallback initials (useful in nav/User Table).
     - `Modal` / `Dialog`: Central overlay for confirming dangerous actions like "Delete/Suspend User" in the admin panel.
     - `Tabs` (or `TabGroup`/`TabPanel`): For navigating sections without page reloads (e.g., in Settings).
-    - `Toaster` (via `sonner`): Toast notification container (`src/components/ui/Toaster.tsx`) mounted in root layout. Toasts are triggered imperatively via `toast()` — no dedicated component needed.
+    - `Toaster` (via `sonner`): Toast notification container (`src/components/ui/Toaster.tsx`) mounted in root layout. Toasts are triggered imperatively via `toast()` - no dedicated component needed.
     - `Alert`: For inline page-level alerts (e.g., static error messages at the top of a form).
     - `Pill` / `Badge`: Minimal inline status indicator (useful for showing roles or active/suspended statuses in tables).
+
+**Deferred to Backlog:**
+
+- `Sheet` / `Drawer`: Slide-in panel not implemented.
+- `SearchInput`: Not implemented (admin table uses a basic input).
+- `Select`: Dropdown not implemented as a reusable primitive.
+- `Tabs` / `TabGroup` / `TabPanel`: Not implemented (settings page not built).
 
 **Route Structure**
 
@@ -657,6 +702,16 @@ These hooks wrap Server Actions via `useActionState` (React 19), which returns `
 | `/profile/[username]`     | `UserProfile`        | Auth   | Members-only public profile (authenticated users only, respects profile visibility settings). |
 | `/settings`               | `SettingsPage`       | Auth   | Settings shell with tab navigation (Profile, Account).                                        |
 | `/admin`                  | `AdminUserTable`     | Admin  | Paginated user management table.                                                              |
+
+**Deferred to Backlog:**
+
+- `/register`: Page exists but shows "Not Implemented".
+- `/forgot-password`: Page exists but shows "Not Implemented".
+- `/reset-password/[token]`: Not functional (requires email flow).
+- `/verify-email` and `/verify-email/[token]`: Not functional (requires NotificationService).
+- `/profile/[username]`: Page returns null.
+- `/settings`: Page returns null.
+- `/users`: Page exists but shows "Not Implemented".
 
 > [!NOTE]
 > **Route Authentication & Redirection**
@@ -681,6 +736,13 @@ _Rule of thumb:_ frontend routes are UX pages, API routes are transport endpoint
 | Verify token consume    | `/verify-email/[token]`   | `VerifyEmailToken`   | `confirmEmailVerificationAction(token)`          | `POST /api/auth/verify-email/confirm`   | Token comes from URL on frontend; in API variant token comes from request body/query. |
 | Forgot password request | `/forgot-password`        | `ForgotPasswordForm` | `requestPasswordResetAction`                     | `POST /api/auth/reset-password/request` | Sends reset mail if account exists (generic response).                                |
 | Reset password submit   | `/reset-password/[token]` | `ResetPasswordForm`  | `confirmResetPasswordAction(token, newPassword)` | `POST /api/auth/reset-password/confirm` | Token is in URL for web UX; API variant receives token in payload.                    |
+
+**Deferred to Backlog:**
+
+- Register: API endpoint works, frontend page not wired up.
+- Verify prompt + resend: Requires NotificationService.
+- Forgot password request: Requires NotificationService.
+- Verify token consume and Reset password submit: Backend token logic works, frontend pages not functional.
 
 > [!NOTE]
 > **Why `/verify-email/[token]` and `/reset-password/[token]` exist on frontend**
@@ -716,41 +778,24 @@ _Admin:_
 
 - `AdminUserTable`: Paginated table of all users with quick actions (suspend/activate, delete).
 
+**Deferred to Backlog:**
+
+- Auth components not implemented: `RegisterForm`, `ForgotPasswordForm`, `ResetPasswordForm`, `VerifyEmailPrompt`.
+- All User Management components: `UserProfile`, `SettingsPage`, `ProfileTab`, `AccountTab`, `EditEmailForm`, `EditUsernameForm`, `EditPasswordForm`, `DeleteAccountSection`.
+
 ### 1.3 Frontend and Design
 
 #### Content Planning
 
 See `./messages/{language}.json`
 
-### 1.4 Finalisation
-
 #### Project Time Frame
 
-| **Week**         | **Date** | **Time (Days)** |               |
-| ---------------- | -------- | --------------- | ------------- |
-|                  |          |                 |               |
-| **4 (holidays)** | 06/04/26 | 0.5             | Ostermontag   |
-|                  | 07/04/26 | 1               |               |
-|                  | 08/04/26 | 0.5             | Familientag   |
-|                  | 09/04/26 | 1               |               |
-|                  | 10/04/26 | 1               |               |
-|                  |          |                 |               |
-| **5**            | 13/04/26 | 1               |               |
-|                  | 14/04/26 | 1               |               |
-|                  | 15/04/26 | 1               |               |
-|                  | 16/04/26 | 0               | Präsentation  |
-|                  |          |                 |               |
-|                  |          | **7**           | **Days left** |
+Done.
 
 #### Schedule
 
-| Task                       | Dates         | Notes                                                                                                                                                                                                                                                                       |
-| :------------------------- | :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **3.2 Auth - Frontend**    | 06/04 - 08/04 | Login form, `SessionProvider`, `nav` update, hooks                                                                                                                                                                                                                          |
-| **3.1 Frontend Shell**     | 09/04 - 10/04 | Root layout, landing page, header/footer, desktop nav. Core UI primitives (Container, Card, Table, Button, Forms). Desktop-only MVP — no mobile hamburger menu. _Defer `SearchInput`, `Select`, `Tabs`, `Avatar`, `Modal`, `Pill` to their respective features or backlog._ |
-| **3.2 Admin Dashboard**    | 13/04 - 14/04 | 3 endpoints, admin dashboard and `UserTable` (using core primitives from 3.1). Table not responsive (horizontal scroll only).                                                                                                                                               |
-| **5. Docs + Presentation** | 15/04         | `README.md`, `api.md`, `TODO.md`, `NOTES.md`, presentation prep.                                                                                                                                                                                                            |
-| **Buffer**                 | 15/04         | ???                                                                                                                                                                                                                                                                         |
+Done.
 
 ---
 
@@ -758,11 +803,51 @@ See `./messages/{language}.json`
 
 ### 3.3 Backlog
 
-**Deferred MVP Features**
+> [!NOTE]
+> Detailed specifications for deferred services, API routes, components, hooks, and logic flows are documented in their respective "Deferred to Backlog" notes throughout sections 1.2 (Architecture and Data) and the Frontend Architecture section. Items below reference those specs rather than duplicating them.
 
+#### Feature: Auth Completion
+
+The highest-priority backlog items. Backend auth logic is complete - these items finish the frontend and email integration.
+
+- **NotificationService (Critical Blocker):** Implement email abstraction using `nodemailer` (`src/lib/mail.ts`, `src/features/auth/services/notification.service.ts`). Create HTML email templates (welcome/verification, password reset). Wire into `AuthService` for registration, password reset, and email verification resend flows. Unblocks all email-dependent auth flows.
+- **Auth Frontend Forms:** Build `RegisterForm`, `ForgotPasswordForm`, `ResetPasswordForm`, `VerifyEmailPrompt` using `useActionState`. Backend actions and API routes exist - only the UI is missing.
+- **Auth Hooks:** Implement `useLogout`, `useResetPassword`, `useRegister`, `useVerifyEmail` in `src/features/auth/hooks/`.
+- **Nav Auth-Awareness:** Implement user menu `Sheet` slide-in panel for authenticated navigation links.
 - **"Remember Me":** Toggle between persistent and session cookies on login.
+- Enable email authentication for default client.
 
-**Features**
+#### Feature: User Management
+
+Full feature not started. Service layer, API routes, frontend pages, and hooks all need to be built. API routes, logic flows, and component specs are documented in section 1.2.
+
+- **Validation:** Create Zod schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`. Define response-shaping types (`PublicUser`) for output filtering.
+- **Services:** Implement `UserService` (profile CRUD, public ID via `nanoid`, email/username/password change, account deletion, resource ownership enforcement) and `RoleService` (user role retrieval and assignments).
+- **Frontend:** Pages (`/profile/[username]`, `/settings`, `/users`), settings tabs, inline edit forms, and all user hooks.
+- Consider setting `username` as `display_name`.
+- **Public User Directory:** Browse/search page at `/users` listing public user profiles (with pagination and filtering).
+- **Enhanced Public Profiles:** Richer profile pages with activity feeds, badges, or extended bio sections.
+- **Settings - Sessions Tab:** `ActiveSessionsList` - table/list of active devices with "Revoke" buttons.
+    - `GET /api/user/sessions`: List all active sessions across devices for the user.
+    - `DELETE /api/user/sessions`: Revoke all sessions (except current) to log out everywhere else.
+    - `DELETE /api/user/sessions/:id`: Revoke a specific session (remote logout).
+- **Settings - Cookies Tab:** Cookie consent and preferences management.
+- **Settings - Privacy Tab:** Profile visibility and data sharing settings.
+- **Settings - Preferences Tab:** Theme, language, notification settings.
+    - `PATCH /api/user/settings`: Change basic settings like language or theme.
+
+#### Feature: Admin Enhancements
+
+- **Admin Dashboard:** Overview/landing page with key metrics (total users, recent registrations, active sessions).
+- **Admin User Table:** Extend with advanced filtering, sorting, search, grid table layout, and batch operations (e.g., `Checkbox` selection to delete, suspend, or manage multiple users at once).
+- **Admin User Detail View:** Detailed account view for a specific user (`GET /api/admin/users/:id`).
+- **Admin User Creation:** Manually create new users (e.g., staff accounts) (`POST /api/admin/users`).
+- **Admin User Editing:** Edit another user's details (`PATCH /api/admin/users/:id`).
+- **AdminService:** Extend to handle high-level global configurations and cross-cutting system actions.
+- **API Client Management:** UI form to register and manage additional API clients (beyond the default `agora_web_default` in config).
+- **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
+
+#### Feature Ideas
 
 - **Localised App Routing (`next-intl`):** Map internal route IDs to locale-specific paths so app URLs can differ per language while resolving to the same internal routes.
 - **Modal Login:** Implement Intercepting Routes for login/register to open in a modal overlay.
@@ -772,109 +857,41 @@ See `./messages/{language}.json`
 - **React Native Support:** Mobile client integration (cookie handling for native?).
 - **Multi-tenant IdP:** Evaluate and implement Agora Auth as a standalone identity provider capable of serving multiple independent applications.
 
-**Settings (Additional Tabs)**
+#### UI / UX
 
-- **Sessions:** `ActiveSessionsList` - table/list of active devices with "Revoke" buttons.
-    - `GET /api/user/sessions`: List all active sessions across devices for the user.
-    - `DELETE /api/user/sessions`: Revoke all sessions (except current) to log out everywhere else.
-    - `DELETE /api/user/sessions/:id`: Revoke a specific session (remote logout).
-- **Cookies:** Cookie consent and preferences management.
-- **Privacy:** Profile visibility and data sharing settings.
-- **Preferences:** Theme, language, notification settings.
-    - `PATCH /api/user/settings`: Change basic settings like language or theme.
-
-**UX**
-
-- **Pagination Page Input:** Add an editable page number input field to the `Pagination` component so users can jump directly to a specific page.
 - **Full Responsiveness:** Implement complete mobile-first responsive design across all pages and components (navigation, forms, tables, modals, etc.).
     - Position pagination, Farbe Hover, margin modal
+- **UI Primitives:**
+    - `Sheet` / `Drawer`: Slide-in panel - required for user menu.
+    - `Tabs` / `TabGroup` / `TabPanel`: Tab navigation - required for settings page.
+    - `SearchInput`: Styled filter input for table/dashboard use.
+    - `Select`: Dropdown primitive (e.g., for role assignment).
+- **Pagination Page Input:** Add an editable page number input field to the `Pagination` component so users can jump directly to a specific page.
 - **Shake Effect:** Animation for failed login attempts.
 - **Real-Time Password Feedback:** Per-rule checklist UI during password entry (using `createPasswordRules` with i18n).
 - **Translated Field Validation:** Zod schemas currently emit translation keys (e.g. `passwordMinLength`) or hardcoded English strings as error messages. Integrate `react-hook-form` with Zod (`@hookform/resolvers/zod`) for instant client-side validation, and translate field errors in the component layer via `useTranslations("Validation")`. This enables per-field feedback before submission and ensures all validation messages respect the active locale.
+- Static about page (`/about`).
+- Docs page content (`/docs`).
 
-**Infrastructure**
+#### Infrastructure
 
 - **Database Housekeeping:** Background jobs/crons to sweep expired or revoked tokens.
 - **Security Hardening:** See [Production-Ready Roadmap (Post-MVP Enhancements)](#production-ready-roadmap-post-mvp-enhancements).
+- **`AuditService`:** Centralised logging for security-critical actions (e.g., "User X updated profile", "Failed login attempt").
 - **`cache()` for Session Deduplication:** Wrap `verifySession()` in React's `cache()` to memoize the session check within a single render pass, avoiding duplicate DB queries when multiple Server Components call it.
 - **`taintUniqueValue`:** Use React's `taintUniqueValue` API to prevent sensitive session data (e.g., tokens, secrets) from accidentally leaking to Client Components via the `SessionProvider`.
 - **Stale Session Revalidation:** The `SessionProvider` is hydrated once from the root layout and not refreshed on client-side navigations. If a user's session expires while the tab is inactive, the header still shows them as logged in until they hit a server action or protected page. Add a `visibilitychange` listener that calls `router.refresh()` when the user returns to the tab after prolonged inactivity, forcing the root layout to re-render and re-hydrate the session.
-- Port remaining utilities from Turbine as needed.
 
-**Architecture / Tech Debt**
+#### Architecture / Tech Debt
 
 - **Full Vertical Slicing Refactor:** Untangle global repositories (`src/repositories/`) and move data access layers strictly into their respective domains (`src/features/.../repositories/`) to achieve true vertical slicing.
     - E.g., Extract `AuthUserRepository` from a global `UserRepository` to contain only authentication-specific queries.
     - Create an `AdminUserService` and `AdminUserRepository` within the `admin` feature for specialized admin queries, avoiding massive conditional logic jumps in the standard `UserService`.
 - **Typed `session` in `withActionHandler`/`withApiHandler`:** Use a conditional generic type (e.g. `TAuth extends boolean`) so that `auth: true` narrows `session` to `AppSession` (non-null) and `auth: false` omits it or types it as `null`. This removes the need for `session!` in handlers. Requires additional overloads or a conditional type mapping in the handler context.
 
-**Questions**
+#### Questions & Notes
 
 - Wieso brauche ich für API keine Cookies, wie Google zusätzlich zu API einsetzt?
 - Multi-tenant IdP
     - Macht das überhaupt Sinn? Als Auth-Provider?
     - Wieso brauche ich für API keine Cookies, wie Google zusätzlich zu API einsetzt?
-
-- **`AuditService`**: Centralised logging for security-critical actions (e.g., "User X updated profile", "Failed login attempt").
-
-**User Overview**
-
-- **Public User Directory:** Browse/search page listing public user profiles (with pagination and filtering).
-- **Enhanced Public Profiles:** Richer profile pages with activity feeds, badges, or extended bio sections.
-
-**Admin**
-
-- **AdminService:** Create an `AdminService` to handle high-level global configurations, cross-cutting system actions, and administrative user management.
-- **Admin Dashboard:** Overview/landing page with key metrics (total users, recent registrations, active sessions).
-- **Admin User Table Enhancements:** Extend the MVP table with advanced filtering, sorting, search, and batch admin operations (e.g. via `Checkbox` selection to delete, suspend, or manage multiple users at once).
-- **Admin User Detail View:** Detailed account view for a specific user (`GET /api/admin/users/:id`).
-- **Admin User Creation:** Manually create new users (e.g., staff accounts) (`POST /api/admin/users`).
-- **Admin User Editing:** Edit another user's details (`PATCH /api/admin/users/:id`).
-- **API Client Management:** UI form to register and manage additional API clients (beyond the default `agora_web_default` in config).
-- **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
-
-client interceptor for old tabs (still locked in? update layout.tsx)
-grid layout tabelle
-was noch von security
-
-## 5. Documentation
-
-- Elevator Pitch
-- Postman-Demo, API-Routen früher
-- Refresh token, access token
-- API + Error Handling
-- Struktur, Datenfluss
-    - Zweigleisigkeit
-- Umstellung Sprache
-- Was noch aus Notizen?
-- Live Update
-- refresh and access token pattern Vorteile
-
-- Dateien/Todos updaten
-- Dateien synchronisieren
-
-Passwort Account
-
-learnings, pipeline nervt zwar, aber ist auch super wichtig
-
-project specifics in README
-
-Nervig an Next:
-Doppelrequests
-Cookies, wo kann man sie setzen
-Caching
-
-Static about page
-
-Was will ich zeigen, Struktur
-Was war Priorität
-
-Kaleidoskode Projekt schicken
-
-Zu wenig Zeit, keine klaren Regeln
-
-Bild Admin
-
-Nicht für Mobile momentan
-
-## 6. Initial Major Release and Deployment

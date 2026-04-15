@@ -1,6 +1,6 @@
 # ===================================================================
 # Dependencies
-# Reinstalled by the package manager — never commit.
+# Reinstalled by the package manager - never commit.
 # ===================================================================
 node_modules/
 vendor/
@@ -8,7 +8,7 @@ bower_components/
 
 # ===================================================================
 # Build Artifacts
-# Generated from source — don't version-control.
+# Generated from source - don't version-control.
 # ===================================================================
 .next/
 dist/
@@ -32,7 +32,7 @@ coverage/
 # Docker
 # compose.override.yaml is personal dev config (gitignored).
 # (.dockerignore also excludes compose files, Dockerfile, .git, etc.
-#  — things Git tracks but Docker doesn't need in the build context.)
+#  - things Git tracks but Docker doesn't need in the build context.)
 # ===================================================================
 compose.override.yaml
 
@@ -72,7 +72,7 @@ Desktop.ini
 # ===================================================================
 # User Content & Temporary Files
 # Ignore uploaded files but keep the directory structure.
-# (.dockerignore excludes uploads/ entirely — the Dockerfile creates
+# (.dockerignore excludes uploads/ entirely - the Dockerfile creates
 #  the directory itself. Runtime data is not a build input.)
 # ===================================================================
 uploads/*

@@ -1,3 +1,11 @@
+/**
+ * Application Error Definitions
+ *
+ * Unified error types, default messages, and the AgoraError class.
+ * Ensures strict typing across the app and automatic mapping of
+ * HTTP status codes and default UI messages.
+ */
+
 export type ErrorCode =
   // Standard Application Errors
   | "VALIDATION_ERROR"
@@ -75,8 +83,9 @@ export const defaultHttpStatus = {
 export type AppHttpStatus = (typeof defaultHttpStatus)[ErrorCode];
 
 /**
- * A unified application error class.
- * Ensures strict typing across the app and automatic mapping of HTTP status codes and default UI messages.
+ * Unified application error class.
+ * Provides strict typing across the app with automatic HTTP status code
+ * and default message mapping.
  */
 export class AgoraError extends Error {
   public readonly code: ErrorCode;

@@ -1,3 +1,9 @@
+/**
+ * Repository Contracts
+ *
+ * Generic interfaces that all data-access repositories must implement.
+ */
+
 export interface BaseRepository<T, TNew, TId = string> {
   create(data: TNew): Promise<T>;
   findById(id: TId): Promise<T | null>;

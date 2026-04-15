@@ -1,3 +1,9 @@
+/**
+ * Users Schema
+ *
+ * Database tables, relations, and types for user accounts, profiles, and settings.
+ */
+
 import { type InferInsertModel, type InferSelectModel, relations } from "drizzle-orm";
 import { jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 

@@ -1,3 +1,8 @@
+/**
+ * Auth feature types.
+ * Token payload and response shapes for authentication.
+ */
+
 import type { User } from "@/src/db/schema/index.ts";
 import type { JWTPayload } from "jose";
 

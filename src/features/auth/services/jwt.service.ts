@@ -1,3 +1,8 @@
+/**
+ * JWT service.
+ * Signs and verifies RS256 access tokens using the jose library.
+ */
+
 import "server-only";
 
 import type { AccessTokenPayload } from "../types.ts";
@@ -8,12 +13,13 @@ import { appConfig } from "@/src/config/index.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 
 /**
- * jose's import functions return either a generic Key object or Uint8Array depending on runtime.
- * We use `Awaited<ReturnType<typeof importPKCS8>>` to extract the exact strict inferred type without breaking compilation.
+ * jose's import functions return either a generic Key object or Uint8Array depending
+ * on runtime. We use Awaited<ReturnType<typeof importPKCS8>> to extract the exact
+ * strict inferred type without breaking compilation.
  */
 type JoseKey = Awaited<ReturnType<typeof importPKCS8>>;
 
-// Lazily load keys so they don't break the Next.js build step when env vars are missing in CI
+// Lazily load keys so they do not break the Next.js build step when env vars are missing in CI.
 let cachedPrivateKey: JoseKey | null = null;
 let cachedPublicKey: JoseKey | null = null;
 let cachedKeyId: string | null = null;
@@ -54,16 +60,16 @@ export const JwtService = {
     const kid = await getKeyId();
 
     return await new SignJWT(payload)
-      .setProtectedHeader({ alg: "RS256", kid }) // Essential: declares the algorithm and key id
+      .setProtectedHeader({ alg: "RS256", kid }) // Declares the algorithm and key ID.
       .setIssuedAt()
-      .setIssuer(appConfig.app.url) // Identifies who created it
-      .setAudience(appConfig.app.url) // Identifies who it's meant for
-      .setExpirationTime(appConfig.auth.accessTokenExpiry) // e.g. "15m"
+      .setIssuer(appConfig.app.url) // Identifies who created it.
+      .setAudience(appConfig.app.url) // Identifies who it is meant for.
+      .setExpirationTime(appConfig.auth.accessTokenExpiry) // e.g. "15m".
       .sign(privateKey);
   },
 
   /**
-   * Cryptographically verifies the access token utilizing the public RSA key.
+   * Cryptographically verifies the access token utilising the public RSA key.
    * Ensures the token is neither expired nor tampered with.
    *
    * @param token The raw JWT string.
@@ -72,7 +78,6 @@ export const JwtService = {
   async verify(token: string): Promise<AccessTokenPayload> {
     try {
       const publicKey = await loadPublicKey();
-      // Verify
       const { payload } = await jwtVerify<AccessTokenPayload>(token, publicKey, {
         issuer: appConfig.app.url,
         audience: appConfig.app.url,
@@ -89,8 +94,8 @@ export const JwtService = {
     }
   },
   /**
-   * Utility for returning the public key or JSON Web Key Set (JWKS).
-   * Needed for external services to verify your tokens.
+   * Returns the public key as a JSON Web Key (JWK).
+   * Required for external services to verify tokens.
    */
   async getPublicKey(): Promise<JWK> {
     const publicKey = await loadPublicKey();

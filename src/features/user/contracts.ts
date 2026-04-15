@@ -1,3 +1,8 @@
+/**
+ * User feature contracts.
+ * Repository interface and validation schemas for user management.
+ */
+
 import type { ListUsersPageResult } from "./types.ts";
 import type { UserStatus } from "@/src/config/constants.ts";
 import type { FullUser, NewUser, User, UserProfile, UserSettings } from "@/src/db/schema/index.ts";

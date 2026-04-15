@@ -242,7 +242,7 @@ jobs:
             # 3. Network Setup
             docker network inspect caddy_net >/dev/null 2>&1 || docker network create caddy_net
 
-            # 4. Start Caddy (independent stack — idempotent, won't restart if already running)
+            # 4. Start Caddy (independent stack - idempotent, won't restart if already running)
             docker compose -p caddy -f compose.caddy.yaml up -d
 
             # 5. Start app stack (project name defaults to directory name: agora-auth)

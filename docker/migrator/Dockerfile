@@ -1,5 +1,5 @@
 # =============================================================================
-# Single-stage Dockerfile — Bun Migrator
+# Single-stage Dockerfile - Bun Migrator
 #
 # Stages:
 #   1. runner    Minimal environment to execute TypeScript database tasks

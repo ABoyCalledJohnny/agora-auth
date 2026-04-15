@@ -1,3 +1,8 @@
+/**
+ * Verification token service.
+ * Issues, consumes, and manages short-lived verification tokens.
+ */
+
 import "server-only";
 
 import type { VerificationTokenType } from "@/src/config/constants.ts";
@@ -21,10 +26,6 @@ import { handleServiceError } from "@/src/lib/service-error.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleVerificationTokenRepository } from "@/src/repositories/verification-token.repository.ts";
 
-/**
- * Service responsible for issuing, consuming, and managing lifecycle
- * of secure, short-lived verification tokens (e.g., email verification, password resets).
- */
 export const VerificationTokenService = {
   /**
    * Creates a new verification token for a user.
@@ -52,7 +53,7 @@ export const VerificationTokenService = {
         metadata: input.metadata,
       });
 
-      // 4. Return the plaintext token here and NO-WHERE ELSE.
+      // 4. Return the plaintext token here and NOWHERE ELSE.
       // It must be used immediately to send the email/SMS and never logged.
       return {
         plainToken,
@@ -66,7 +67,7 @@ export const VerificationTokenService = {
   /**
    * Atomically consumes a verification token.
    * Validates the token's existence, matches its type, consumes it,
-   * and verifies it hasn't expired.
+   * and verifies it has not expired.
    *
    * @param plainToken The raw plaintext token string provided by the user.
    * @param type The expected token type (e.g., email_verification).
@@ -84,8 +85,8 @@ export const VerificationTokenService = {
       // 3. If no matching token is found, it's either invalid or already consumed
       if (!token) throw new AgoraError("TOKEN_INVALID");
 
-      // 4. Check if the token was past its expiration (since they are eagerly deleted here,
-      // we just reject it if they attempt to use it too late)
+      // 4. Check if the token is past its expiration (since they are eagerly deleted here,
+      // we reject it if the user attempts to use it too late).
       if (token.expiresAt < new Date()) throw new AgoraError("TOKEN_EXPIRED");
 
       return token;
@@ -113,7 +114,7 @@ export const VerificationTokenService = {
    * Flushes all expired verification tokens from the database.
    * Useful for cron jobs or maintenance routines.
    *
-   * @returns The number of expired tokens successfully deleted.
+   * @returns The number of expired tokens deleted.
    */
   async deleteExpired(): Promise<number> {
     try {

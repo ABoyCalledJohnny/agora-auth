@@ -18,18 +18,16 @@ import { parseDuration } from "./utils.ts";
 /**
  * Global Authentication Context
  *
- * This file contains the primary Server-Side mechanisms for retrieving,
- * verifying, and asserting the user's secure session state. It serves as the
- * single source of truth for "who the user is" inside Next.js Server Components,
- * Server Actions, and API Route Handlers.
+ * Server-side mechanisms for retrieving, verifying, and asserting user session
+ * state. Single source of truth for "who the user is" inside Next.js Server
+ * Components, Server Actions, and API Route Handlers.
  *
- * Functions available:
- * - `getSession()`: Soft check. Resolves user from cookies, or returns null if no valid session exists. Handled gracefully.
- * - `authenticate()`: Hard check. Guarantees a valid user or throws an `UNAUTHORIZED` AgoraError immediately.
- * - `authorize()`: Validates Role-Based Access Control against a required list.
- * - `assertAuth()`: Convenience helper for protecting Next.js Page components.
- * - `getSessionCookies()`: Retrieves the raw access and refresh cookies from the request.
- * - `setSessionCookies()`: Securely sets the session cookie pair (access + refresh) with secure defaults.
+ * - `getSession()`: Soft check. Returns the session from cookies, or null.
+ * - `authenticate()`: Hard check. Guarantees a valid session or throws UNAUTHORIZED.
+ * - `authorize()`: Validates RBAC roles against a required list.
+ * - `assertAuth()`: Convenience helper for protecting page components.
+ * - `getSessionCookies()`: Retrieves the raw access and refresh cookies.
+ * - `setSessionCookies()`: Sets the session cookie pair with secure defaults.
  * - `clearSessionCookies()`: Clears both session cookies.
  */
 
@@ -37,7 +35,7 @@ import { parseDuration } from "./utils.ts";
 // Types
 // ---------------------------------------------------------------------------
 
-// This becomes the standard user context available to all your Next.js pages/components!
+// This becomes the standard user context available to all Next.js pages/components.
 export type AppSession = {
   user: {
     id: string; // mapped from sub
@@ -48,19 +46,19 @@ export type AppSession = {
 };
 
 // ---------------------------------------------------------------------------
-// Session retrieval (read-only — safe for Server Components)
+// Session retrieval (read-only - safe for Server Components)
 // ---------------------------------------------------------------------------
 
 /**
- * Reads the Access JWT from the cookie and verifies it.
+ * Reads the access JWT from the cookie and verifies it.
  *
- * This is a **read-only** check: it never writes cookies, so it is safe to
- * call from Server Components, Server Actions, and Route Handlers alike.
+ * This is a read-only check: it never writes cookies, so it is safe to call
+ * from Server Components, Server Actions, and Route Handlers alike.
  *
- * If the Access JWT is expired or missing, returns `null` without attempting
+ * If the access JWT is expired or missing, returns `null` without attempting
  * a refresh. Silent token refresh is handled by:
- * - `proxy.ts` — for page navigations (runs before the render)
- * - `authenticate()` — for Server Actions / Route Handlers
+ * - `proxy.ts` - for page navigations (runs before the render).
+ * - `authenticate()` - for Server Actions / Route Handlers.
  */
 export const getSession = cache(_getSession);
 
@@ -91,24 +89,24 @@ async function _getSession(): Promise<AppSession | null> {
 // ---------------------------------------------------------------------------
 
 /**
- * Verifies a valid Access JWT exists and returns the decoded payload.
+ * Verifies a valid access JWT exists and returns the decoded payload.
  * If the access token is expired but a valid refresh cookie is present,
  * silently rotates the session and updates the cookies.
  *
- * **Only safe in Server Actions and Route Handlers** (contexts that can
+ * Only safe in Server Actions and Route Handlers (contexts that can
  * write cookies). For Server Components, use `getSession()` / `assertAuth()`.
  *
- * Throws `UNAUTHORIZED` if no valid session can be established.
+ * @throws {AgoraError} UNAUTHORIZED if no valid session can be established.
  */
 export async function authenticate(): Promise<AppSession> {
   const { accessCookie, refreshCookie } = await getSessionCookies();
 
-  // No tokens at all — nothing to do
+  // No tokens at all - nothing to do.
   if (!accessCookie && !refreshCookie) {
     throw new AgoraError("UNAUTHORIZED");
   }
 
-  // Fast path: verify access token directly
+  // Fast path: verify access token directly.
   if (accessCookie) {
     try {
       const payload = await JwtService.verify(accessCookie.value);
@@ -121,11 +119,11 @@ export async function authenticate(): Promise<AppSession> {
         },
       };
     } catch {
-      // Expired or invalid — fall through to refresh attempt
+      // Expired or invalid - fall through to refresh attempt.
     }
   }
 
-  // Slow path: attempt silent refresh
+  // Slow path: attempt silent refresh.
   if (!refreshCookie) {
     throw new AgoraError("UNAUTHORIZED");
   }
@@ -160,7 +158,8 @@ export async function authenticate(): Promise<AppSession> {
 
 /**
  * Checks that the decoded JWT payload holds at least one of the required roles.
- * Throws `FORBIDDEN` if the check fails.
+ *
+ * @throws {AgoraError} FORBIDDEN if the check fails.
  */
 export function authorize(session: AppSession, requiredRoles: string[]): void {
   if (requiredRoles.length === 0) return;
@@ -184,28 +183,14 @@ export function authorize(session: AppSession, requiredRoles: string[]): void {
  * Intended for use at the top of protected `page.tsx` files.
  *
  * Redirects unauthenticated users to `/login` (with optional `?next=` path).
- * Throws `FORBIDDEN` if the user lacks required roles.
  *
- * @example
- * ```ts
- * // app/settings/page.tsx
- * export default async function SettingsPage() {
- *   const session = await assertAuth({ redirectTo: "/settings" });
- *   // …
- * }
- *
- * // app/admin/page.tsx
- * export default async function AdminPage() {
- *   const session = await assertAuth({ roles: ["admin"], redirectTo: "/admin" });
- *   // …
- * }
- * ```
+ * @throws {AgoraError} FORBIDDEN if the user lacks required roles.
  */
 export async function assertAuth(options: { roles?: SystemRoleName[]; redirectTo?: string } = {}): Promise<AppSession> {
   const session = await getSession();
   if (!session) {
     // By the time we reach here, proxy.ts has already attempted a silent
-    // refresh. If there's still no session the user must log in.
+    // refresh. If there is still no session the user must log in.
     const destination = options.redirectTo ?? "/";
     redirect(`/login?next=${encodeURIComponent(destination)}`);
   }
@@ -263,10 +248,7 @@ export async function clearSessionCookies() {
   cookieStore.delete({ name: appConfig.auth.refreshCookieName, ...deleteOptions });
 }
 
-/**
- * Extracts the IP address and User Agent from the current request headers.
- * Works identically in Next.js Route Handlers and Server Actions.
- */
+/** Extracts the IP address and user agent from the current request headers. */
 export async function getRequestMetadata(): Promise<{ ipAddress: string; userAgent: string }> {
   const headersList = await headers();
   const ipAddress =

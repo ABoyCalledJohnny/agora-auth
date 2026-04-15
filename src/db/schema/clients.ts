@@ -1,3 +1,9 @@
+/**
+ * API Clients Schema
+ *
+ * Database table and types for external API client registrations (B2B integrations).
+ */
+
 import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { boolean, pgTable, text } from "drizzle-orm/pg-core";
 
@@ -8,7 +14,7 @@ export const apiClients = pgTable("api_clients", {
   name: text().notNull().unique(),
   clientId: text().notNull().unique(),
   apiKeyHash: text().notNull().unique(),
-  baseUrl: text().notNull().unique(), // e.g., "https://example.com" or "http://localhost:3000"
+  baseUrl: text().notNull().unique(),
   verifyEmailPath: text().notNull(),
   resetPasswordPath: text().notNull(),
   isActive: boolean().notNull().default(true),

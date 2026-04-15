@@ -1,3 +1,8 @@
+/**
+ * Session service.
+ * Issues, rotates, and manages database-backed user sessions (refresh tokens).
+ */
+
 import "server-only";
 
 import type { Session } from "@/src/db/schema/index.ts";
@@ -20,10 +25,6 @@ import { handleServiceError } from "@/src/lib/service-error.ts";
 import { parseDuration } from "@/src/lib/utils.ts";
 import { DrizzleSessionRepository } from "@/src/repositories/session.repository.ts";
 
-/**
- * Service responsible for issuing, rotating, and managing long-lived
- * database-backed user sessions (Refresh Tokens).
- */
 export const SessionService = {
   /**
    * Creates a new persistent user session.
@@ -149,7 +150,7 @@ export const SessionService = {
    * Soft-deletes (revokes) a specific session by its database ID.
    *
    * @param id The internal session database ID.
-   * @returns The securely revoked session entity.
+   * @returns The revoked session entity.
    */
   async revoke(id: string): Promise<Session> {
     try {
@@ -160,11 +161,11 @@ export const SessionService = {
   },
 
   /**
-   * Revokes an active session utilizing the plaintext session token format.
+   * Revokes an active session utilising the plaintext session token.
    *
    * @param plainToken The raw plaintext session token from the user request.
-   * @returns The securely revoked session entity.
-   * @throws {AgoraError} NOT_FOUND if the session didn't exist.
+   * @returns The revoked session entity.
+   * @throws {AgoraError} NOT_FOUND if the session does not exist.
    */
   async revokeByToken(plainToken: string): Promise<Session> {
     try {
@@ -198,7 +199,7 @@ export const SessionService = {
 
   /**
    * Permanently hard-deletes a session.
-   * Prefer \`revoke()\` for standard auth flows.
+   * Prefer revoke() for standard auth flows.
    *
    * @param id The internal session database ID.
    * @returns The deleted session entity.
@@ -212,10 +213,10 @@ export const SessionService = {
   },
 
   /**
-   * Hard-deletes permanently expired sessions from the database
-   * to free up storage space. Useful for cron jobs.
+   * Hard-deletes expired sessions from the database
+   * to free up storage. Useful for cron jobs.
    *
-   * @returns The number of sessions successfully deleted.
+   * @returns The number of sessions deleted.
    */
   async deleteExpired(): Promise<number> {
     try {

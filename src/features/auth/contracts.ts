@@ -1,3 +1,8 @@
+/**
+ * Auth feature contracts.
+ * Repository interfaces and Zod validation schemas for authentication flows.
+ */
+
 import type { SystemRoleName, VerificationTokenType } from "@/src/config/constants.ts";
 import type {
   ApiClient,
@@ -70,12 +75,12 @@ export interface VerificationTokenRepository extends BaseRepository<Verification
   deleteExpired(): Promise<VerificationToken[]>;
 }
 
-/** Schema to validate high-entropy 32-byte base64url encoded tokens via API / JSON inputs */
+/** Schema to validate high-entropy 32-byte base64url-encoded tokens via API/JSON inputs. */
 export const tokenStringSchema = z
   .string()
-  // 32 byte base64url is exactly 43 characters long
+  // 32-byte base64url is exactly 43 characters long.
   .length(TOKEN_STRING_LENGTH, "Token format invalid (must be 43-character base64url string)")
-  // Base64url character set standard
+  // Base64url character set standard.
   .regex(/^[A-Za-z0-9_-]+$/, "Token format invalid (must be 43-character base64url string)");
 
 const ClientSchema = createInsertSchema(apiClients);

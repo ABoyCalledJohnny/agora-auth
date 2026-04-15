@@ -19,13 +19,13 @@ import { sanitizeInput } from "@/src/lib/utils.ts";
  * A higher-order function that wraps Next.js API Route Handlers to provide a unified
  * pipeline for authentication, authorisation, validation, and error handling.
  *
- * Typical Flow:
- * 1. Authentication: If `auth: true` or `roles` are provided, it calls `authenticate()` to verify the access token/session.
- * 2. Authorisation: If `roles` are provided, it calls `authorize()` to check if the user has the required roles.
- * 3. Client Resolution: Resolves the API client making the request (useful for tenant/client-specific logic).
- * 4. Validation: If `bodySchema` is provided, it parses the payload as JSON, sanitizes it, and validates against the Zod schema.
- * 5. Execution: Runs your specific route handler with the strongly-typed `data`, `session`, `client`, and route `params`.
- * 6. Error Handling: Catches `AgoraError` (or internal errors) and transforms them into a standard `ApiErrorResponse` with correct HTTP status codes.
+ * Typical flow:
+ * 1. Authentication - verifies the access token/session if required.
+ * 2. Authorisation - checks RBAC roles if specified.
+ * 3. Client resolution - resolves the API client making the request.
+ * 4. Validation - sanitises and validates JSON body against a Zod schema.
+ * 5. Execution - runs the handler with strongly-typed `data`, `session`, `client`, and `params`.
+ * 6. Error handling - catches errors and returns a standard `ApiErrorResponse` with correct HTTP status codes.
  */
 
 // ---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ import { sanitizeInput } from "@/src/lib/utils.ts";
 type RouteParams = Promise<Record<string, string>>;
 
 // Note: When `auth: true` is set, `session` is guaranteed non-null at runtime.
-// TypeScript still types it as `Session | null` — use `session!` or a guard.
+// TypeScript still types it as `Session | null` - use `session!` or a guard.
 
 // ---------------------------------------------------------------------------
 // Internals
@@ -74,7 +74,7 @@ function formatApiError(error: unknown): NextResponse {
 // withApiHandler
 // ---------------------------------------------------------------------------
 
-/** With schema — handler receives `{ request, data, session, client, params }`. */
+/** With schema - handler receives `{ request, data, session, client, params }`. */
 export function withApiHandler<TSchema extends z.ZodType>(
   config: HandlerConfig<TSchema> & { bodySchema: TSchema },
   handler: (context: {
@@ -86,7 +86,7 @@ export function withApiHandler<TSchema extends z.ZodType>(
   }) => Promise<NextResponse>,
 ): (request: NextRequest, routeContext: { params: RouteParams }) => Promise<NextResponse>;
 
-/** Without schema — handler receives `{ request, session, client, params }`. */
+/** Without schema - handler receives `{ request, session, client, params }`. */
 export function withApiHandler(
   config: Omit<HandlerConfig, "bodySchema">,
   handler: (context: {
@@ -117,7 +117,7 @@ export function withApiHandler(
         authorize(session, config.roles);
       }
 
-      // 3. Client Resolution
+      // 3. Client resolution.
       let client: ApiClient;
       const clientId = request.headers.get("x-client-id");
       const apiKey = request.headers.get("x-api-key");
@@ -132,7 +132,7 @@ export function withApiHandler(
         client = await ApiClientService.getDefaultClient();
       }
 
-      // 4. Validation & sanitisation (JSON body)
+      // 4. Validation and sanitisation (JSON body).
       let data: unknown;
       if (config.bodySchema) {
         let body: unknown;
@@ -151,14 +151,14 @@ export function withApiHandler(
         data = result.data;
       }
 
-      // 5. Execute handler
+      // 5. Execute handler.
       const context = config.bodySchema
         ? { request, data, session, client, params: routeContext.params }
         : { request, session, client, params: routeContext.params };
 
       return await handler(context);
     } catch (error) {
-      // 6. Error Handling
+      // 6. Error handling.
       return formatApiError(error);
     }
   };

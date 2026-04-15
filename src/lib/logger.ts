@@ -1,3 +1,10 @@
+/**
+ * Application Logger
+ *
+ * Structured logging with level filtering and automatic redaction of
+ * sensitive keys. Log level is determined by the Zod-validated config.
+ */
+
 import "server-only";
 
 import { SENSITIVE_LOG_KEYS } from "../config/constants.ts";
@@ -12,7 +19,7 @@ export const logLevelWeights: Record<LogLevel, number> = {
   error: 3,
 };
 
-// Calculate the current threshold once based on zod-validated config
+// Calculate the current threshold once based on Zod-validated config.
 const currentLevelWeight = logLevelWeights[appConfig.logging.level as LogLevel] ?? 1;
 
 // ---------------------------------------------------------------------------
@@ -26,7 +33,7 @@ function redactData(data: unknown): unknown {
     return data.map(redactData);
   }
 
-  // Handle Error objects specially because message/stack are non-enumerable
+  // Handle Error objects specially because message/stack are non-enumerable.
   if (data instanceof Error) {
     const errorObj: Record<string, unknown> = {
       name: data.name,
@@ -34,12 +41,12 @@ function redactData(data: unknown): unknown {
       stack: data.stack,
     };
 
-    // Include custom properties (like code, details) which are usually enumerable
+    // Include custom properties (like code, details) which are usually enumerable.
     for (const [key, value] of Object.entries(data)) {
       errorObj[key] = value;
     }
 
-    // Redact the resulting plain object
+    // Redact the resulting plain object.
     return redactData(errorObj);
   }
 

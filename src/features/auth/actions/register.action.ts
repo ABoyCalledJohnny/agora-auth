@@ -1,5 +1,10 @@
 "use server";
 
+/**
+ * Register action.
+ * Creates a new user account with uniqueness checks and email verification.
+ */
+
 import { withActionHandler } from "@/src/lib/action-wrapper.ts";
 
 import { registerSchema } from "../contracts.ts";
@@ -11,7 +16,7 @@ export const registerAction = withActionHandler(
     auth: false,
   },
   async ({ data, client }) => {
-    // AuthService performs uniqueness checks, hashes password,
+    // AuthService performs uniqueness checks, hashes the password,
     // saves the user, and sends the verification email.
     const newUser = await AuthService.register(
       {
@@ -22,8 +27,8 @@ export const registerAction = withActionHandler(
       client,
     );
 
-    // The withActionHandler wrapper will automatically wrap this return value into
-    // a standard { success: true, data: newUser } structure.
+    // The withActionHandler wrapper automatically wraps this return value
+    // into a standard { success: true, data: newUser } structure.
     return newUser;
   },
 );

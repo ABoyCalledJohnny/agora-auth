@@ -114,6 +114,7 @@ Notes:
 - `ACCOUNT_SUSPENDED` (403)
 - `EMAIL_EXISTS` (409)
 - `USERNAME_EXISTS` (409)
+- `NOT_FOUND` (404)
 - `NOT_IMPLEMENTED` (501)
 - `INTERNAL` (500)
 
@@ -131,13 +132,13 @@ Use one source of truth (headers) to avoid drift or spoofing ambiguity.
 
 For first-party web app flow, this may be handled server-side and not sent by browser forms directly.
 
-## 5. Endpoint Drafts
+## 5. Endpoints
 
 ## 5.1 POST `/api/auth/register`
 
 Creates user + credential, status usually starts as `pending`, sends verification email.
 
-Request body (draft):
+Request body:
 
 ```json
 {
@@ -197,7 +198,7 @@ Possible errors:
 
 Authenticates user and starts session.
 
-Request body (draft):
+Request body:
 
 ```json
 {
@@ -337,7 +338,7 @@ Purpose:
 - create/recreate verification token (`type = email_verification`)
 - send verification email
 
-Typical request body (draft):
+Typical request body:
 
 ```json
 {
@@ -380,7 +381,7 @@ Purpose:
 - set `users.email_verified_at`
 - move status from `pending` to `active` (if applicable)
 
-Request body (draft):
+Request body:
 
 ```json
 {
@@ -431,7 +432,7 @@ Purpose:
 - create password reset token (`type = password_reset`)
 - send reset email
 
-Request body (draft):
+Request body:
 
 ```json
 {
@@ -474,7 +475,7 @@ Purpose:
 - set new password hash
 - invalidate old sessions
 
-Request body (draft):
+Request body:
 
 ```json
 {
@@ -621,22 +622,22 @@ const resetData = await resetRes.json();
 console.log(resetData);
 ```
 
-### Refresh = await fetch("http://localhost:3000/api/auth/refresh", {
+### Refresh
 
-    method: "POST",
-    headers: {
-    	"Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-    	refreshToken: "opaque_refresh_token",
-    }),
-
+```ts
+const refreshRes = await fetch("http://localhost:3000/api/auth/refresh", {
+	method: "POST",
+	headers: {
+		"Content-Type": "application/json",
+	},
+	body: JSON.stringify({
+		refreshToken: "opaque_refresh_token",
+	}),
 });
 
 const refreshData = await refreshRes.json();
 console.log(refreshData);
-
-````
+```
 
 ### Logout (`200 OK`)
 
@@ -648,7 +649,7 @@ const logoutRes = await fetch("http://localhost:3000/api/auth/logout", {
 if (logoutRes.status === 200) {
 	console.log("Logged out successfully");
 }
-````
+```
 
 ## 7. Route Overview
 

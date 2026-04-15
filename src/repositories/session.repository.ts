@@ -1,3 +1,11 @@
+/**
+ * Session Repository
+ *
+ * Data-access layer for database-backed user sessions.
+ * Handles creation, lookup, token rotation, revocation (soft-delete),
+ * and hard-deletion of sessions.
+ */
+
 import type { SessionRepository } from "@/src/features/auth/contracts.ts";
 
 import { and, eq, gt, isNull, lt } from "drizzle-orm";
@@ -115,7 +123,7 @@ export const DrizzleSessionRepository: SessionRepository = {
         .where(eq(userSessions.userId, userId))
         .returning();
 
-      return revokedSessions; // Note: Drizzle always returns an array here, empty if no updates occurred
+      return revokedSessions; // Drizzle always returns an array here, empty if no updates occurred.
     } catch (error) {
       if (error instanceof AgoraError) throw error;
       throw new AgoraError("INTERNAL", "A database error occurred while revoking user sessions.");
@@ -139,7 +147,7 @@ export const DrizzleSessionRepository: SessionRepository = {
 
   async deleteExpired(): Promise<Session[]> {
     try {
-      // We can do this in a single fast database round-trip without loops!
+      // Delete all expired sessions in a single database round-trip.
       const expiredSessions = await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date())).returning();
 
       return expiredSessions;
