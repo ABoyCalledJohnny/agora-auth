@@ -58,7 +58,7 @@
     - [x] **Note Synchronisation:** Set up `systemd` service to synchronise Obsidian vault project notes (`README.md` and `TODO.md`) to project repository documentation.
 - **Research:**
     - [x] **Learning List:** Create learning list (using notes as basis).
-    - [ ] **Practice and Documentation:** Learn and practice unknown technologies/patterns and create cheat sheets.
+    - [x] **Practice and Documentation:** Learn and practice unknown technologies/patterns and create cheat sheets.
 
 ##### 1.2 Architecture and Data
 

@@ -1,12 +1,5 @@
 # Agora Auth
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="src/assets/agora-logo-dark.svg" />
-    <img src="src/assets/agora-logo.svg" alt="Agora Auth Logo" width="400" />
-  </picture>
-</p>
-
 ![Badge: Latest Release](https://img.shields.io/github/v/release/ABoyCalledJohnny/agora-auth)
 ![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
 
@@ -19,13 +12,20 @@
 
 A full-stack authentication and user management system built as a final project ("Abschlussprojekt") for a web development program, using Next.js, Drizzle ORM, and PostgreSQL.
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/assets/agora-logo-dark.svg" />
+    <img src="src/assets/agora-logo.svg" alt="Agora Auth Logo" width="400" />
+  </picture>
+</p>
+
 ## Table of Contents
 
 - [Agora Auth](#agora-auth)
     - [Table of Contents](#table-of-contents)
     - [About the Project](#about-the-project)
-        - [Priorities](#priorities)
         - [Key Features](#key-features)
+        - [Priorities](#priorities)
     - [Tech Stack](#tech-stack)
     - [Prerequisites](#prerequisites)
     - [Getting Started](#getting-started)
@@ -48,16 +48,6 @@ Agora Auth is the final project ("Abschlussprojekt") for a full-stack web develo
 
 The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system. It prioritises security best practices like HTTP-only cookies, Argon2 password hashing, RS256-signed JWTs, and strict Zod input validation throughout.
 
-### Priorities
-
-- **Intentional Engineering:** Prioritise reliability and correctness over speed. Understand the tools and design decisions rather than blindly accepting AI-generated code - use AI as a targeted assistant, not a substitute for understanding.
-- **Production-Ready Quality:** Build an MVP that handles errors and edge cases gracefully, going beyond a simple "happy path" demo.
-- **Security First:** Treat security as a core requirement from day one, applying multiple layers of protection throughout the system.
-- **Clean Architecture:** Keep a clear separation of concerns so the codebase stays maintainable and easy to navigate.
-- **Modularity:** Design components and logic to be reusable, independent, and easily composable.
-- **Automation & Workflow:** Establish automated checks for code quality and deployment early to ensure consistency.
-- **Modern Best Practices:** Leverage current, stable features of the chosen technologies rather than outdated patterns.
-
 ### Key Features
 
 - **Stateless JWT Access Tokens:** Paired with database-backed sessions and automatic token rotation.
@@ -66,6 +56,15 @@ The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to pro
 - **Admin Dashboard:** Full user management interface (listing, suspending, activating, deleting accounts).
 - **External Client API:** Secure cross-service verification using RS256 token signing and a public JWKS endpoint.
 - **Internationalisation:** Full English and German language support via next-intl.
+
+### Priorities
+
+- **Intentional Engineering:** Reliability over speed, AI as assistant not autopilot.
+- **Production-Ready Quality:** Proper error handling and edge cases, not just the happy path.
+- **Security First:** Defence-in-depth from day one.
+- **Clean Architecture:** Clear separation of concerns, maintainable codebase.
+- **Modularity:** Reusable, independent, composable components and logic.
+- **Automation & Workflow:** Automated quality checks and deployment from the start.
 
 ---
 

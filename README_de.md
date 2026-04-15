@@ -1,12 +1,5 @@
 # Agora Auth
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="src/assets/agora-logo-dark.svg" />
-    <img src="src/assets/agora-logo.svg" alt="Agora Auth Logo" width="400" />
-  </picture>
-</p>
-
 ![Badge: Latest Release](https://img.shields.io/github/v/release/ABoyCalledJohnny/agora-auth)
 ![Badge: Last Commit](https://img.shields.io/github/last-commit/ABoyCalledJohnny/agora-auth)
 
@@ -18,6 +11,13 @@
 > Das Frontend ist derzeit nicht für kleinere Bildschirme optimiert und wird am besten auf dem Desktop betrachtet.
 
 Ein Fullstack-Authentifizierungs- und Benutzerverwaltungssystem, entwickelt als Abschlussprojekt eines Webentwicklungs-Programms, mit Next.js, Drizzle ORM und PostgreSQL.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/assets/agora-logo-dark.svg" />
+    <img src="src/assets/agora-logo.svg" alt="Agora Auth Logo" width="400" />
+  </picture>
+</p>
 
 ## Inhaltsverzeichnis
 
@@ -50,13 +50,13 @@ Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um e
 
 ### Prioritäten
 
-- **Bewusstes Engineering:** Zuverlässigkeit und Korrektheit vor Geschwindigkeit. Die eingesetzten Werkzeuge und Designentscheidungen verstehen, anstatt KI-generierten Code blind zu übernehmen - KI als gezielten Assistenten nutzen, nicht als Ersatz für eigenes Verständnis.
-- **Produktionsreife Qualität:** Ein MVP entwickeln, das Fehler und Randfälle sauber behandelt und über eine reine „Happy Path"-Demo hinausgeht.
-- **Sicherheit von Anfang an:** Sicherheit als Kernanforderung vom ersten Tag an behandeln und mehrere Schutzschichten im gesamten System anwenden.
-- **Saubere Architektur:** Eine klare Trennung der Zuständigkeiten einhalten, damit die Codebasis wartbar und übersichtlich bleibt.
-- **Modularität:** Komponenten und Logik wiederverwendbar, unabhängig und leicht kombinierbar gestalten.
-- **Automatisierung & Workflow:** Automatisierte Prüfungen für Codequalität und Deployment frühzeitig etablieren, um Konsistenz sicherzustellen.
-- **Moderne Best Practices:** Aktuelle, stabile Features der gewählten Technologien nutzen, anstatt auf veraltete Muster zurückzugreifen.
+- **Bewusstes Engineering:** Zuverlässigkeit vor Geschwindigkeit, KI als Assistent nicht als Autopilot.
+- **Produktionsreife Qualität:** Saubere Fehlerbehandlung und Edge Cases, nicht nur der Happy Path.
+- **Sicherheit von Anfang an:** Defence-in-Depth vom ersten Tag.
+- **Saubere Architektur:** Klare Trennung der Zuständigkeiten, wartbare Codebasis.
+- **Modularität:** Wiederverwendbare, unabhängige, kombinierbare Komponenten und Logik.
+- **Automatisierung & Workflow:** Automatisierte Qualitätsprüfungen und Deployment von Beginn an.
+- **Moderne Best Practices:** Aktuelle, stabile Technologien statt veralteter Muster.
 
 ### Hauptfunktionen
 
