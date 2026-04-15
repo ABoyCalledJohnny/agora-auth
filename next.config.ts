@@ -149,8 +149,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: process.env.ALLOWED_DEV_ORIGINS?.split(",").filter(Boolean) ?? [],
+
   experimental: {
     authInterrupts: true,
+    serverActions: {
+      allowedOrigins: process.env.ALLOWED_ORIGINS?.split(",").filter(Boolean) ?? [],
+    },
   },
 
   images: {
