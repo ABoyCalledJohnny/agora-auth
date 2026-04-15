@@ -9,8 +9,8 @@ import { Nav } from "./nav.tsx";
 
 export function Header() {
   return (
-    <header id="masthead" className="sticky top-0 z-40 h-16 border-b border-neutral-200 bg-white">
-      <Container className="flex h-full items-center">
+    <header id="masthead" className="sticky top-0 z-40 border-b border-neutral-200 bg-white md:h-16">
+      <Container className="flex h-full flex-wrap items-center gap-y-4 py-2 md:py-0">
         <div className="flex flex-1 justify-start">
           <Link href="/" className="flex">
             <Image src={logo} alt="Agora - Home" className="h-8 w-auto" />
