@@ -116,21 +116,7 @@ Umstellung Sprache
 
 ---
 
-## 5. CI/CD + Deployment (~3 Min) ⏱ spätestens 0:22
-
-**Zeigen:** GitHub → Actions → letzter erfolgreicher Run (Pipeline-Visualisierung)
-
-- **3-Stufen-Pipeline:**
-    - **Verify** (alle Branches): Lint, Typecheck, Format, Security Audit, Build
-    - **Package** (nur `main`): Docker-Images bauen, zu GHCR pushen
-    - **Deploy** (nur `main`): Artefakte per rsync auf VPS, Secrets generieren, Services starten, Migrationen + Bootstrap
-- **Infrastruktur:** Caddy (Auto-TLS) + App (2 Replicas) + Postgres auf VPS
-- **Migrator:** Ephemerer Container nach Deployment für Schema-Änderungen
-- Kurz README "VPS Layout" zeigen für die Dateistruktur auf dem Server
-
----
-
-## 6. Live-Demo (~4 Min) ⏱ spätestens 0:26
+## 5. Live-Demo (~2 Min) ⏱ spätestens 0:13
 
 **Zeigen:** Live-App im Browser öffnen
 
@@ -146,20 +132,36 @@ Alles auch per API machbar, das ist hier quasi nur eine Mögl
 
 ---
 
+## 6. CI/CD + Deployment (~2 Min) ⏱ spätestens 0:13
+
+**Zeigen:** GitHub → Actions → letzter erfolgreicher Run (Pipeline-Visualisierung)
+
+- **3-Stufen-Pipeline:**
+    - **Verify** (alle Branches): Lint, Typecheck, Format, Security Audit, Build
+    - **Package** (nur `main`): Docker-Images bauen, zu GHCR pushen
+    - **Deploy** (nur `main`): Artefakte per rsync auf VPS, Secrets generieren, Services starten, Migrationen + Bootstrap
+- **Infrastruktur:** Caddy (Auto-TLS) + App (2 Replicas) + Postgres auf VPS
+- **Migrator:** Ephemerer Container nach Deployment für Schema-Änderungen
+- Kurz README "VPS Layout" zeigen für die Dateistruktur auf dem Server
+
+---
+
 ## 7. Reflexion + Fragen (~5 Min) ⏱ spätestens 0:30
 
-- **Was lief gut:**
-    - Sicherheitsarchitektur von Anfang an durchdacht.
-    - Strukturierte Planung (`NOTES.md`, `TODO.md`) hat sich ausgezahlt.
-    - CI/CD Pipeline früh aufgesetzt → sauberer Workflow.
-- **Was war schwieriger als erwartet:**
-    - Alles dauert immer länger als gedacht - Zeitschätzungen sind schwierig, besonders wenn man Technologien zum ersten Mal einsetzt.
-    - Sicherheit ist ein unfassbar komplexes Thema. Alles selbst machen hat einen super Lerneffekt, aber dauert auch sehr lange. In der Praxis nutzt man meist fertige Libraries - das ist aber ein bewusster Trade-off, weil man dann die Interna nicht wirklich versteht.
-    - CI/CD war sehr komplex aufzusetzen, ermöglicht aber super schnelles Deployment ohne darüber nachzudenken. Die Sicherheitschecks (Lint, Audit) haben sich schon während der Entwicklung ausgezahlt.
-    - Ein gutes Verhältnis aus eigener Arbeit und KI-Nutzung zu finden - sicherzustellen, dass ich das Heft in der Hand behalte. Vibe Coding ist verführerisch, aber super tückisch.
-- **Was würde ich anders machen / Erkenntnisse:**
-    - Strukturierte Planung (`NOTES.md`, TODO.md) hat sich nicht nur ausgezahlt - sie hat das Projekt so überhaupt erst möglich gemacht.
-- **Ausblick:** Backlog zeigen (Rate Limiting, MFA, Audit Logging, Mobile-Support, komplette Umstellung auf Vertical Slices - aus Zeitgründen nicht mehr geschafft)
+**Erfahrungen:**
+
+- Strukturierte Planung (`NOTES.md`, `TODO.md`) hat sich ausgezahlt, hat Projekt möglich gemacht
+- CI/CD Pipeline früh aufgesetzt erspart später viel Arbeit.
+- Alles dauert immer länger als gedacht - Zeitschätzungen sind schwierig, besonders wenn man Technologien zum ersten Mal einsetzt.
+- Sicherheit ist ein unfassbar komplexes Thema. Alles selbst machen hat einen super Lerneffekt, aber dauert auch sehr lange. In der Praxis nutzt man meist fertige Libraries - das ist aber ein bewusster Trade-off, weil man dann die Interna nicht wirklich versteht.
+- Ein gutes Verhältnis aus eigener Arbeit und KI-Nutzung zu finden - sicherzustellen, dass ich das Heft in der Hand behalte. Vibe Coding ist verführerisch, aber super tückisch.
+
+**Ausblick:**
+
+- Rate Limiting
+- MFA
+- Mobile-Support
+- Nutzer-Profile und -Einstellungen
 
 Zu wenig Zeit, keine klaren Regeln
 Nervig an Next:
