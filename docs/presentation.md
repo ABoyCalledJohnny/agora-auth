@@ -14,10 +14,10 @@
 | 3   | Tech stack                                                           | 1           | README "Tech Stack"                               |
 | 4   | Database schema (ERD)                                                | 3           | `dbdiagram.io` live                               |
 | 5   | Architecture + project layout<br> + error handling, config, and i18n | 5           | README "Project Structure", NOTES §1.2 (services) |
-| 6   | CI/CD + deployment                                                   | 3           | README "Deployment", pipeline diagram             |
+| 6   | CI/CD + deployment                                                   | 2           | README "Deployment", pipeline diagram             |
 | 9   | Live demo (login → admin)                                            | 2           | Live app                                          |
 | 10  | Reflection + Q&A                                                     | 5           | -                                                 |
-|     |                                                                      | **~16 + 5** |                                                   |
+|     |                                                                      | **~15 + 5** |                                                   |
 
 ---
 
@@ -132,7 +132,7 @@ Alles auch per API machbar, das ist hier quasi nur eine Mögl
 
 ---
 
-## 6. CI/CD + Deployment (~2 Min) ⏱ spätestens 0:13
+## 6. CI/CD + Deployment (~2 Min) ⏱ spätestens 0:15
 
 **Zeigen:** GitHub → Actions → letzter erfolgreicher Run (Pipeline-Visualisierung)
 
@@ -146,7 +146,7 @@ Alles auch per API machbar, das ist hier quasi nur eine Mögl
 
 ---
 
-## 7. Reflexion + Fragen (~5 Min) ⏱ spätestens 0:30
+## 7. Reflexion + Fragen (~5 Min) ⏱ spätestens 0:20
 
 **Erfahrungen:**
 
@@ -161,6 +161,7 @@ Alles auch per API machbar, das ist hier quasi nur eine Mögl
 - Rate Limiting
 - MFA
 - Mobile-Support
+    - Tabelle
 - Nutzer-Profile und -Einstellungen
 
 Zu wenig Zeit, keine klaren Regeln
