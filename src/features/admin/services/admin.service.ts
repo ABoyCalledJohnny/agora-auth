@@ -10,16 +10,14 @@ import { DrizzleSessionRepository } from "@/src/repositories/session.repository.
 import { DrizzleUserRepository } from "@/src/repositories/user.repository.ts";
 
 /**
- * AdminService
+ * Admin Service
  *
- * Admin-specific user management operations.
- * Uses shared UserRepository and RoleRepository for data access,
- * adding admin-level business rules (self-action guards, session revocation).
+ * Admin-specific user management operations. Uses shared repositories
+ * for data access, adding admin-level business rules (self-action guards,
+ * session revocation).
  */
 export const AdminService = {
-  /**
-   * List users with pagination, filtering, sorting, and search.
-   */
+  /** Lists users with pagination, filtering, sorting, and search. */
   async listUsers(query: AdminListUsersQuery): Promise<AdminListUsersResult> {
     try {
       return await DrizzleUserRepository.listPage(query);

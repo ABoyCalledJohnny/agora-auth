@@ -1,3 +1,8 @@
+/**
+ * API client service.
+ * Validates external API clients and resolves their email/redirect paths.
+ */
+
 import "server-only";
 
 import type { CreateClientRequest, UpdateClientRequest } from "../contracts.ts";
@@ -10,10 +15,6 @@ import { handleServiceError } from "@/src/lib/service-error.ts";
 import { createPublicId, isSafeRedirect, stripUndefined } from "@/src/lib/utils.ts";
 import { DrizzleApiClientRepository } from "@/src/repositories/api-client.repository.ts";
 
-/**
- * Service responsible for validating external API clients and resolving
- * their respective paths for emails and redirects.
- */
 export const ApiClientService = {
   /**
    * Retrieves the default first-party web application client.
@@ -48,8 +49,7 @@ export const ApiClientService = {
   },
 
   /**
-   * Generates the fully qualified URL for email verification specifically for this client.
-   * Replaces dynamic tokens in the client's configured `verifyEmailPath`.
+   * Generates the fully qualified URL for email verification for this client.
    *
    * @param client The validated ApiClient.
    * @param token The raw string verification token.
@@ -62,8 +62,7 @@ export const ApiClientService = {
   },
 
   /**
-   * Generates the fully qualified URL for password resets specifically for this client.
-   * Replaces dynamic tokens in the client's configured `resetPasswordPath`.
+   * Generates the fully qualified URL for password resets for this client.
    *
    * @param client The validated ApiClient.
    * @param token The raw string reset token.
@@ -76,13 +75,12 @@ export const ApiClientService = {
   },
 
   /**
-   * Validates if a provided origin matches the client's configured base URL.
-   * Useful for enforcing that requests or post-login redirects actually originate from
-   * or lead to the allowed client domain, preventing Open Redirect attacks.
+   * Validates whether a provided origin matches the client's configured base URL.
+   * Prevents open redirect attacks by ensuring redirects target the allowed domain.
    *
    * NOTE: Currently unused. Intended for a future multi-tenant OAuth flow where
    * external clients redirect through this auth server and their redirect URLs
-   * need to be validated against their registered `baseUrl`.
+   * need to be validated against their registered baseUrl.
    *
    * @param client The validated ApiClient.
    * @param urlToVerify The requested redirect URL or origin.
@@ -128,7 +126,7 @@ export const ApiClientService = {
    */
   async update(id: string, clientData: UpdateClientRequest): Promise<ApiClient> {
     try {
-      // Strip undefined values to satisfy exactOptionalPropertyTypes in TS
+      // Strip undefined values to satisfy exactOptionalPropertyTypes
       // and match Drizzle's strict Partial<NewObject> requirements.
       const cleanedData = stripUndefined(clientData);
 

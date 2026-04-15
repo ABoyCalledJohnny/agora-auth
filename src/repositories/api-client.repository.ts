@@ -1,3 +1,10 @@
+/**
+ * API Client Repository
+ *
+ * Data-access layer for managing external API clients (B2B integrations).
+ * Handles creation, conflict resolution, updates, and querying of API credentials.
+ */
+
 import type { ApiClientRepository } from "@/src/features/auth/contracts.ts";
 
 import { eq } from "drizzle-orm";
@@ -6,17 +13,11 @@ import { db } from "@/src/db/index.ts";
 import { type ApiClient, apiClients, type NewApiClient } from "@/src/db/schema/index.ts";
 import { AgoraError } from "@/src/lib/errors.ts";
 
-/**
- * DrizzleApiClientRepository
- *
- * Database access layer for managing external API clients (B2B integrations).
- * Handles creation, conflict resolution, updates, and querying of API credentials.
- */
 export const DrizzleApiClientRepository: ApiClientRepository = {
   /**
-   * Creates a new API client or strictly overwrites an existing one if a name conflict occurs.
+   * Creates a new API client, or overwrites an existing one if a name conflict occurs.
    *
-   * @param data The validated payload for generating an API client.
+   * @param data The validated payload for creating an API client.
    * @returns The fully persisted ApiClient entity.
    * @throws {AgoraError} CLIENT_CONFLICT if unique constraints are violated.
    */
@@ -55,10 +56,10 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   },
 
   /**
-   * Looks up an API client intrinsically by its internal database auto-increment ID.
+   * Looks up an API client by its internal database ID.
    *
    * @param id The internal database ID.
-   * @returns The resolved ApiClient, or null if missing.
+   * @returns The resolved ApiClient, or null if not found.
    */
   async findById(id: string): Promise<ApiClient | null> {
     const [client] = await db.select().from(apiClients).where(eq(apiClients.id, id)).limit(1);
@@ -66,10 +67,10 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   },
 
   /**
-   * Looks up an API client intrinsically by its distinct recognizable name.
+   * Looks up an API client by its name.
    *
-   * @param name The descriptive name of the B2B client.
-   * @returns The resolved ApiClient, or null if missing.
+   * @param name The descriptive name of the client.
+   * @returns The resolved ApiClient, or null if not found.
    */
   async findByName(name: string): Promise<ApiClient | null> {
     const [client] = await db.select().from(apiClients).where(eq(apiClients.name, name)).limit(1);
@@ -77,11 +78,10 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   },
 
   /**
-   * Looks up an API client explicitly by its publicly accessible `clientId`.
-   * Standard route for inbound credential validations.
+   * Looks up an API client by its public `clientId`.
    *
    * @param clientId The unique public identifier of the client.
-   * @returns The resolved ApiClient, or null if missing.
+   * @returns The resolved ApiClient, or null if not found.
    */
   async findByClientId(clientId: string): Promise<ApiClient | null> {
     const [client] = await db.select().from(apiClients).where(eq(apiClients.clientId, clientId)).limit(1);
@@ -89,9 +89,9 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   },
 
   /**
-   * Retrieves all registered API clients in the database.
+   * Retrieves all registered API clients.
    *
-   * @returns An array mapping all existing internal client credentials.
+   * @returns An array of all existing ApiClient entities.
    */
   async findAll(): Promise<ApiClient[]> {
     return await db.select().from(apiClients);
@@ -99,12 +99,12 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
 
   /**
    * Applies partial updates to an existing API client.
-   * Protects intrinsic fields like ID or structural timeline data from mutation.
    *
    * @param id The internal ID of the target client.
-   * @param data The subset of properties currently being overwritten.
-   * @returns The correctly updated ApiClient object.
-   * @throws {AgoraError} NOT_FOUND if the client ID does not exist, CLIENT_CONFLICT on identical constraints.
+   * @param data The subset of properties to update.
+   * @returns The updated ApiClient object.
+   * @throws {AgoraError} NOT_FOUND if the client ID does not exist.
+   * @throws {AgoraError} CLIENT_CONFLICT on unique constraint violations.
    */
   async update(id: string, data: Partial<Omit<NewApiClient, "id" | "createdAt" | "updatedAt">>): Promise<ApiClient> {
     try {
@@ -125,12 +125,11 @@ export const DrizzleApiClientRepository: ApiClientRepository = {
   },
 
   /**
-   * Totally eradicates an API Client permanently from the database.
-   * Warning: This fundamentally unplugs whichever domain uses this client context directly.
+   * Permanently deletes an API client from the database.
    *
-   * @param id The internal ID target for deletion.
-   * @returns The fully deleted API Client.
-   * @throws {AgoraError} NOT_FOUND if the target did not exist.
+   * @param id The internal ID of the client to delete.
+   * @returns The deleted ApiClient entity.
+   * @throws {AgoraError} NOT_FOUND if the target does not exist.
    */
   async delete(id: string): Promise<ApiClient> {
     try {

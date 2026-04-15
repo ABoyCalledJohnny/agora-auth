@@ -24,8 +24,8 @@ Ein Fullstack-Authentifizierungs- und Benutzerverwaltungssystem, entwickelt als 
 - [Agora Auth](#agora-auth)
     - [Inhaltsverzeichnis](#inhaltsverzeichnis)
     - [Über das Projekt](#über-das-projekt)
-        - [Prioritäten](#prioritäten)
         - [Hauptfunktionen](#hauptfunktionen)
+        - [Prioritäten](#prioritäten)
     - [Tech-Stack](#tech-stack)
     - [Voraussetzungen](#voraussetzungen)
     - [Erste Schritte](#erste-schritte)
@@ -48,6 +48,15 @@ Agora Auth ist das Abschlussprojekt eines Fullstack-Webentwicklungs-Programms un
 
 Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um ein sicheres und skalierbares Identitätsmanagementsystem bereitzustellen. Dabei haben bewährte Sicherheitspraktiken wie HTTP-only-Cookies, Argon2-Passwort-Hashing, RS256-signierte JWTs und durchgehend strenge Zod-Eingabevalidierung höchste Priorität.
 
+### Hauptfunktionen
+
+- **Zustandslose JWT-Zugriffstoken:** In Kombination mit datenbankgestützten Sitzungen und automatischer Token-Rotation.
+- **Sicheres Passwort-Hashing:** Unter Verwendung von Buns nativem Argon2.
+- **Rollenbasierte Zugriffskontrolle:** Granulare Berechtigungen mit Unterscheidung zwischen öffentlichen und privaten Benutzerdaten.
+- **Admin-Dashboard:** Vollständige Benutzeroberfläche zur Benutzerverwaltung (Auflisten, Sperren, Aktivieren, Löschen von Konten).
+- **Externe Client-API:** Sichere dienstübergreifende Verifizierung mittels RS256-Token-Signierung und einem öffentlichen JWKS-Endpunkt.
+- **Internationalisierung:** Vollständige Unterstützung für Englisch und Deutsch via next-intl.
+
 ### Prioritäten
 
 - **Bewusstes Engineering:** Zuverlässigkeit vor Geschwindigkeit, KI als Assistent nicht als Autopilot.
@@ -57,15 +66,6 @@ Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um e
 - **Modularität:** Wiederverwendbare, unabhängige, kombinierbare Komponenten und Logik.
 - **Automatisierung & Workflow:** Automatisierte Qualitätsprüfungen und Deployment von Beginn an.
 - **Moderne Best Practices:** Aktuelle, stabile Technologien statt veralteter Muster.
-
-### Hauptfunktionen
-
-- **Zustandslose JWT-Zugriffstoken:** In Kombination mit datenbankgestützten Sitzungen und automatischer Token-Rotation.
-- **Sicheres Passwort-Hashing:** Unter Verwendung von Buns nativem Argon2.
-- **Rollenbasierte Zugriffskontrolle:** Granulare Berechtigungen mit Unterscheidung zwischen öffentlichen und privaten Benutzerdaten.
-- **Admin-Dashboard:** Vollständige Benutzeroberfläche zur Benutzerverwaltung (Auflisten, Sperren, Aktivieren, Löschen von Konten).
-- **Externe Client-API:** Sichere dienstübergreifende Verifizierung mittels RS256-Token-Signierung und einem öffentlichen JWKS-Endpunkt.
-- **Internationalisierung:** Vollständige Unterstützung für Englisch und Deutsch via next-intl.
 
 ---
 

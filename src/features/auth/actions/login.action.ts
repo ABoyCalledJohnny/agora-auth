@@ -1,5 +1,10 @@
 "use server";
 
+/**
+ * Login action.
+ * Authenticates credentials, sets session cookies, and redirects.
+ */
+
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -22,16 +27,16 @@ export const loginAction = withActionHandler(
     auth: false,
   },
   async ({ data: { identifier, password, redirectTo } }) => {
-    // Step 1: Extract request metadata for the session
+    // 1. Extract request metadata for the session.
     const { ipAddress, userAgent } = await getRequestMetadata();
 
-    // Step 2: Authenticate credentials via `AuthService.login`
+    // 2. Authenticate credentials via AuthService.login.
     const loginResponse = await AuthService.login({ identifier, password }, ipAddress, userAgent);
 
-    // Step 3: Call `setSessionCookies(accessToken, refreshToken)`
+    // 3. Set session cookies.
     await setSessionCookies(loginResponse.accessToken, loginResponse.refreshToken);
 
-    // Step 4: Validate the `redirectTo` URL. If it's provided and passes `isSafeRedirect(appConfig.app.baseUrl, data.redirectTo)`, use it. Otherwise, fallback to a default (e.g., "/profile").
+    // 4. Validate the redirect URL and fall back to the home page if unsafe.
     const redirectPath = redirectTo && isSafeRedirect(appConfig.app.url, redirectTo) ? redirectTo : "/";
     redirect(redirectPath);
   },

@@ -1,3 +1,10 @@
+/**
+ * Database Seed
+ *
+ * Generates realistic development data (users with profiles and settings).
+ * Only runs in development environments.
+ */
+
 import { randomUUID } from "node:crypto";
 
 import { eq, like } from "drizzle-orm";

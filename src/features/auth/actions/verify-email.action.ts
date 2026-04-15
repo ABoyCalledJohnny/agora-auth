@@ -1,5 +1,10 @@
 "use server";
 
+/**
+ * Verify email action.
+ * Consumes a verification token and activates the user's account.
+ */
+
 import { withActionHandler } from "@/src/lib/action-wrapper.ts";
 
 import { verifyEmailSchema } from "../contracts.ts";
@@ -13,7 +18,7 @@ export const verifyEmailAction = withActionHandler(
   async ({ data: { token } }) => {
     await AuthService.verifyEmail(token);
 
-    // The action wrapper will map this to { success: true, data: null }
+    // The action wrapper maps this to { success: true, data: null }.
     return null;
   },
 );

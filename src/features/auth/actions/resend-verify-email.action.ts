@@ -1,5 +1,10 @@
 "use server";
 
+/**
+ * Resend verification email action.
+ * Re-dispatches the email verification link to the user.
+ */
+
 import { withActionHandler } from "@/src/lib/action-wrapper.ts";
 
 import { resendVerifyEmailSchema } from "../contracts.ts";
@@ -13,7 +18,7 @@ export const resendVerifyEmailAction = withActionHandler(
   async ({ data: { email }, client }) => {
     await AuthService.requestVerificationEmail(email, client);
 
-    // The action wrapper will map this to { success: true, data: null }
+    // The action wrapper maps this to { success: true, data: null }.
     return null;
   },
 );

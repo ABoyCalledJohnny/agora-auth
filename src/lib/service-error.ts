@@ -4,7 +4,7 @@ import { AgoraError } from "@/src/lib/errors.ts";
 import { logger } from "@/src/lib/logger.ts";
 
 /**
- * Standardized error handler for service layers.
+ * Standardised error handler for service layers.
  * Rethrows known application errors and logs unexpected (internal) errors
  * before throwing a generic 500 INTERNAL error.
  */

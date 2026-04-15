@@ -1,3 +1,10 @@
+/**
+ * Verification Token Repository
+ *
+ * Data-access layer for short-lived verification tokens (email verification,
+ * password resets). Supports atomic consumption to prevent TOCTOU race conditions.
+ */
+
 import type { VerificationTokenType } from "../config/constants.ts";
 import type { VerificationTokenRepository } from "@/src/features/auth/contracts.ts";
 
@@ -12,13 +19,11 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
   // Create
   // ---------------------------------------------------------------------------
   /**
-   * Securely persists a completely hashed, short-lived verification token.
-   * Leverages native Drizzle timestamping mapping for accurate rotation context.
+   * Persists a hashed, short-lived verification token.
    *
-   * @param data The required payload generating a strict Token signature.
+   * @param data The required payload for creating the token.
    * @returns The fully mapped VerificationToken entity.
-   * @throws {AgoraError} INTERNAL on insertion failure constraints.
-   *
+   * @throws {AgoraError} INTERNAL on insertion failure.
    */
   async create(data: NewVerificationToken): Promise<VerificationToken> {
     try {
@@ -85,12 +90,11 @@ export const DrizzleVerificationTokenRepository: VerificationTokenRepository = {
   // ---------------------------------------------------------------------------
 
   /**
-   * Hard-deletes a verification token by its unique database ID.
+   * Hard-deletes a verification token by its database ID.
    *
-   * SECURITY WARNING: If you are verifying a token for a user action (e.g., password reset,
-   * email verification), DO NOT use `findByToken` -> validate -> `delete(id)`.
-   * That multi-step sequence introduces a Time-of-Check to Time-of-Use (TOCTOU) race condition.
-   * Attempting to consume a token must be done atomically via `tryConsumeByToken()` instead.
+   * SECURITY WARNING: Do NOT use `findByToken` -> validate -> `delete(id)`.
+   * That multi-step sequence introduces a TOCTOU race condition.
+   * Use `tryConsumeByToken()` for atomic token consumption instead.
    */
   async delete(id: string): Promise<VerificationToken> {
     try {

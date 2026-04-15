@@ -1,3 +1,9 @@
+/**
+ * Role Repository
+ *
+ * Data-access layer for RBAC roles and the users-roles junction table.
+ */
+
 import type { SystemRoleName } from "@/src/config/constants.ts";
 import type { RoleRepository } from "@/src/features/auth/contracts.ts";
 
@@ -79,11 +85,10 @@ export const DrizzleRoleRepository: RoleRepository = {
   },
 
   /**
-   * Removes a joined relationship strictly stripping rights from a User.
+   * Removes a role assignment from a user.
    *
-   * @param userId The user's root ID.
-   * @param roleId The internal Role ID mappings.
-   *
+   * @param userId The user's ID.
+   * @param roleId The role ID to remove.
    */
   async removeRoleFromUser(userId: string, roleId: string): Promise<void> {
     try {

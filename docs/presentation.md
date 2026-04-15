@@ -3,25 +3,21 @@
 > [!NOTE]
 > **Dauer:** ~20 Min (15 Min Vortrag + 5 Min Fragen)
 > **Format:** Kein PowerPoint. Live-Walkthrough durch Doku, Code, ERD, Pipeline und App.
-> **Vorbereitung:** - Datenbank zurücksetzen, GitHub-Bild integrieren - Tabs und Fenster - `README.md` (GitHub/Preview) - `dbdiagram.io` - VS Code - GitHub Actions - Live-App
-
-Welche Tabs in VSCode offen haben?
-
-- `.env.local`
+> **Vorbereitung:** - Datenbank zurücksetzen, GitHub-Bild integrieren - Tabs und Fenster - `README.md` (GitHub/Preview) - `dbdiagram.io` - VS Code (schemas, `.env.local`) - GitHub Actions - Live-App
 
 ## Ablauf
 
-| #   | Topic                                                                | ~Min | Source                                            |
-| --- | -------------------------------------------------------------------- | ---- | ------------------------------------------------- |
-| 1   | Project intro + goals                                                | 1    | README "Über das Projekt"                         |
-| 2   | Priorities / approach                                                | 1    |                                                   |
-| 3   | Tech stack                                                           | 1    | README "Tech Stack"                               |
-| 4   | Architecture + project layout<br> + error handling, config, and i18n | 4    | README "Project Structure", NOTES §1.2 (services) |
-| 5   | Database schema (ERD)                                                | 3    | dbdiagram.io live                                 |
-| 7   | API design + external clients                                        | 2    | API docs, NOTES §1.2                              |
-| 8   | CI/CD + deployment                                                   | 3    | README "Deployment", pipeline diagram             |
-| 9   | Live demo (landing page -> register → login → admin)                 | 4    | Live app                                          |
-| 10  | Reflection + Q&A                                                     | 5    | -                                                 |
+| #   | Topic                                                                | ~Min        | Source                                            |
+| --- | -------------------------------------------------------------------- | ----------- | ------------------------------------------------- |
+| 1   | Project intro + MVP                                                  | 1           | README "Über das Projekt / "                      |
+| 2   | Priorities / approach                                                | 1           | README "Über das Projekt -> Prioritäten"          |
+| 3   | Tech stack                                                           | 1           | README "Tech Stack"                               |
+| 4   | Database schema (ERD)                                                | 3           | `dbdiagram.io` live                               |
+| 5   | Architecture + project layout<br> + error handling, config, and i18n | 5           | README "Project Structure", NOTES §1.2 (services) |
+| 6   | CI/CD + deployment                                                   | 3           | README "Deployment", pipeline diagram             |
+| 9   | Live demo (login → admin)                                            | 2           | Live app                                          |
+| 10  | Reflection + Q&A                                                     | 5           | -                                                 |
+|     |                                                                      | **~16 + 5** |                                                   |
 
 ---
 
@@ -33,61 +29,58 @@ Welche Tabs in VSCode offen haben?
 
 ## 1. Projektvorstellung + Ziele (~1 Min) ⏱ spätestens 0:01
 
-**Zeigen:** `NOTES.md` §1.1 oder README "About the Project"
+> [!IMPORTANT] Zeigen
+> `README.md` "Über das Projekt"
 
-**Was macht Agora Auth?**
-
-- Was ist Agora Auth? → Ein vollständiges Authentifizierungs- und Benutzerverwaltungssystem.
-- Zielgruppe: moderne Webanwendungen, die eine eigene Auth-Lösung brauchen statt Third-Party-Dienste.
-- MVP-Umfang kurz umreißen: Registrierung, Login, E-Mail-Verifizierung, Passwort-Reset, Admin-Dashboard, externe API für Drittanbieter.
-
-**Weitere Projekteigenschaften**
+**Anmerkungen:**
 
 - Backend-Projekt
-- Alleine gearbeitet, aber:
-- Bezug auf Ralf
+- Alleine gearbeitet, aber: Bezug auf Ralf
 - Zweigleisig
 
-- Struktur, Datenfluss
-    - Zweigleisigkeit
+---
+
+## 2. Prioritäten / Herangehensweise (~1 Min) ⏱ spätestens 0:02
+
+> [!IMPORTANT] Zeigen
+> `README.md` "Über das Projekt" -> "Prioritäten"
+
+**App-Prioritäten:**
+
+- Backend
+- CI/CD Pipeline
+- App-Infrastruktur
 
 ---
 
-## 2. Prioritäten / Herangehensweise (~1 Min) ⏱ spätestens 0:03
+## 3. Tech Stack (~1 Min) ⏱ spätestens 0:03
 
-**Zeigen:** `NOTES.md` §1.1 "Considerations/Priorities"
-
-- **Intentional Engineering:** Bewusst verstehen statt blind AI-Output übernehmen. AI als Multiplikator, nicht als Ersatz.
-- **Production-Oriented Mindset:** Über den Happy Path hinaus - Fehlerbehandlung und Edge Cases von Anfang an.
-- **Security First:** Sicherheit als Kernanforderung, nicht als Nachgedanke.
-- **Clean Architecture:** Klare Trennung von Zuständigkeiten, Feature-basierte Modulstruktur.
-
-Backend, CI/CD Pipeline, Produktionsreife
+> [!IMPORTANT] Zeigen
+> `README.md` "Tech Stack"
 
 ---
 
-## 3. Tech Stack (~2 Min) ⏱ spätestens 0:06
+## 4. Datenbankschema (ERD) (~3 Min) ⏱ spätestens 0:06
 
-**Zeigen:** README "Tech Stack"
+> [!IMPORTANT] Zeigen
+> `dbdiagram.io` öffnen
 
----
+**Anmerkungen:**
 
-## 5. Datenbankschema (ERD) (~3 Min) ⏱ spätestens 0:14
+- Credentials absichtlich in separater Tabelle (Passwort-Hash nie versehentlich in Queries/Responses)
+- `public_id` (nanoid) vs. `id` (UUID) - externe API gibt nie die echte DB-ID raus
+- Sessions DB-backed + Refresh Token Rotation
+- `api_clients` für externen Zugriff (Klassenkamerad nutzt die API)
 
-**Zeigen:** `dbdiagram.io` öffnen
-
-- Haupttabellen durchgehen: `users`, `user_credentials`, `sessions`, `verification_tokens`, `roles`, `user_roles`, `api_clients`
-- Schlüsselentscheidungen erklären:
-    - Credentials absichtlich in separater Tabelle (Passwort-Hash nie versehentlich in Queries/Responses)
-    - `public_id` (nanoid) vs. `id` (UUID) - externe API gibt nie die echte DB-ID raus
-    - Sessions DB-backed + Refresh Token Rotation
-    - `api_clients` für externen Zugriff (Klassenkamerad nutzt die API)
-
-- TS-Typen
+> [!IMPORTANT] Zeigen
+> Drizzle-Schemas und TS-Typen in VS Code
 
 ---
 
-## 4. Architektur + Projektstruktur (~4-5 Min) ⏱ spätestens 0:11
+## 4. Architektur, Projektstruktur, API-Design (~5 Min) ⏱ spätestens 0:11
+
+> [!IMPORTANT] Zeigen
+> `dbdiagram.io` öffnen
 
 **Zeigen:** README "Project Structure", dann in VS Code die Ordnerstruktur öffnen
 
@@ -114,10 +107,6 @@ Auch Error-Handling?
 
 Umstellung Sprache
 
-## 7. API-Design + externe Clients (~2 Min) ⏱ spätestens 0:19
-
-**Zeigen:** `docs/api_DRAFT.md` - Routenübersicht-Tabelle (§7)
-
 - Routenübersicht kurz zeigen: 22 Endpunkte, 9 implementiert, Rest geplant
 - Einheitliches Response-Format: `{ success, message, data }` bzw. `{ success, error: { code, message } }`
 - **Externer Client:** Klassenkamerad konsumiert die API von einer separaten App
@@ -127,7 +116,7 @@ Umstellung Sprache
 
 ---
 
-## 8. CI/CD + Deployment (~3 Min) ⏱ spätestens 0:22
+## 5. CI/CD + Deployment (~3 Min) ⏱ spätestens 0:22
 
 **Zeigen:** GitHub → Actions → letzter erfolgreicher Run (Pipeline-Visualisierung)
 
@@ -141,7 +130,7 @@ Umstellung Sprache
 
 ---
 
-## 9. Live-Demo (~4 Min) ⏱ spätestens 0:26
+## 6. Live-Demo (~4 Min) ⏱ spätestens 0:26
 
 **Zeigen:** Live-App im Browser öffnen
 
@@ -151,11 +140,13 @@ Umstellung Sprache
 4. **Login:** Mit neuem Account einloggen → Session wird erstellt
 5. **Admin-Dashboard:** Als Admin einloggen → Benutzertabelle mit Paginierung, Suspend/Delete-Aktionen zeigen
 
+Alles auch per API machbar, das ist hier quasi nur eine Mögl
+
 > **Tipp:** Vorher einen frischen Test-Account vorbereiten. Admin-Account mit Testdaten in der DB haben. Tabs im Browser schon offen haben.
 
 ---
 
-## 10. Reflexion + Fragen (~5 Min) ⏱ spätestens 0:30
+## 7. Reflexion + Fragen (~5 Min) ⏱ spätestens 0:30
 
 - **Was lief gut:**
     - Sicherheitsarchitektur von Anfang an durchdacht.
@@ -187,3 +178,8 @@ learnings, pipeline nervt zwar, aber ist auch super wichtig
 
 - Was noch aus Notizen?
 - Mehrmaid on GitHub?
+- Welche Tabs in VSCode offen haben?
+    - `.env.local`
+- Ablauf auf Deutsch übersetzen
+- Libraries in Backticks
+- Zeitangaben besser lösen

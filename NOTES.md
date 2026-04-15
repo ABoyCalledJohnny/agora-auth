@@ -826,3 +826,7 @@ client interceptor for old tabs (still locked in? update layout.tsx)
 grid layout tabelle
 was noch von security
 static about page
+
+## 5. Documentation
+
+- Dokumente abgleichen

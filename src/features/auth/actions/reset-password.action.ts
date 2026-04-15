@@ -1,5 +1,10 @@
 "use server";
 
+/**
+ * Reset password action.
+ * Consumes a reset token and updates the user's password.
+ */
+
 import { withActionHandler } from "@/src/lib/action-wrapper.ts";
 
 import { resetPasswordConfirmSchema } from "../contracts.ts";
@@ -13,7 +18,7 @@ export const resetPasswordAction = withActionHandler(
   async ({ data: { token, password } }) => {
     await AuthService.resetPassword({ token, password });
 
-    // The action wrapper will map this to { success: true, data: null }
+    // The action wrapper maps this to { success: true, data: null }.
     return null;
   },
 );

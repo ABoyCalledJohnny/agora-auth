@@ -1,10 +1,10 @@
 /**
- * Setup Utility Functions:
+ * Utility Functions
  *
  * - `sanitizeInput`: Recursively sanitises string values in request payloads.
  * - `parseDuration`: Parses a human-readable duration string into milliseconds.
- * - `cn`: A utility to merge Tailwind classes cleanly using clsx and tailwind-merge.
- * - `createPublicId`: Creates a unique public ID consisting of PUBLIC_ID_LENGTH (27) PUBLIC_ID_ALPHABET (a-z) letters.
+ * - `cn`: Merges Tailwind classes dynamically using clsx and tailwind-merge.
+ * - `createPublicId`: Creates a unique public ID of 24 alphanumeric characters.
  * - `stripUndefined`: Strips explicit `undefined` values from an object to satisfy Drizzle types.
  * - `isSafeRedirect`: Validates if a provided target URL or origin securely matches an allowed base URL.
  */
@@ -19,9 +19,9 @@ import { AgoraError } from "@/src/lib/errors.ts";
 /**
  * Recursively sanitises string values in the input by trimming whitespace.
  *
- * NOTE: This function strips prototypes and methods from complex objects
- * (like class instances) and returns plain objects. It is only intended
- * for plain JSON-serializable structures (e.g., DTOs or Request payloads).
+ * Note: This function strips prototypes and methods from complex objects
+ * (like class instances) and returns plain objects. Only intended for
+ * plain JSON-serialisable structures (e.g. DTOs or request payloads).
  */
 export function sanitizeInput<T>(data: T): T {
   if (typeof data === "string") {
@@ -56,23 +56,17 @@ export function parseDuration(str: string): number {
   return Number(value) * multipliers[unit as keyof typeof multipliers];
 }
 
-/**
- * Merges Tailwind classes dynamically. Usage: cn('text-red-500', isError && 'text-blue-500')
- * `cn` -> "class name"
- */
+/** Merges Tailwind classes dynamically. Usage: cn('text-red-500', isError && 'text-blue-500') */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/**
- * Creates a unique public ID consisting of 27 lowercase a-z letters.
- * Matches the publicIdSchema defined in src/lib/validation.ts.
- */
+/** Creates a unique public ID of 24 alphanumeric characters. */
 export const createPublicId = customAlphabet(PUBLIC_ID_ALPHABET, PUBLIC_ID_LENGTH);
 
 /**
  * Strips explicit `undefined` values from an object.
- * Essential for passing partial payloads into Drizzle ORM schemas while
+ * Essential for passing partial payloads into Drizzle ORM schemas whilst
  * satisfying the strict `exactOptionalPropertyTypes` TypeScript configuration.
  */
 export function stripUndefined<T extends Record<string, unknown>>(
@@ -85,11 +79,11 @@ export function stripUndefined<T extends Record<string, unknown>>(
 
 /**
  * Validates if a provided target URL or origin securely matches an allowed base URL.
- * Useful for preventing Open Redirect attacks on frontend login forms
+ * Useful for preventing open redirect attacks on frontend login forms
  * and backend API client validations.
  *
- * @param allowedBaseUrl The trusted base URL (e.g., "https://example.com/app")
- * @param urlToVerify The requested redirect URL or origin (e.g., "/login" or "https://evil.com")
+ * @param allowedBaseUrl The trusted base URL (e.g. "https://example.com/app").
+ * @param urlToVerify The requested redirect URL or origin (e.g. "/login" or "https://evil.com").
  * @returns True if the target URL safely falls under the allowed base URL.
  */
 export function isSafeRedirect(allowedBaseUrl: string, urlToVerify: string): boolean {
@@ -101,21 +95,21 @@ export function isSafeRedirect(allowedBaseUrl: string, urlToVerify: string): boo
     // If urlToVerify is absolute (e.g., "https://evil.com"), it ignores the fallback entirely.
     const target = new URL(urlToVerify, allowed.origin);
 
-    // 1. Strict Origin Check (Protocol, Domain, Port)
+    // 1. Strict origin check (protocol, domain, port).
     // This protects against string-based bypasses like https://example.com.evil.com/
     if (target.origin !== allowed.origin) {
       return false;
     }
 
-    // 2. Strict Path Prefix Check
+    // 2. Strict path prefix check.
     // We append a trailing slash to both paths to prevent prefix bypass attacks.
-    // E.g., protecting "/app" from being bypassed by "/app-evil".
+    // E.g. protecting "/app" from being bypassed by "/app-evil".
     const allowedPath = allowed.pathname.endsWith("/") ? allowed.pathname : allowed.pathname + "/";
     const targetPath = target.pathname.endsWith("/") ? target.pathname : target.pathname + "/";
 
     return targetPath.startsWith(allowedPath);
   } catch {
-    // Rejects malformed URLs securely
+    // Rejects malformed URLs securely.
     return false;
   }
 }

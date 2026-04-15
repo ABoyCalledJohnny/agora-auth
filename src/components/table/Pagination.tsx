@@ -21,7 +21,7 @@ export function Pagination({ page, totalPages, onPageChange, labels, className }
   if (totalPages <= 1) return null;
 
   return (
-    <nav aria-label="Pagination" className={cn("flex items-center px-4 py-3", className)}>
+    <nav aria-label="Pagination" className={cn("flex items-center py-3 sm:px-4", className)}>
       <div className="flex flex-1 justify-start gap-1.5">
         <Button
           variant="secondary"

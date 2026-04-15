@@ -9,8 +9,10 @@ import {
 } from "./constants.ts";
 
 // ---------------------------------------------------------------------------
-// 1. Environment schema - validates process.env at import time.
-//    If a required variable is missing the server won't start.
+// 1. Environment Schema
+//
+//    Validates process.env at import time. If a required variable is missing
+//    the server will not start.
 //
 //    z.coerce.number() converts the env string ("5432") to a number before
 //    validating. `.default()` applies when the value is undefined/missing;
@@ -66,15 +68,19 @@ const env = process.env.SKIP_ENV_VALIDATION
   : envSchema.parse(process.env);
 
 // ---------------------------------------------------------------------------
-// 2. Derived URL - composed once from validated parts.
-//    CI/CD injects app-user creds for the runtime step and superuser creds
-//    for the migration step. Same env var names, different values per step.
+// 2. Derived URL
+//
+//    Composed once from validated parts. CI/CD injects app-user credentials
+//    for the runtime step and superuser credentials for the migration step.
+//    Same env var names, different values per step.
 // ---------------------------------------------------------------------------
 
 const databaseUrl = `postgres://${encodeURIComponent(env.APP_DB_USER)}:${encodeURIComponent(env.APP_DB_PASSWORD)}@${env.DB_HOST}:${env.DB_PORT}/${env.POSTGRES_DB}`;
 
 // ---------------------------------------------------------------------------
-// 3. Application configuration - single source of truth.
+// 3. Application Configuration
+//
+//    Single source of truth for all runtime settings.
 //
 //    Token expiry strings ('15m', '7d', '24h') are consumed by the `jose`
 //    library: new SignJWT(payload).setExpirationTime(appConfig.auth.accessTokenExpiry)
@@ -117,9 +123,9 @@ export const appConfig = {
       sameSite: "lax",
       path: "/",
     },
-    accessTokenExpiry: "15m", // jose string - JWT exp claim / access cookie lifespan
-    refreshTokenExpiry: "7d", // jose string - DB session claim / refresh cookie lifespan
-    verificationTokenExpiry: "24h", // jose string - email verification / password reset
+    accessTokenExpiry: "15m", // jose string - JWT exp claim / access cookie lifespan.
+    refreshTokenExpiry: "7d", // jose string - DB session claim / refresh cookie lifespan.
+    verificationTokenExpiry: "24h", // jose string - email verification / password reset.
     allowSessionIpChange: true,
     allowSessionAgentChange: true,
   },
@@ -152,7 +158,7 @@ export const appConfig = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// 4. Convenience re-exports for hot paths (middleware, i18n).
+// 4. Convenience Re-exports
 // ---------------------------------------------------------------------------
 
 export const locales = appConfig.i18n.locales;

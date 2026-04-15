@@ -1,3 +1,10 @@
+/**
+ * Auth Schema
+ *
+ * Database tables and types for user credentials, verification tokens,
+ * and session management.
+ */
+
 import { type InferInsertModel, type InferSelectModel, relations } from "drizzle-orm";
 import { index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
@@ -12,7 +19,7 @@ export const userCredentials = pgTable("user_credentials", {
   id: idColumn(),
   userId: uuid()
     .notNull()
-    .unique() // 1:1 relationship
+    .unique() // 1:1 relationship.
     .references(() => users.id, { onDelete: "cascade" }),
   passwordHash: text().notNull(),
   createdAt: createdAtColumn(),

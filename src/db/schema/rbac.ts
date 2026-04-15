@@ -1,3 +1,10 @@
+/**
+ * RBAC Schema
+ *
+ * Database tables and types for role-based access control: roles and
+ * the users-roles junction table.
+ */
+
 import { type InferInsertModel, type InferSelectModel, relations } from "drizzle-orm";
 import { index, pgEnum, pgTable, primaryKey, uuid } from "drizzle-orm/pg-core";
 

@@ -1,5 +1,10 @@
-// import { db } from "./index.ts";
-// import { roles } from "./schema/index.ts";
+/**
+ * Database Bootstrap
+ *
+ * Seeds the initial system roles, admin account, and default API client.
+ * Intended to run once during first deployment or environment setup.
+ */
+
 import { DEFAULT_PREFERENCES, DEFAULT_PRIVACY_SETTINGS, SYSTEM_ROLE_NAMES } from "@/src/config/constants.ts";
 
 import { appConfig } from "../config/index.ts";
@@ -44,8 +49,8 @@ async function seedAdminAccount() {
 
     if (!adminUser) throw new AgoraError("INTERNAL", "Error creating bootstrap admin user");
 
-    // 2. Set credentials
-    const hashedPassword = await hashPassword(appConfig.bootstrap.initialAdminPassword); // Need a hashing tool here!
+    // 2. Set credentials.
+    const hashedPassword = await hashPassword(appConfig.bootstrap.initialAdminPassword);
     await tx
       .insert(userCredentials)
       .values({ userId: adminUser.id, passwordHash: hashedPassword })
@@ -54,7 +59,7 @@ async function seedAdminAccount() {
         set: { passwordHash: hashedPassword },
       });
 
-    // 3. Profiles and Settings (Dependencies for app usage)
+    // 3. Profiles and settings (dependencies for app usage).
     await tx.insert(userProfiles).values({ userId: adminUser.id }).onConflictDoNothing();
 
     await tx
@@ -72,8 +77,8 @@ async function seedAdminAccount() {
         },
       });
 
-    // 4. Find admin role and assign it
-    // Note: DrizzleRoleRepository.findByName isn't inherently transaction aware, but lookups are safe
+    // 4. Find admin role and assign it.
+    // Note: DrizzleRoleRepository.findByName is not inherently transaction-aware, but lookups are safe.
     const adminRole = await DrizzleRoleRepository.findByName("admin");
     if (adminRole) {
       await tx.insert(usersRoles).values({ userId: adminUser.id, roleId: adminRole.id }).onConflictDoNothing();
@@ -99,13 +104,13 @@ async function bootstrap() {
   console.log("Starting database bootstrap...");
 
   try {
-    // 1. Roles must exist first for foreign key constraints
+    // 1. Roles must exist first for foreign key constraints.
     await seedRoles();
 
-    // 2. Admin account depends on roles
+    // 2. Admin account depends on roles.
     await seedAdminAccount();
 
-    // 3. API client is independent but essential
+    // 3. API client is independent but essential.
     await seedDefaultClient();
 
     console.log("Database bootstrap completed successfully.");
