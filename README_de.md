@@ -35,8 +35,10 @@ Ein Fullstack-Authentifizierungs- und Benutzerverwaltungssystem, entwickelt als 
         - [Infrastruktur](#infrastruktur)
         - [VPS-Layout](#vps-layout)
     - [Projektstruktur](#projektstruktur)
+        - [Beispiel: Registrierungsablauf](#beispiel-registrierungsablauf)
     - [Entwicklungs-Workflow](#entwicklungs-workflow)
         - [Nützliche Befehle](#nützliche-befehle)
+    - [Reflexion](#reflexion)
     - [Roadmap \& Dokumentation](#roadmap--dokumentation)
     - [Lizenz](#lizenz)
 
@@ -44,28 +46,28 @@ Ein Fullstack-Authentifizierungs- und Benutzerverwaltungssystem, entwickelt als 
 
 ## Über das Projekt
 
-Agora Auth ist das Abschlussprojekt eines Fullstack-Webentwicklungs-Programms und wurde innerhalb von ca. 13 Arbeitstagen, plus wenige zusätzliche Tage für die Vorbereitung, entwickelt. Das Ziel war es, ein produktionsreifes Authentifizierungs- und Benutzerverwaltungssystem von Grund auf zu entwerfen und umzusetzen - von der Backend-Architektur über das Datenbankdesign und die API-Entwicklung bis hin zur Frontend-UI, CI/CD und dem Deployment auf einem Live-Server.
+Agora Auth ist das Abschlussprojekt eines Fullstack-Webentwicklungs-Programms und wurde innerhalb von ca. 13 Arbeitstagen, plus wenige zusätzliche Tage für die Vorbereitung, entwickelt.
 
-Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um ein sicheres und skalierbares Identitätsmanagementsystem bereitzustellen. Dabei haben bewährte Sicherheitspraktiken wie HTTP-only-Cookies, Argon2-Passwort-Hashing, RS256-signierte JWTs und durchgehend strenge Zod-Eingabevalidierung höchste Priorität.
+Das Ziel war es, ein produktionsreifes Authentifizierungs- und Benutzerverwaltungssystem von Grund auf zu entwerfen und umzusetzen - von der Backend-Architektur über das Datenbankdesign und die API-Entwicklung bis hin zur Frontend-UI, CI/CD und dem Deployment auf einem Live-Server.
+
+Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um ein sicheres und skalierbares Identitätsmanagementsystem bereitzustellen. Dabei haben bewährte Sicherheitspraktiken wie HTTP-only-Cookies, `Argon2`-Passwort-Hashing, RS256-signierte JWTs und durchgehend strenge `zod`-Eingabevalidierung höchste Priorität.
 
 ### Hauptfunktionen
 
-- **Zustandslose JWT-Zugriffstoken:** In Kombination mit datenbankgestützten Sitzungen und automatischer Token-Rotation.
-- **Sicheres Passwort-Hashing:** Unter Verwendung von Buns nativem Argon2.
-- **Rollenbasierte Zugriffskontrolle:** Granulare Berechtigungen mit Unterscheidung zwischen öffentlichen und privaten Benutzerdaten.
-- **Admin-Dashboard:** Vollständige Benutzeroberfläche zur Benutzerverwaltung (Auflisten, Sperren, Aktivieren, Löschen von Konten).
-- **Externe Client-API:** Sichere dienstübergreifende Verifizierung mittels RS256-Token-Signierung und einem öffentlichen JWKS-Endpunkt.
-- **Internationalisierung:** Vollständige Unterstützung für Englisch und Deutsch via next-intl.
+- **Login & Registrierung:** Sichere Anmeldung mit `Argon2`-Passwort-Hashing und Duplikatprüfung.
+- **Session-Management:** Datenbankgestützte Sitzungen mit automatischer Refresh-Token-Rotation und Wiederverwendungserkennung.
+- **Zustandslose JWT-Zugriffstoken:** RS256-signierte, kurzlebige Tokens mit öffentlichem JWKS-Endpunkt zur dienstübergreifenden Verifizierung.
+- **Externe Client-API:** Drittanbieter-Dienste können Benutzer authentifizieren und Tokens unabhängig verifizieren.
+- **Admin-Dashboard:** Paginierte Benutzertabelle mit Filterung, Sortierung, Sperr-/Aktivierungs- und Löschaktionen.
+- **CI/CD-Pipeline:** Dreistufige GitHub-Actions-Pipeline (Verify, Package, Deploy) auf einen Live-VPS.
+- **Internationalisierung:** Vollständige Unterstützung für Englisch und Deutsch via `next-intl`.
 
 ### Prioritäten
 
 - **Bewusstes Engineering:** Zuverlässigkeit vor Geschwindigkeit, KI als Assistent nicht als Autopilot.
 - **Produktionsreife Qualität:** Saubere Fehlerbehandlung und Edge Cases, nicht nur der Happy Path.
-- **Sicherheit von Anfang an:** Defence-in-Depth vom ersten Tag.
 - **Saubere Architektur:** Klare Trennung der Zuständigkeiten, wartbare Codebasis.
-- **Modularität:** Wiederverwendbare, unabhängige, kombinierbare Komponenten und Logik.
 - **Automatisierung & Workflow:** Automatisierte Qualitätsprüfungen und Deployment von Beginn an.
-- **Moderne Best Practices:** Aktuelle, stabile Technologien statt veralteter Muster.
 
 ---
 
@@ -76,11 +78,11 @@ Das Projekt basiert auf Next.js Server Actions, Drizzle ORM und PostgreSQL, um e
 - **Runtime & Tooling:** Bun
 - **Datenbank:** PostgreSQL
 - **ORM:** Drizzle ORM
-- **Validierung:** Zod
-- **JWT & JWKS:** jose
-- **Internationalisierung:** next-intl
-- **ID-Generierung:** nanoid
-- **Toast-Benachrichtigungen:** Sonner
+- **Validierung:** `zod`
+- **JWT & JWKS:** `jose`
+- **Internationalisierung:** `next-intl`
+- **ID-Generierung:** `nanoid`
+- **Toast-Benachrichtigungen:** `sonner`
 - **Reverse Proxy:** Caddy (Auto-TLS)
 - **CI/CD:** GitHub Actions
 - **Container Registry:** GitHub Container Registry (GHCR)
@@ -203,6 +205,22 @@ Das Projekt folgt einer feature-getriebenen, modularen Struktur, die auf dem Nex
     └── types.ts            # Globale TypeScript-Definitionen
 ```
 
+### Beispiel: Registrierungsablauf
+
+Wie eine Anfrage die Schichten der Architektur durchläuft - am Beispiel der Benutzerregistrierung. Route, Wrapper und Service befinden sich innerhalb des vertikalen `features/auth`-Slices, während die Repositories feature-übergreifend genutzt werden.
+
+```mermaid
+flowchart LR
+    subgraph auth["features/auth · vertikaler Slice"]
+        A["Wrapper<br/>Zod-Validierung<br/><i>Eingabegrenze</i>"] --> B["Route / Controller<br/>POST /api/auth/register<br/><i>HTTP-Verarbeitung</i>"]
+        B --> C["AuthService<br/>Duplikatprüfung, Argon2-Hash<br/><i>Business logic</i>"]
+    end
+    subgraph repo["repositories · übergreifend"]
+        D["UserRepository · create()<br/><i>Datenbankzugriff</i>"]
+    end
+    C --> D
+```
+
 ---
 
 ## Entwicklungs-Workflow
@@ -232,6 +250,17 @@ Alle Entwicklungsaufgaben werden über Bun-Skripte in der `package.json` gesteue
 
 ---
 
+## Reflexion
+
+- **Strukturierte Planung** (`NOTES.md`, `TODO.md`) - Projekt auf Kurs gehalten, hat es erst ermöglicht
+- **Frühe CI/CD-Pipeline** - spart später Zeit, erzwingt Sicherheitschecks (`bun audit`)
+- **Sicherheit selbst bauen** - hoher Lerneffekt, hoher Zeitaufwand; Produktions-Apps nutzen meist etablierte Libraries (bewusster Trade-off zwischen Verständnis und Pragmatismus)
+- **KI-Balance** - Assistent, nicht Autopilot; Vibe Coding ist verführerisch, aber tückisch
+- **Next.js-Reibungspunkte** - doppelte Requests, Cookie-Handling, Caching-Verhalten
+- **13 Arbeitstage** - extrem enger Rahmen
+
+---
+
 ## Roadmap & Dokumentation
 
 Das Projekt hat seinen MVP-Meilenstein erreicht. Eine Weiterentwicklung über diesen Punkt hinaus ist nicht garantiert.
@@ -243,6 +272,12 @@ Die API-Dokumentation ist im Verzeichnis `docs/` zu finden:
 
 - [API-Dokumentation (EN)](docs/api.md)
 - [API-Dokumentation (DE)](docs/api_de.md)
+
+- Rate Limiting
+- MFA
+- Mobile-Support
+    - Tabelle
+- Nutzer-Profile und -Einstellungen, Selbstverwaltung
 
 ---
 

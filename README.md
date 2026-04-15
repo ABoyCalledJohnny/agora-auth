@@ -35,8 +35,10 @@ A full-stack authentication and user management system built as a final project 
         - [Infrastructure](#infrastructure)
         - [VPS Layout](#vps-layout)
     - [Project Structure](#project-structure)
+        - [Example: Registration Flow](#example-registration-flow)
     - [Development Workflow](#development-workflow)
         - [Useful Commands](#useful-commands)
+    - [Reflections](#reflections)
     - [Roadmap \& Reference Documentation](#roadmap--reference-documentation)
     - [License](#license)
 
@@ -46,24 +48,23 @@ A full-stack authentication and user management system built as a final project 
 
 Agora Auth is the final project ("Abschlussprojekt") for a full-stack web development program and was built within approximately 13 working days, plus a few additional days of preparation. The goal was to design and implement a production-grade authentication and user management system from scratch - covering backend architecture, database design, API development, frontend UI, CI/CD, and deployment to a live server.
 
-The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system. It prioritises security best practices like HTTP-only cookies, Argon2 password hashing, RS256-signed JWTs, and strict Zod input validation throughout.
+The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to provide a secure and scalable identity management system. It prioritises security best practices like HTTP-only cookies, `Argon2` password hashing, RS256-signed JWTs, and strict `zod` input validation throughout.
 
 ### Key Features
 
-- **Stateless JWT Access Tokens:** Paired with database-backed sessions and automatic token rotation.
-- **Secure Password Hashing:** Using Bun's native Argon2.
-- **Role-Based Access Control:** Granular permissions distinguishing between public and private user data.
-- **Admin Dashboard:** Full user management interface (listing, suspending, activating, deleting accounts).
-- **External Client API:** Secure cross-service verification using RS256 token signing and a public JWKS endpoint.
-- **Internationalisation:** Full English and German language support via next-intl.
+- **Login & Registration:** Secure credential verification with `Argon2` password hashing and duplicate checks.
+- **Session Management:** Database-backed sessions with automatic refresh token rotation and reuse detection.
+- **Stateless JWT Access Tokens:** RS256-signed, short-lived tokens with public JWKS endpoint for cross-service verification.
+- **External Client API:** Third-party services can authenticate users and verify tokens independently.
+- **Admin Dashboard:** Paginated user table with filtering, sorting, suspend/activate, and delete actions.
+- **CI/CD Pipeline:** Three-stage GitHub Actions pipeline (Verify, Package, Deploy) to a live VPS.
+- **Internationalisation:** Full English and German language support via `next-intl`.
 
 ### Priorities
 
 - **Intentional Engineering:** Reliability over speed, AI as assistant not autopilot.
 - **Production-Ready Quality:** Proper error handling and edge cases, not just the happy path.
-- **Security First:** Defence-in-depth from day one.
 - **Clean Architecture:** Clear separation of concerns, maintainable codebase.
-- **Modularity:** Reusable, independent, composable components and logic.
 - **Automation & Workflow:** Automated quality checks and deployment from the start.
 
 ---
@@ -75,11 +76,11 @@ The project leverages Next.js Server Actions, Drizzle ORM, and PostgreSQL to pro
 - **Runtime & Tooling:** Bun
 - **Database:** PostgreSQL
 - **ORM:** Drizzle ORM
-- **Validation:** Zod
-- **JWT & JWKS:** jose
-- **Internationalisation:** next-intl
-- **ID Generation:** nanoid
-- **Toast Notifications:** Sonner
+- **Validation:** `zod`
+- **JWT & JWKS:** `jose`
+- **Internationalisation:** `next-intl`
+- **ID Generation:** `nanoid`
+- **Toast Notifications:** `sonner`
 - **Reverse Proxy:** Caddy (auto-TLS)
 - **CI/CD:** GitHub Actions
 - **Container Registry:** GitHub Container Registry (GHCR)
@@ -202,6 +203,22 @@ The project follows a feature-driven, modular structure built on top of Next.js 
     └── types.ts            # Global TypeScript definitions
 ```
 
+### Example: Registration Flow
+
+How a request flows through the layered architecture - using user registration as an example. The route, wrapper, and service live inside the `features/auth` vertical slice, while repositories are shared across features.
+
+```mermaid
+flowchart LR
+    subgraph auth["features/auth · vertical slice"]
+        A["Wrapper<br/>Zod Validation<br/><i>input boundary</i>"] --> B["Route / Controller<br/>POST /api/auth/register<br/><i>HTTP handling</i>"]
+        B --> C["AuthService<br/>Duplicate checks, Argon2 hash<br/><i>business logic</i>"]
+    end
+    subgraph repo["repositories · cross-cutting"]
+        D["UserRepository · create()<br/><i>database access</i>"]
+    end
+    C --> D
+```
+
 ---
 
 ## Development Workflow
@@ -228,6 +245,18 @@ All development tasks are handled via Bun scripts defined in `package.json`:
 | `bun run verify`      | Runs lint, typecheck, and format checks                     |
 | `bun run docker:up`   | Starts the necessary Docker containers                      |
 | `bun run docker:stop` | Stops the Docker containers                                 |
+
+---
+
+## Reflections
+
+- **Structured planning** (`NOTES.md`, `TODO.md`) - kept the project on track, made it feasible
+- **Early CI/CD setup** - saves time later, enforces security checks (`bun audit`)
+- **Time estimation** - everything takes longer than expected, especially with unfamiliar technologies
+- **Security from scratch** - great learning effect, high time cost; production apps typically use established libraries (conscious trade-off between understanding and pragmatism)
+- **AI balance** - assistant, not autopilot; vibe coding is tempting but deceptive
+- **Next.js friction** - double requests, cookie handling, caching behaviour
+- **13 working days** - extremely tight scope
 
 ---
 
