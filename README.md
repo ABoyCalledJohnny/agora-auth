@@ -102,6 +102,8 @@ Minimum local setup:
 
 ```bash
 bun install
+cp .env.local.example .env.local      # then fill in real values (JWT keys, SMTP, admin credentials)
+cp .env.tunnel.example .env.tunnel    # only needed for production DB access via SSH tunnel
 bun run docker:up
 bun run dev
 ```
@@ -252,7 +254,6 @@ All development tasks are handled via Bun scripts defined in `package.json`:
 
 - **Structured planning** (`NOTES.md`, `TODO.md`) - kept the project on track, made it feasible
 - **Early CI/CD setup** - saves time later, enforces security checks (`bun audit`)
-- **Time estimation** - everything takes longer than expected, especially with unfamiliar technologies
 - **Security from scratch** - great learning effect, high time cost; production apps typically use established libraries (conscious trade-off between understanding and pragmatism)
 - **AI balance** - assistant, not autopilot; vibe coding is tempting but deceptive
 - **Next.js friction** - double requests, cookie handling, caching behaviour
@@ -271,6 +272,22 @@ API documentation can be found in the `docs/` directory:
 
 - [API Documentation (EN)](docs/api.md)
 - [API Documentation (DE)](docs/api_de.md)
+
+**Ideas for future development:**
+
+- Security
+    - Rate Limiting
+    - MFA
+    - Bot Protection
+- Mobile Support
+    - Tables
+- User Management
+    - Profiles
+    - Settings
+    - User Overview
+- Expand Admin Functionality
+    - Table Filtering
+    - Create, Edit Users
 
 ---
 

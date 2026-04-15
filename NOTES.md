@@ -14,7 +14,7 @@
 2. **[Development](#3-development)**
     1. [Infrastructure and Core Setup](#31-infrastructure-and-core-setup): _(notes added during implementation)_
     2. [Features](#32-features): Auth and component considerations and questions.
-    3. [Backlog](#backlog): Deferred MVP features, future enhancements, settings, UX improvements, infrastructure, and admin ideas.
+    3. [Backlog](#33-backlog): Auth completion, user management, admin enhancements, feature ideas, UI/UX, infrastructure, architecture, and open questions.
 3. **[Documentation](#5-documentation):** Presentation scheduling notes.
 4. **[Initial Major Release and Deployment](#6-initial-major-release-and-deployment):** _(notes added during implementation)_
 
@@ -458,6 +458,12 @@ JWT_PUBLIC_KEY=""
 # --- Optional ---
 # CRON_SECRET=""     # Only needed if testing cron endpoints locally
 # MAIL_FROM=""       # Override sender address (default: noreply@localhost)
+
+# --- LAN / Mobile Testing ---
+# Allow cross-origin requests from LAN IPs in dev (Next.js allowedDevOrigins)
+ALLOWED_DEV_ORIGINS=""
+# Comma-separated origin allowlist (host:port) for server-side CORS checks
+ALLOWED_ORIGINS=""
 ```
 
 > [!NOTE]
@@ -518,6 +524,9 @@ Complete matrix of every variable across all committed `.env` files. Replace `{p
 | **Rate Limiting**                 |               |                              |                               |                            |                    |
 | `RATE_LIMIT_MAX`                  |     `100`     |              -               |               -               |             -              |         -          |
 | `RATE_LIMIT_WINDOW`               |     `60`      |              -               |               -               |             -              |         -          |
+| **LAN / Mobile Testing**          |               |                              |                               |                            |                    |
+| `ALLOWED_DEV_ORIGINS`             |               |       🔒 `.env.local`        |               -               |             -              |         -          |
+| `ALLOWED_ORIGINS`                 |               |       🔒 `.env.local`        |               -               |             -              |         -          |
 | **Infrastructure**                |               |                              |                               |                            |                    |
 | `CRON_SECRET`                     |               |                              |                               |          🔒 CI/CD          |      🔒 CI/CD      |
 
@@ -780,24 +789,13 @@ _Admin:_
 
 See `./messages/{language}.json`
 
-### 1.4 Finalisation
-
 #### Project Time Frame
 
-| **Week** | **Date** | **Time (Days)** |               |
-| -------- | -------- | --------------- | ------------- |
-|          |          |                 |               |
-|          | 14/04/26 | 1               |               |
-|          | 15/04/26 | 1               |               |
-|          | 16/04/26 | 0               | Präsentation  |
-|          |          |                 |               |
-|          |          | **2**           | **Days left** |
+Done.
 
 #### Schedule
 
-| Task                       | Dates         | Notes                                                            |
-| :------------------------- | :------------ | :--------------------------------------------------------------- |
-| **5. Docs + Presentation** | 14/04 - 15/04 | `README.md`, `api.md`, `TODO.md`, `NOTES.md`, presentation prep. |
+Done.
 
 ---
 
@@ -805,11 +803,51 @@ See `./messages/{language}.json`
 
 ### 3.3 Backlog
 
-**Deferred MVP Features**
+> [!NOTE]
+> Detailed specifications for deferred services, API routes, components, hooks, and logic flows are documented in their respective "Deferred to Backlog" notes throughout sections 1.2 (Architecture and Data) and the Frontend Architecture section. Items below reference those specs rather than duplicating them.
 
+#### Feature: Auth Completion
+
+The highest-priority backlog items. Backend auth logic is complete - these items finish the frontend and email integration.
+
+- **NotificationService (Critical Blocker):** Implement email abstraction using `nodemailer` (`src/lib/mail.ts`, `src/features/auth/services/notification.service.ts`). Create HTML email templates (welcome/verification, password reset). Wire into `AuthService` for registration, password reset, and email verification resend flows. Unblocks all email-dependent auth flows.
+- **Auth Frontend Forms:** Build `RegisterForm`, `ForgotPasswordForm`, `ResetPasswordForm`, `VerifyEmailPrompt` using `useActionState`. Backend actions and API routes exist - only the UI is missing.
+- **Auth Hooks:** Implement `useLogout`, `useResetPassword`, `useRegister`, `useVerifyEmail` in `src/features/auth/hooks/`.
+- **Nav Auth-Awareness:** Implement user menu `Sheet` slide-in panel for authenticated navigation links.
 - **"Remember Me":** Toggle between persistent and session cookies on login.
+- Enable email authentication for default client.
 
-**Features**
+#### Feature: User Management
+
+Full feature not started. Service layer, API routes, frontend pages, and hooks all need to be built. API routes, logic flows, and component specs are documented in section 1.2.
+
+- **Validation:** Create Zod schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`. Define response-shaping types (`PublicUser`) for output filtering.
+- **Services:** Implement `UserService` (profile CRUD, public ID via `nanoid`, email/username/password change, account deletion, resource ownership enforcement) and `RoleService` (user role retrieval and assignments).
+- **Frontend:** Pages (`/profile/[username]`, `/settings`, `/users`), settings tabs, inline edit forms, and all user hooks.
+- Consider setting `username` as `display_name`.
+- **Public User Directory:** Browse/search page at `/users` listing public user profiles (with pagination and filtering).
+- **Enhanced Public Profiles:** Richer profile pages with activity feeds, badges, or extended bio sections.
+- **Settings - Sessions Tab:** `ActiveSessionsList` - table/list of active devices with "Revoke" buttons.
+    - `GET /api/user/sessions`: List all active sessions across devices for the user.
+    - `DELETE /api/user/sessions`: Revoke all sessions (except current) to log out everywhere else.
+    - `DELETE /api/user/sessions/:id`: Revoke a specific session (remote logout).
+- **Settings - Cookies Tab:** Cookie consent and preferences management.
+- **Settings - Privacy Tab:** Profile visibility and data sharing settings.
+- **Settings - Preferences Tab:** Theme, language, notification settings.
+    - `PATCH /api/user/settings`: Change basic settings like language or theme.
+
+#### Feature: Admin Enhancements
+
+- **Admin Dashboard:** Overview/landing page with key metrics (total users, recent registrations, active sessions).
+- **Admin User Table:** Extend with advanced filtering, sorting, search, grid table layout, and batch operations (e.g., `Checkbox` selection to delete, suspend, or manage multiple users at once).
+- **Admin User Detail View:** Detailed account view for a specific user (`GET /api/admin/users/:id`).
+- **Admin User Creation:** Manually create new users (e.g., staff accounts) (`POST /api/admin/users`).
+- **Admin User Editing:** Edit another user's details (`PATCH /api/admin/users/:id`).
+- **AdminService:** Extend to handle high-level global configurations and cross-cutting system actions.
+- **API Client Management:** UI form to register and manage additional API clients (beyond the default `agora_web_default` in config).
+- **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
+
+#### Feature Ideas
 
 - **Localised App Routing (`next-intl`):** Map internal route IDs to locale-specific paths so app URLs can differ per language while resolving to the same internal routes.
 - **Modal Login:** Implement Intercepting Routes for login/register to open in a modal overlay.
@@ -819,73 +857,41 @@ See `./messages/{language}.json`
 - **React Native Support:** Mobile client integration (cookie handling for native?).
 - **Multi-tenant IdP:** Evaluate and implement Agora Auth as a standalone identity provider capable of serving multiple independent applications.
 
-**Settings (Additional Tabs)**
+#### UI / UX
 
-- **Sessions:** `ActiveSessionsList` - table/list of active devices with "Revoke" buttons.
-    - `GET /api/user/sessions`: List all active sessions across devices for the user.
-    - `DELETE /api/user/sessions`: Revoke all sessions (except current) to log out everywhere else.
-    - `DELETE /api/user/sessions/:id`: Revoke a specific session (remote logout).
-- **Cookies:** Cookie consent and preferences management.
-- **Privacy:** Profile visibility and data sharing settings.
-- **Preferences:** Theme, language, notification settings.
-    - `PATCH /api/user/settings`: Change basic settings like language or theme.
-
-**UX**
-
-- **Pagination Page Input:** Add an editable page number input field to the `Pagination` component so users can jump directly to a specific page.
 - **Full Responsiveness:** Implement complete mobile-first responsive design across all pages and components (navigation, forms, tables, modals, etc.).
     - Position pagination, Farbe Hover, margin modal
+- **UI Primitives:**
+    - `Sheet` / `Drawer`: Slide-in panel - required for user menu.
+    - `Tabs` / `TabGroup` / `TabPanel`: Tab navigation - required for settings page.
+    - `SearchInput`: Styled filter input for table/dashboard use.
+    - `Select`: Dropdown primitive (e.g., for role assignment).
+- **Pagination Page Input:** Add an editable page number input field to the `Pagination` component so users can jump directly to a specific page.
 - **Shake Effect:** Animation for failed login attempts.
 - **Real-Time Password Feedback:** Per-rule checklist UI during password entry (using `createPasswordRules` with i18n).
 - **Translated Field Validation:** Zod schemas currently emit translation keys (e.g. `passwordMinLength`) or hardcoded English strings as error messages. Integrate `react-hook-form` with Zod (`@hookform/resolvers/zod`) for instant client-side validation, and translate field errors in the component layer via `useTranslations("Validation")`. This enables per-field feedback before submission and ensures all validation messages respect the active locale.
+- Static about page (`/about`).
+- Docs page content (`/docs`).
 
-**Infrastructure**
+#### Infrastructure
 
 - **Database Housekeeping:** Background jobs/crons to sweep expired or revoked tokens.
 - **Security Hardening:** See [Production-Ready Roadmap (Post-MVP Enhancements)](#production-ready-roadmap-post-mvp-enhancements).
+- **`AuditService`:** Centralised logging for security-critical actions (e.g., "User X updated profile", "Failed login attempt").
 - **`cache()` for Session Deduplication:** Wrap `verifySession()` in React's `cache()` to memoize the session check within a single render pass, avoiding duplicate DB queries when multiple Server Components call it.
 - **`taintUniqueValue`:** Use React's `taintUniqueValue` API to prevent sensitive session data (e.g., tokens, secrets) from accidentally leaking to Client Components via the `SessionProvider`.
 - **Stale Session Revalidation:** The `SessionProvider` is hydrated once from the root layout and not refreshed on client-side navigations. If a user's session expires while the tab is inactive, the header still shows them as logged in until they hit a server action or protected page. Add a `visibilitychange` listener that calls `router.refresh()` when the user returns to the tab after prolonged inactivity, forcing the root layout to re-render and re-hydrate the session.
-- Port remaining utilities from Turbine as needed.
 
-**Architecture / Tech Debt**
+#### Architecture / Tech Debt
 
 - **Full Vertical Slicing Refactor:** Untangle global repositories (`src/repositories/`) and move data access layers strictly into their respective domains (`src/features/.../repositories/`) to achieve true vertical slicing.
     - E.g., Extract `AuthUserRepository` from a global `UserRepository` to contain only authentication-specific queries.
     - Create an `AdminUserService` and `AdminUserRepository` within the `admin` feature for specialized admin queries, avoiding massive conditional logic jumps in the standard `UserService`.
 - **Typed `session` in `withActionHandler`/`withApiHandler`:** Use a conditional generic type (e.g. `TAuth extends boolean`) so that `auth: true` narrows `session` to `AppSession` (non-null) and `auth: false` omits it or types it as `null`. This removes the need for `session!` in handlers. Requires additional overloads or a conditional type mapping in the handler context.
 
-**Questions**
+#### Questions & Notes
 
 - Wieso brauche ich für API keine Cookies, wie Google zusätzlich zu API einsetzt?
 - Multi-tenant IdP
     - Macht das überhaupt Sinn? Als Auth-Provider?
     - Wieso brauche ich für API keine Cookies, wie Google zusätzlich zu API einsetzt?
-
-- **`AuditService`**: Centralised logging for security-critical actions (e.g., "User X updated profile", "Failed login attempt").
-
-**User Overview**
-
-- **Public User Directory:** Browse/search page listing public user profiles (with pagination and filtering).
-- **Enhanced Public Profiles:** Richer profile pages with activity feeds, badges, or extended bio sections.
-
-**Admin**
-
-- **AdminService:** Create an `AdminService` to handle high-level global configurations, cross-cutting system actions, and administrative user management.
-- **Admin Dashboard:** Overview/landing page with key metrics (total users, recent registrations, active sessions).
-- **Admin User Table Enhancements:** Extend the MVP table with advanced filtering, sorting, search, and batch admin operations (e.g. via `Checkbox` selection to delete, suspend, or manage multiple users at once).
-- **Admin User Detail View:** Detailed account view for a specific user (`GET /api/admin/users/:id`).
-- **Admin User Creation:** Manually create new users (e.g., staff accounts) (`POST /api/admin/users`).
-- **Admin User Editing:** Edit another user's details (`PATCH /api/admin/users/:id`).
-- **API Client Management:** UI form to register and manage additional API clients (beyond the default `agora_web_default` in config).
-- **Admin API Clients (M2M):** Implement client-level scopes/roles so a programmatic API client can be granted "admin" permissions. This enables external services or scripts to manage users programmatically without human login, while keeping raw database access secured behind SSH/Drizzle.
-
-client interceptor for old tabs (still locked in? update layout.tsx)
-grid layout tabelle
-was noch von security
-static about page
-
-## 5. Documentation
-
-- Dokumente abgleichen
-- SVG-Datei

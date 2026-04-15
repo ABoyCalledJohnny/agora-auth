@@ -7,6 +7,8 @@
 >
 > - Datenbank zurücksetzen, GitHub-Bild integrieren
 > - Tabs und Fenster vorbereiten
+> - Zoom anpassen
+> - Tab und Code Ralf
 
 ## Ablauf
 
@@ -216,11 +218,3 @@
 >
 > - Dauer: **~5 Min**
 > - Fertig: **spätestens 0:21**
-
----
-
-## Klären
-
-- Was noch aus Notizen?
-- Mermaid on GitHub?
-- Welche Tabs in VSCode offen haben?

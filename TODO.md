@@ -167,7 +167,6 @@
         - [x] **Header and footer:** Implement `header.tsx` (top navigation/branding bar) and `footer.tsx` (bottom site info/links).
         - **Navigation:** Implement `nav.tsx` with static placeholder links and two navigation patterns (desktop-only MVP):
             - [x] **Desktop nav:** Horizontal link bar in the header.
-            - [ ] **User menu:** `Sheet` slide-in panel triggered by a user/avatar button (placeholder for now - auth-aware content is added in the Auth feature).
         - [x] **Error pages:** Implement `error.tsx`, `not-found.tsx`, `global-error.tsx`, `unauthorized.tsx`, `forbidden.tsx`.
         - [x] **Loading UI:** Add root-level `loading.tsx` (Suspense boundary).
         - **UI primitives:** Port and adapt reusable components from Turbine:
@@ -176,7 +175,7 @@
             - [x] General: `Button`, `Alert`, `Avatar`, `Modal`, `Pill`.
             - [x] Table: `Table` ecosystem, `DataTable`/`TableWrapper`, `Pagination`.
             - [x] Hooks: `useFormAction`.
-- [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
+- [x] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `infrastructure-setup`).
 
 ##### 3.2 Features
 
@@ -192,9 +191,6 @@
         - [x] **`SessionService`:** DB session CRUD and Refresh Token Rotation.
         - [x] **`JwtService`:** Pure RS256 JWT signing/verification via `jose` (no DB access - callable from `proxy.ts`).
         - [x] **`VerificationTokenService`:** Single-use hashed tokens for email verification and password reset.
-        - [ ] **`NotificationService`:** Email abstraction using `nodemailer`.
-            - [ ] Create HTML templates (welcome/verification, password reset).
-            - [ ] Implement service in `AuthService` etc.
         - [x] **`ApiClientService`:** Verify external API clients (validate API keys, check allowed domains) before granting access to core services.
     - **API Routes and Server Actions:**
         - Implement auth endpoints (dual-channel: API route returning JSON + Server Action for forms). Use `withApiHandler`/`withActionHandler` wrappers with Zod validation. Endpoints marked 🔒 require authentication:
@@ -209,47 +205,16 @@
         - [x] `GET /api/auth/jwks` - Public JWKS endpoint for external JWT verification.
     - **Auth Infrastructure:**
         - [x] **`auth.ts`:** Implement `getSession()`, `authenticate()`, and `authorize()` - connect to `JwtService`/`SessionService`.
-        - [ ] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
+        - [x] **`proxy.ts`:** Implement request interceptor - verify access-token JWT, pass through expired tokens (server-side `getSession()` handles refresh), redirect unauthenticated users to `/login?next=…` (appends original path), block `/admin/*` for non-admin roles.
     - **Frontend:**
         - [x] **`SessionProvider`:** Create in `src/providers/` - React Context with `useSession()` hook. Hydrate from `layout.tsx` via server-side `getSession()`. Add to root layout.
-        - [ ] **`nav.tsx`:** Update with auth-aware rendering - guest links (Login, Register) vs. authenticated (Profile, Settings, Logout) vs. admin (Admin) using `useSession()`. Populate user menu `Sheet` with authenticated links.
-        - [ ] **Auth forms:** Build `LoginForm` (reads and validates `?next=` param - must start with `/` - passes to login action for post-login redirect), `RegisterForm`, `ForgotPasswordForm`, `ResetPasswordForm`, `VerifyEmailPrompt`. Use `useActionState` for pending/error states.
-        - [ ] **Auth hooks:** `useLogout` `useResetPassword` in `src/features/auth/hooks/`.
-- [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `auth`).
-
-###### Feature: User Management (Days 13-15)
-
-- [ ] **Preparation:** Do pre-development checks before starting work.
-- **Development:**
-    - **Validation and Contracts:**
-        - [ ] Create Zod validation schemas (`updateProfileSchema`, `updateEmailSchema`, `updateUsernameSchema`, `updatePasswordSchema`, `deleteAccountSchema`) in `src/features/user/contracts.ts`.
-        - [ ] Define response-shaping TypeScript types (`PublicUser`) as field projections for output filtering.
-    - **Services:**
-        - [ ] **`UserService`:** Profile CRUD (public vs. private field filtering via `FrontendUser`/`PublicUser` types), public ID generation via `nanoid`, email change, username change, password change, account deletion. Enforce resource ownership.
-            - Set `username` as `display_name`?
-        - [ ] **`RoleService`:** Handle user role retrieval and assignments, encapsulating authorisation queries.
-    - **API Routes and Server Actions:**
-        - Implement user endpoints (dual-channel). All routes require authentication via `{ auth: true }`:
-        - [ ] 🔒 `GET /api/user/profile` - Authenticated user's full profile.
-        - [ ] 🔒 `PATCH /api/user/profile` - Update display name, bio, etc.
-        - [ ] 🔒 `PATCH /api/user/email` - Initiate email change (triggers verification).
-        - [ ] 🔒 `PATCH /api/user/username` - Change username.
-        - [ ] 🔒 `PATCH /api/user/password` - Change password (requires current password).
-        - [ ] 🔒 `DELETE /api/user` - Self-serve account deletion (requires current password).
-        - [ ] 🔒 `GET /api/users/:username` - Public profile (authenticated users only, strictly public fields, respects profile visibility settings).
-    - **Frontend:**
-        - [ ] **`UserProfile`:** Public profile page at `/profile/[username]`.
-        - [ ] **`SettingsPage`:** Settings shell with `Tabs` component (Profile tab, Account tab).
-        - [ ] **`ProfileTab`:** Display name and bio form with save + success toast.
-        - [ ] **`AccountTab`:** Display current values with Change buttons, inline edit forms (`EditEmailForm`, `EditUsernameForm`, `EditPasswordForm`), and `DeleteAccountSection`.
-        - [ ] **User hooks:** `useGetProfile`, `useUpdateProfile`, `useUpdateEmail`, `useUpdateUsername`, `useUpdatePassword`, `useDeleteAccount`, `useGetPublicProfile` in `src/features/user/hooks/`.
-- [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `user`).
-    - [ ] Enable email authentication for default client.
-    - [ ] Remove debug logs.
+        - [x] ~~**`nav.tsx`:** Auth-aware rendering.~~
+        - [x] **`LoginForm`:** Reads and validates `?next=` param (must start with `/`), passes to login action for post-login redirect, `useActionState` for pending/error states.
+- [x] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `auth`).
 
 ###### Feature: Admin Dashboard (Days 15-16) 🟢
 
-- [ ] **Preparation:** Do pre-development checks before starting work.
+- [x] **Preparation:** Do pre-development checks before starting work.
 - **Development:**
     - **Validation and Contracts:**
         - [x] Create Zod validation schemas (`listUsersQuerySchema`, `updateUserStatusSchema`) in `src/features/admin/contracts.ts`. Export inferred TypeScript types from schemas (e.g., `ListUsersQuery`, `UpdateUserStatusRequest`) for type-safe request handling.
@@ -263,8 +228,8 @@
         - [x] 🔒 `DELETE /api/admin/users/:id` - Delete a user account.
     - **Frontend:**
         - [x] **Admin hooks:** `useAdminUsers` (for list/pagination), `useUpdateUserStatus`, `useDeleteUser` in `src/features/admin/hooks/`.
-            - [ ] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog). Use URL search params (`useSearchParams` + `router.push`) for pagination state so page survives refresh and back/forward navigation.
-- [ ] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `admin`).
+		- [x] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog). Use URL search params (`useSearchParams` + `router.push`) for pagination state so page survives refresh and back/forward navigation.
+- [x] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `admin`).
 
 ---
 
@@ -276,10 +241,11 @@ _Out of scope for this project._
 
 #### 5. Documentation (Day 17)
 
-- [ ] **Project Readme:** Finalise `README.md` from initial draft.
-- [ ] **API Documentation:** Finalise `api.md` (and `api_de.md`) documenting all public endpoints, request/response schemas, authentication requirements, and example usage - share with classmate consuming the API.
-- [ ] **Code quality:** Add JSDoc/DocBlocks and helpful inline comments to complex functions and components (where missing).
-- [ ] **Presentation:** Prepare project presentation.
+- [x] **Project Readme:** Finalise `README.md` from initial draft.
+- [x] **To-do and notes:** Update `TODO.md` and `NOTES.md` to reflect final project MVP status.
+- [x] **API Documentation:** Finalise `api.md` (and `api_de.md`) documenting all public endpoints, request/response schemas, authentication requirements, and example usage - share with classmate consuming the API.
+- [x] **Code quality:** Add JSDoc/DocBlocks and helpful inline comments to complex functions and components (where missing).
+- [x] **Presentation:** Prepare project presentation.
 
 ---
 

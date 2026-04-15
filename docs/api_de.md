@@ -109,6 +109,7 @@ Globaler Hinweis zu Response-Bodies:
 - `ACCOUNT_SUSPENDED` (403)
 - `EMAIL_EXISTS` (409)
 - `USERNAME_EXISTS` (409)
+- `NOT_FOUND` (404)
 - `NOT_IMPLEMENTED` (501)
 - `INTERNAL` (500)
 
@@ -126,13 +127,13 @@ Eine einzige Quelle (Header) verhindert Abweichungen und Unklarheiten.
 
 Für den First-Party-Webflow kann das serverseitig erledigt werden, ohne direkte Browser-Formulare dafür zu nutzen.
 
-## 5. Endpunkt-Entwürfe
+## 5. Endpunkte
 
 ## 5.1 POST `/api/auth/register`
 
 Erstellt User + Credentials, Status startet normalerweise mit `pending`, und versendet eine Verifizierungs-E-Mail.
 
-Request-Body (Entwurf):
+Request-Body:
 
 ```json
 {
@@ -192,7 +193,7 @@ Mögliche Fehler:
 
 Authentifiziert den User und startet eine Session.
 
-Request-Body (Entwurf):
+Request-Body:
 
 ```json
 {
@@ -332,7 +333,7 @@ Zweck:
 - erstellt/erneuert einen Verifizierungs-Token (`type = email_verification`)
 - sendet die Verifizierungs-E-Mail
 
-Typischer Request-Body (Entwurf):
+Typischer Request-Body:
 
 ```json
 {
@@ -375,7 +376,7 @@ Zweck:
 - setzt `users.email_verified_at`
 - wechselt Status von `pending` auf `active` (falls zutreffend)
 
-Request-Body (Entwurf):
+Request-Body:
 
 ```json
 {
@@ -426,7 +427,7 @@ Zweck:
 - erstellt einen Passwort-Reset-Token (`type = password_reset`)
 - sendet die Reset-E-Mail
 
-Request-Body (Entwurf):
+Request-Body:
 
 ```json
 {
@@ -469,7 +470,7 @@ Zweck:
 - setzt neuen Passwort-Hash
 - invalidiert alte Sessions
 
-Request-Body (Entwurf):
+Request-Body:
 
 ```json
 {
@@ -616,24 +617,24 @@ const resetData = await resetRes.json();
 console.log(resetData);
 ```
 
-### Refresh = await fetch("http://localhost:3000/api/auth/refresh", {
+### Refresh
 
-    method: "POST",
-    headers: {
-    	"Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-    	refreshToken: "opaque_refresh_token",
-    }),
-
+```ts
+const refreshRes = await fetch("http://localhost:3000/api/auth/refresh", {
+	method: "POST",
+	headers: {
+		"Content-Type": "application/json",
+	},
+	body: JSON.stringify({
+		refreshToken: "opaque_refresh_token",
+	}),
 });
 
 const refreshData = await refreshRes.json();
 console.log(refreshData);
+```
 
-````
-
-### Logout (`204 No Content`)
+### Logout (`200 OK`)
 
 ```ts
 const logoutRes = await fetch("http://localhost:3000/api/auth/logout", {
@@ -643,7 +644,7 @@ const logoutRes = await fetch("http://localhost:3000/api/auth/logout", {
 if (logoutRes.status === 200) {
 	console.log("Logged out successfully");
 }
-````
+```
 
 ## 7. Routenübersicht
 

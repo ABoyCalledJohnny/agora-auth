@@ -104,6 +104,8 @@ Mindest-Setup für die lokale Entwicklung:
 
 ```bash
 bun install
+cp .env.local.example .env.local      # dann mit echten Werten befüllen (JWT-Schlüssel, SMTP, Admin-Zugangsdaten)
+cp .env.tunnel.example .env.tunnel    # nur nötig für Produktions-DB-Zugriff über SSH-Tunnel
 bun run docker:up
 bun run dev
 ```
@@ -273,11 +275,21 @@ Die API-Dokumentation ist im Verzeichnis `docs/` zu finden:
 - [API-Dokumentation (EN)](docs/api.md)
 - [API-Dokumentation (DE)](docs/api_de.md)
 
-- Rate Limiting
-- MFA
+**Ideen für zukünftige Weiterentwicklung:**
+
+- Sicherheit
+    - Rate Limiting
+    - MFA
+    - Bot-Schutz
 - Mobile-Support
     - Tabelle
-- Nutzer-Profile und -Einstellungen, Selbstverwaltung
+- Nutzer-Verwaltung
+    - Profile
+    - Einstellungen
+    - Nutzerübersicht
+- Admin-Funktionalität erweitern
+    - Tabelle filtern
+    - Nutzer anlegen, bearbeiten
 
 ---
 
