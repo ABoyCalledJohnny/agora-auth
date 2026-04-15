@@ -10,14 +10,14 @@
 > [!NOTE]
 > The frontend is currently not optimised for smaller screens and is best viewed on desktop.
 
-A full-stack authentication and user management system built as a final project ("Abschlussprojekt") for a web development program, using Next.js, Drizzle ORM, and PostgreSQL.
-
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="src/assets/agora-logo-dark.svg" />
     <img src="src/assets/agora-logo.svg" alt="Agora Auth Logo" width="400" />
   </picture>
 </p>
+
+A full-stack authentication and user management system built as a final project ("Abschlussprojekt") for a web development program, using Next.js, Drizzle ORM, and PostgreSQL.
 
 ## Table of Contents
 
