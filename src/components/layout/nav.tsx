@@ -7,7 +7,7 @@ export async function Nav() {
   const t = await getTranslations("Nav");
 
   return (
-    <nav className="flex items-center gap-3">
+    <nav className="order-last flex w-full justify-center gap-3 md:order-0 md:w-auto">
       {navRoutes.map((route) => (
         <Link
           key={route.href}
