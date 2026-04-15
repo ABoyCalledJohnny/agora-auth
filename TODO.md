@@ -228,7 +228,7 @@
         - [x] 🔒 `DELETE /api/admin/users/:id` - Delete a user account.
     - **Frontend:**
         - [x] **Admin hooks:** `useAdminUsers` (for list/pagination), `useUpdateUserStatus`, `useDeleteUser` in `src/features/admin/hooks/`.
-		- [x] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog). Use URL search params (`useSearchParams` + `router.push`) for pagination state so page survives refresh and back/forward navigation.
+        - [x] **`AdminUserTable`:** Paginated table of all users with quick actions (suspend/activate, delete). Built with `DataTable` + `Pagination` primitives. Table uses `overflow-x-auto` for horizontal scroll on mobile (full responsive layout deferred to backlog). Use URL search params (`useSearchParams` + `router.push`) for pagination state so page survives refresh and back/forward navigation.
 - [x] **Finalisation and Release:** Do cleanup and preflight checks, update documentation, and release new repository version (milestone: `admin`).
 
 ---
