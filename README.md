@@ -279,6 +279,8 @@ API documentation can be found in the `docs/` directory:
     - Rate Limiting
     - MFA
     - Bot Protection
+- Authentication
+    - Fully implement forgot password and email confirmation
 - Mobile Support
     - Tables
 - User Management

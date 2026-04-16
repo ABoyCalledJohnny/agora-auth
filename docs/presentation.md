@@ -5,10 +5,11 @@
 > **Format:** Kein PowerPoint. Live-Walkthrough durch Doku, Code, ERD, Pipeline und App.
 > **Vorbereitung:**
 >
-> - Datenbank zurücksetzen, GitHub-Bild integrieren
-> - Tabs und Fenster vorbereiten
-> - Zoom anpassen
-> - Tab und Code Ralf
+> - [x] Dev-Server starten
+> - [x] Datenbank zurücksetzen, GitHub-Bild integrieren
+> - [x] Tabs und Fenster vorbereiten
+> - [x] Zoom anpassen
+> - [ ] Tab und Code Ralf
 
 ## Ablauf
 
@@ -134,6 +135,7 @@
     - _Dieselbe Logik als Server Action (für eigenes Frontend) UND als REST API (für externe Clients)_
     - _Andere Features und Routen funktionieren ähnlich._
     - _Route im Code nachzeichnen:_
+        - _Auch hier Ordnung nach Features_
         - _Validierung zeigen_
         - _Route zeigen_
         - _Service zeigen_
@@ -142,7 +144,7 @@
     - _Falsche Daten (Nutzer existiert schon, keine E-Mail, Passwortregeln)_
     - _Neuen Nutzer anlegen, zeige ich gleich im Frontend._
 - _Nicht zu viel Backend zeigen, aber das ist vielleicht noch interessant: _`messages/en.json` + `i18n.ts` → Internationalisierung via `next-intl`, alle UI-Texte in JSON, Deutsch + Englisch\*
-    - _Mit KI super einfach möglich, neue Sprachen anzulegen. _
+    - _Mit KI super einfach möglich, neue Sprachen anzulegen._
 
 > [!IMPORTANT] Zeitrahmen
 >
@@ -164,7 +166,7 @@
 
 1. Landing Page
 2. Login
-3. Wechsel auf `localhost`, `.env.development` zeigen
+3. Wechsel auf `localhost`, `.env.development` zeigen, _will jetzt nicht die Testaccounts bearbeiten_
 4. Admin-Dashboard
     - Neuen Nutzer zeigen
     - Nutzer verwalten
@@ -191,7 +193,7 @@
 **Zeigen:**
 
 1. "Deployment" in `README.md`
-2. GitHub Action Tab
+2. GitHub Action Tab -> in drei Schichten kurz reinklicken
 
 **Anmerkungen:**
 
@@ -213,6 +215,7 @@
 **Anmerkungen:**
 
 - _Habt ihr noch Fragen?_
+- _Bei Ralf, DCI und Teilnehmer:innen bedanken_
 
 > [!IMPORTANT] Zeitrahmen
 >

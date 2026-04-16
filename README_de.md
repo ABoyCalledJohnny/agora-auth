@@ -281,6 +281,8 @@ Die API-Dokumentation ist im Verzeichnis `docs/` zu finden:
     - Rate Limiting
     - MFA
     - Bot-Schutz
+- Authentifizierung
+    - Passwort-Vergessen und E-Mail-Bestätigung vollständig implementieren
 - Mobile-Support
     - Tabelle
 - Nutzer-Verwaltung
