@@ -9,7 +9,7 @@
 > - [x] Datenbank zurücksetzen, GitHub-Bild integrieren
 > - [x] Tabs und Fenster vorbereiten
 > - [x] Zoom anpassen
-> - [ ] Tab und Code Ralf
+> - [x] Tab und Code Ralf
 
 ## Ablauf
 
@@ -32,8 +32,9 @@
 > **Zeit stoppen!**
 
 - _Freut mich, dass so viele gekommen sind._
-- _Bin tatsächlich etwas angespannt. Seht es mir nach..._
+- _Bin tatsächlich etwas nervös. Seht es mir nach..._
 - _Will gar keine weitere Zeit verlieren, Zeit ist knapp._
+- _Wenn Fragen sind, ihr nicht mehr hinterherkommt, gerne bescheid geben..._
 
 ## 1. Projektvorstellung + MVP
 
@@ -42,7 +43,12 @@
 
 **Anmerkungen:**
 
+- _Wir haben in der Fortbildung immer wieder mit Authentifizierung und Nutzereingaben gearbeitet, aber..._
+- _Da rein, wo es wehtut..._
+
+- _MVP nicht vergessen_
 - _Backend-Projekt: Augenmerk auf Backend-Funktionalität, CI/CD Pipeline und App-Infrastruktur_
+- _Hoffe, es wird trotzdem nicht zu langweilig_
 - _Alleine gearbeitet, aber: Bezug auf Ralf_
 - _Zweigleisig_
 
@@ -105,10 +111,18 @@
 
 **Anmerkungen:**
 
+- _Hab überall Zoom an, sagt bescheid, wenn es trotzdem zu klein ist._
+
+ERD:
+
 - _Credentials absichtlich in separater Tabelle (Passwort-Hash nie versehentlich in Queries/Responses)_
-- _`public_id` (nanoid) vs. `id` (UUID) - externe API gibt nie die echte DB-ID raus_
+- _`public_id` (`nanoid`) vs. `id` (UUID) - externe API gibt nie die echte DB-ID raus_
 - _Sessions DB-backed + Refresh Token Rotation_
 - _`api_clients` für externen Zugriff (Klassenkamerad nutzt die API)_
+
+Schema:
+
+- _Lasst euch von der Wand aus Code nicht erschlagen..._
 - _TS-Typen werden aus Drizzle-Schemas abgeleitet._
 
 > [!IMPORTANT] Zeitrahmen
@@ -129,9 +143,9 @@
 
 **Anmerkungen:**
 
-- _Allgemeine und feature-driven Architektur erklären: `src/features/auth/`, `src/features/user/`, `src/features/admin/`_
-- _Routen zeigen_
-- _Schichtenmodell zeigen: Route/Action → Service → Repository → DB_
+- _Allgemeine und feature-driven Architektur erklären: `src/features/auth/`, `src/features/user/`, `src/features/admin/` (`README.md`)_
+- _Routen zeigen (`docs/api_de.md`)_
+- _Schichtenmodell zeigen: Route/Action → Service → Repository → DB_ (`README.md`)\_
     - _Dieselbe Logik als Server Action (für eigenes Frontend) UND als REST API (für externe Clients)_
     - _Andere Features und Routen funktionieren ähnlich._
     - _Route im Code nachzeichnen:_
@@ -143,7 +157,7 @@
 - _Mini Postman-Demo_
     - _Falsche Daten (Nutzer existiert schon, keine E-Mail, Passwortregeln)_
     - _Neuen Nutzer anlegen, zeige ich gleich im Frontend._
-- _Nicht zu viel Backend zeigen, aber das ist vielleicht noch interessant: _`messages/en.json` + `i18n.ts` → Internationalisierung via `next-intl`, alle UI-Texte in JSON, Deutsch + Englisch\*
+- _Nicht zu viel Backend zeigen, aber das ist vielleicht noch interessant: _`messages/en.json` + `i18n.ts` → Internationalisierung via `next-intl`, alle UI-Texte in JSON, Deutsch + Englisch\_
     - _Mit KI super einfach möglich, neue Sprachen anzulegen._
 
 > [!IMPORTANT] Zeitrahmen
@@ -166,7 +180,7 @@
 
 1. Landing Page
 2. Login
-3. Wechsel auf `localhost`, `.env.development` zeigen, _will jetzt nicht die Testaccounts bearbeiten_
+3. Wechsel auf `localhost`, `.env.development` zeigen: _Will jetzt nicht die Testaccounts bearbeiten_
 4. Admin-Dashboard
     - Neuen Nutzer zeigen
     - Nutzer verwalten
@@ -192,8 +206,8 @@
 
 **Zeigen:**
 
-1. "Deployment" in `README.md`
-2. GitHub Action Tab -> in drei Schichten kurz reinklicken
+1. "Deployment" (`README.md`)
+2. GitHub Action Tab -> In die drei Schichten kurz reinklicken.
 
 **Anmerkungen:**
 
@@ -215,7 +229,7 @@
 **Anmerkungen:**
 
 - _Habt ihr noch Fragen?_
-- _Bei Ralf, DCI und Teilnehmer:innen bedanken_
+- _Bei Ralf, DCI (Duygu, Luisa) und Teilnehmer:innen bedanken._
 
 > [!IMPORTANT] Zeitrahmen
 >
